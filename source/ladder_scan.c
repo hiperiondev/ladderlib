@@ -30,7 +30,7 @@
 
 #include "ladder.h"
 #include "ladder_internals.h"
-#include "ladder_logic_instructions.h"
+#include "ladder_instructions.h"
 
 void ladder_scan_plc(plc_ctx_t *plc_ctx, ladder_network_t networks[]) {
     typedef void (*ladder_logic)(plc_ctx_t *plc_ctx, int c, int r, int f);
