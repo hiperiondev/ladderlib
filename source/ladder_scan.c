@@ -72,12 +72,13 @@ static ladder_logic const fn_ladder[] = {
 
 void ladder_scan(ladder_ctx_t *ladder_ctx) {
     ladder_ins_err_t ins_err;
+    uint32_t f;
 
     for (uint32_t network = 0; network < (*ladder_ctx).ladder.total_networks; network++) {
         (*ladder_ctx).exec_network = (*ladder_ctx).network[network];
 
         // resets dynamic flags before to start each network
-        for (uint32_t f = 0; f < NET_COLUMNS - 1; f++) {
+        for (f = 0; f < NET_COLUMNS - 1; f++) {
             (*ladder_ctx).internals.ladder_network_flags[f] = 0;
         }
 
@@ -151,10 +152,7 @@ void ladder_scan(ladder_ctx_t *ladder_ctx) {
         }
 
         // external function (ex. entry for edition or events)
-        if ((*ladder_ctx).io.external_on_scan != NULL && (*ladder_ctx).io.external_on_scan(ladder_ctx)) {
-            for (uint32_t ff = 0; ff < NET_COLUMNS - 1; ff++) {
-                (*ladder_ctx).internals.ladder_network_flags_online[ff] = 0;
-            }
-        }
+        if ((*ladder_ctx).io.external_on_scan != NULL)
+            (*ladder_ctx).io.external_on_scan(ladder_ctx);
     }
 }

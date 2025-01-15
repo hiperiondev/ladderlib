@@ -357,11 +357,10 @@ typedef struct ladder_registers_s {
  *
  */
 typedef struct ladder_internals_s {
-         uint16_t flags_mask[NET_ROWS];                         /**< */
-         uint16_t ladder_network_flags[NET_COLUMNS - 1];        /**< */
-         uint32_t ladder_actual_scan_time;                      /**< */
-         uint32_t ladder_start_time;                            /**< */
-         uint16_t ladder_network_flags_online[NET_COLUMNS - 1]; /**< */
+         uint16_t flags_mask[NET_ROWS];                  /**< */
+         uint16_t ladder_network_flags[NET_COLUMNS - 1]; /**< */
+         uint32_t ladder_actual_scan_time;               /**< */
+         uint32_t ladder_start_time;                     /**< */
 } ladder_internals_t;
 
 /**

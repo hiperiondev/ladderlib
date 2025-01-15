@@ -190,18 +190,21 @@ ladder_ins_err_t execTON(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row
         (*ladder_ctx).memory.Tr[(*ladder_ctx).exec_network.cells[row][column].data] = 0;
         (*ladder_ctx).memory.Td[(*ladder_ctx).exec_network.cells[row][column].data] = 0;
     }
+
     // timer is activated in this scan, set timer running flag and snapshot the timestamp
     if (flag && !(*ladder_ctx).memory.Td[(*ladder_ctx).exec_network.cells[row][column].data]
             && !(*ladder_ctx).memory.Tr[(*ladder_ctx).exec_network.cells[row][column].data]) {
         (*ladder_ctx).memory.Tr[(*ladder_ctx).exec_network.cells[row][column].data] = 1;
         (*ladder_ctx).timers[(*ladder_ctx).exec_network.cells[row][column].data].time_stamp = ((*ladder_ctx).io.micros() / 1000);
     }
+
     // timer is running, update acc value
     if ((*ladder_ctx).memory.Tr[(*ladder_ctx).exec_network.cells[row][column].data]) {
         (*ladder_ctx).timers[(*ladder_ctx).exec_network.cells[row][column].data].acc =
                 (uint16_t) ((((*ladder_ctx).io.micros() / 1000) - (*ladder_ctx).timers[(*ladder_ctx).exec_network.cells[row][column].data].time_stamp)
                         / (*ladder_ctx).exec_network.cells[row + 1][column].type);
     }
+
     // timer done --> activate timer done flag and set acc value to his set point
     if ((*ladder_ctx).memory.Tr[(*ladder_ctx).exec_network.cells[row][column].data]
             && ((((*ladder_ctx).io.micros() / 1000) - (*ladder_ctx).timers[(*ladder_ctx).exec_network.cells[row][column].data].time_stamp)
@@ -210,10 +213,12 @@ ladder_ins_err_t execTON(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row
         (*ladder_ctx).memory.Td[(*ladder_ctx).exec_network.cells[row][column].data] = 1;
         (*ladder_ctx).timers[(*ladder_ctx).exec_network.cells[row][column].data].acc = (*ladder_ctx).exec_network.cells[row + 1][column].data;
     }
+
     // copy timer flags to dynamic flags on network
     if ((*ladder_ctx).memory.Td[(*ladder_ctx).exec_network.cells[row][column].data]) {
         (*ladder_ctx).internals.ladder_network_flags[column] = (*ladder_ctx).internals.ladder_network_flags[column] | (*ladder_ctx).internals.flags_mask[row];
     }
+
     if ((*ladder_ctx).memory.Tr[(*ladder_ctx).exec_network.cells[row][column].data]) {
         (*ladder_ctx).internals.ladder_network_flags[column] = (*ladder_ctx).internals.ladder_network_flags[column]
                 | (*ladder_ctx).internals.flags_mask[row + 1];
@@ -228,22 +233,26 @@ ladder_ins_err_t execTOFF(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t ro
             && !(*ladder_ctx).memory.Tr[(*ladder_ctx).exec_network.cells[row][column].data]) {
         (*ladder_ctx).memory.Td[(*ladder_ctx).exec_network.cells[row][column].data] = 1;
     }
+
     // timer reactivated while running --> reset
     if (flag && (*ladder_ctx).memory.Tr[(*ladder_ctx).exec_network.cells[row][column].data]) {
         (*ladder_ctx).memory.Tr[(*ladder_ctx).exec_network.cells[row][column].data] = 0;
     }
+
     // timer is activated in this scan, set timer running flag and snapshot the timestamp
     if (!flag && (*ladder_ctx).memory.Td[(*ladder_ctx).exec_network.cells[row][column].data]
             && !(*ladder_ctx).memory.Tr[(*ladder_ctx).exec_network.cells[row][column].data]) {
         (*ladder_ctx).memory.Tr[(*ladder_ctx).exec_network.cells[row][column].data] = 1;
         (*ladder_ctx).timers[(*ladder_ctx).exec_network.cells[row][column].data].time_stamp = ((*ladder_ctx).io.micros() / 1000);
     }
+
     // timer is running, update acc value
     if ((*ladder_ctx).memory.Tr[(*ladder_ctx).exec_network.cells[row][column].data]) {
         (*ladder_ctx).timers[(*ladder_ctx).exec_network.cells[row][column].data].acc =
                 (uint16_t) ((((*ladder_ctx).io.micros() / 1000) - (*ladder_ctx).timers[(*ladder_ctx).exec_network.cells[row][column].data].time_stamp)
                         / (*ladder_ctx).exec_network.cells[row + 1][column].type);
     }
+
     // timer done --> activate timer done flag and set acc value to his set point
     if ((*ladder_ctx).memory.Tr[(*ladder_ctx).exec_network.cells[row][column].data]
             && ((((*ladder_ctx).io.micros() / 1000) - (*ladder_ctx).timers[(*ladder_ctx).exec_network.cells[row][column].data].time_stamp)
@@ -252,10 +261,12 @@ ladder_ins_err_t execTOFF(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t ro
         (*ladder_ctx).memory.Td[(*ladder_ctx).exec_network.cells[row][column].data] = 0;
         (*ladder_ctx).timers[(*ladder_ctx).exec_network.cells[row][column].data].acc = (*ladder_ctx).exec_network.cells[row + 1][column].data;
     }
+
     // copy timer flags to dynamic flags on network
     if ((*ladder_ctx).memory.Td[(*ladder_ctx).exec_network.cells[row][column].data]) {
         (*ladder_ctx).internals.ladder_network_flags[column] = (*ladder_ctx).internals.ladder_network_flags[column] | (*ladder_ctx).internals.flags_mask[row];
     }
+
     if ((*ladder_ctx).memory.Tr[(*ladder_ctx).exec_network.cells[row][column].data]) {
         (*ladder_ctx).internals.ladder_network_flags[column] = (*ladder_ctx).internals.ladder_network_flags[column]
                 | (*ladder_ctx).internals.flags_mask[row + 1];
@@ -272,17 +283,20 @@ ladder_ins_err_t execTP(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row,
         (*ladder_ctx).memory.Tr[(*ladder_ctx).exec_network.cells[row][column].data] = 1;
         (*ladder_ctx).timers[(*ladder_ctx).exec_network.cells[row][column].data].time_stamp = ((*ladder_ctx).io.micros() / 1000);
     }
+
     // reset timer running when input goes false to avoid continuously running the timer if input stays true
     if (!flag && !(*ladder_ctx).memory.Td[(*ladder_ctx).exec_network.cells[row][column].data]
             && (*ladder_ctx).memory.Tr[(*ladder_ctx).exec_network.cells[row][column].data]) {
         (*ladder_ctx).memory.Tr[(*ladder_ctx).exec_network.cells[row][column].data] = 0;
     }
+
     // timer is running, update acc value
     if ((*ladder_ctx).memory.Td[(*ladder_ctx).exec_network.cells[row][column].data]) {
         (*ladder_ctx).timers[(*ladder_ctx).exec_network.cells[row][column].data].acc =
                 (uint16_t) ((((*ladder_ctx).io.micros() / 1000) - (*ladder_ctx).timers[(*ladder_ctx).exec_network.cells[row][column].data].time_stamp)
                         / (*ladder_ctx).exec_network.cells[row + 1][column].type);
     }
+
     // timer done --> activate timer done flag and set acc value to his setpoint
     if ((*ladder_ctx).memory.Td[(*ladder_ctx).exec_network.cells[row][column].data]
             && ((((*ladder_ctx).io.micros() / 1000) - (*ladder_ctx).timers[(*ladder_ctx).exec_network.cells[row][column].data].time_stamp)
@@ -290,10 +304,12 @@ ladder_ins_err_t execTP(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row,
         (*ladder_ctx).memory.Td[(*ladder_ctx).exec_network.cells[row][column].data] = 0;
         (*ladder_ctx).timers[(*ladder_ctx).exec_network.cells[row][column].data].acc = (*ladder_ctx).exec_network.cells[row + 1][column].data;
     }
+
     // copy timer flags to dynamic flags on network
     if ((*ladder_ctx).memory.Td[(*ladder_ctx).exec_network.cells[row][column].data]) {
         (*ladder_ctx).internals.ladder_network_flags[column] = (*ladder_ctx).internals.ladder_network_flags[column] | (*ladder_ctx).internals.flags_mask[row];
     }
+
     if ((*ladder_ctx).memory.Tr[(*ladder_ctx).exec_network.cells[row][column].data]) {
         (*ladder_ctx).internals.ladder_network_flags[column] = (*ladder_ctx).internals.ladder_network_flags[column]
                 | (*ladder_ctx).internals.flags_mask[row + 1];
@@ -317,24 +333,29 @@ ladder_ins_err_t execCTU(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row
             (*ladder_ctx).memory.Cr[(*ladder_ctx).exec_network.cells[row][column].data] = 0;
         }
     }
+
     // counter is activated in this scan, change count
     if (flag && !(*ladder_ctx).memory.Cr[(*ladder_ctx).exec_network.cells[row][column].data]
             && !(*ladder_ctx).memory.Cd[(*ladder_ctx).exec_network.cells[row][column].data]) {
         (*ladder_ctx).memory.Cr[(*ladder_ctx).exec_network.cells[row][column].data] = 1;
         (*ladder_ctx).registers.C[(*ladder_ctx).exec_network.cells[row][column].data]++;
     }
+
     // reset counter edge detection
     if (!flag) {
         (*ladder_ctx).memory.Cr[(*ladder_ctx).exec_network.cells[row][column].data] = 0;
     }
+
     // counter done
     if ((*ladder_ctx).registers.C[(*ladder_ctx).exec_network.cells[row][column].data] >= (*ladder_ctx).exec_network.cells[row + 1][column].data) {
         (*ladder_ctx).memory.Cd[(*ladder_ctx).exec_network.cells[row][column].data] = 1;
     }
+
     // copy counter flags to dynamic flags on network
     if ((*ladder_ctx).memory.Cd[(*ladder_ctx).exec_network.cells[row][column].data] && flag) {
         (*ladder_ctx).internals.ladder_network_flags[column] = (*ladder_ctx).internals.ladder_network_flags[column] | (*ladder_ctx).internals.flags_mask[row];
     }
+
     if ((*ladder_ctx).memory.Cr[(*ladder_ctx).exec_network.cells[row][column].data] && flag) {
         (*ladder_ctx).internals.ladder_network_flags[column] = (*ladder_ctx).internals.ladder_network_flags[column]
                 | (*ladder_ctx).internals.flags_mask[row + 1];
@@ -358,24 +379,29 @@ ladder_ins_err_t execCTD(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row
             (*ladder_ctx).memory.Cr[(*ladder_ctx).exec_network.cells[row][column].data] = 0;
         }
     }
+
     // counter is activated in this scan, change count
     if (flag && !(*ladder_ctx).memory.Cr[(*ladder_ctx).exec_network.cells[row][column].data]
             && !(*ladder_ctx).memory.Cd[(*ladder_ctx).exec_network.cells[row][column].data]) {
         (*ladder_ctx).memory.Cr[(*ladder_ctx).exec_network.cells[row][column].data] = 1;
         (*ladder_ctx).registers.C[(*ladder_ctx).exec_network.cells[row][column].data]--;
     }
+
     // reset counter edge detection
     if (!flag) {
         (*ladder_ctx).memory.Cr[(*ladder_ctx).exec_network.cells[row][column].data] = 0;
     }
+
     // counter done
     if ((*ladder_ctx).registers.C[(*ladder_ctx).exec_network.cells[row][column].data] == 0) {
         (*ladder_ctx).memory.Cd[(*ladder_ctx).exec_network.cells[row][column].data] = 1;
     }
+
     // copy counter flags to dynamic flags on network
     if ((*ladder_ctx).memory.Cd[(*ladder_ctx).exec_network.cells[row][column].data] && flag) {
         (*ladder_ctx).internals.ladder_network_flags[column] = (*ladder_ctx).internals.ladder_network_flags[column] | (*ladder_ctx).internals.flags_mask[row];
     }
+
     if ((*ladder_ctx).memory.Cr[(*ladder_ctx).exec_network.cells[row][column].data] && flag) {
         (*ladder_ctx).internals.ladder_network_flags[column] = (*ladder_ctx).internals.ladder_network_flags[column]
                 | (*ladder_ctx).internals.flags_mask[row + 1];
