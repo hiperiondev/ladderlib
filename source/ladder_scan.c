@@ -91,24 +91,35 @@ void ladder_scan(ladder_ctx_t *ladder_ctx) {
                         (*ladder_ctx).exec_network.cells[row][column].code & LADDER_INS_CELL_CODE_MASK,
                         ((*ladder_ctx).exec_network.cells[row][column].code & LADDER_INS_CELL_CODE_MASK) > 34 ?
                                 "???" : fn_str[(*ladder_ctx).exec_network.cells[row][column].code & LADDER_INS_CELL_CODE_MASK]);
-                printf("   -             Data: %u\n", (*ladder_ctx).exec_network.cells[row][column].data);
                 printf("   -             Type: %s (%u)\n",
                         ladder_type_str[(
                                 (*ladder_ctx).exec_network.cells[row][column].type >= LADDER_TYPE_INV ?
                                         LADDER_TYPE_INV : (*ladder_ctx).exec_network.cells[row][column].type)],
                         (*ladder_ctx).exec_network.cells[row][column].type);
+                printf("   -             Data: %u\n", (*ladder_ctx).exec_network.cells[row][column].data);
+
                 printf("-------------------------------------\n");
 #endif
+
+                (*ladder_ctx).ladder.last_instr = (*ladder_ctx).exec_network.cells[row][column].code;
+                (*ladder_ctx).ladder.last_instr_err = ins_err;
+                (*ladder_ctx).ladder.last_instr_network = network;
+                (*ladder_ctx).ladder.last_instr_cell[0] = row;
+                (*ladder_ctx).ladder.last_instr_cell[1] = column;
+
                 // evaluation for an invalid code if the cell is not part of an instruction that uses more than one cell
                 // plc to error state and serial log else, do not process, it was processed before
                 if ((*ladder_ctx).exec_network.cells[row][column].code >= LADDER_INS_INV) {
                     if (((*ladder_ctx).exec_network.cells[row][column].code & LADDER_INS_CELL_CODE_MASK) >= LADDER_INS_INV) {
+#ifdef DEBUG
                         printf("TASK LADDER INSTRUCTION CODE INVALID: \n");
                         printf("   - Network: %d\n", network);
                         printf("   - Code: %u\n", (*ladder_ctx).exec_network.cells[row][column].code);
-                        printf("   - Data: %u\n", (*ladder_ctx).exec_network.cells[row][column].data);
                         printf("   - Type: %u\n", (*ladder_ctx).exec_network.cells[row][column].type);
+                        printf("   - Data: %u\n", (*ladder_ctx).exec_network.cells[row][column].data);
+#endif
                         (*ladder_ctx).ladder.state = LADDER_ST_INV;
+                        return;
                     }
                     (*ladder_ctx).exec_network.cells[row][column].code = 0;
                 }
@@ -125,13 +136,6 @@ void ladder_scan(ladder_ctx_t *ladder_ctx) {
                         ins_err = fn_ladder[(*ladder_ctx).exec_network.cells[row][column].code](ladder_ctx, column, row,
                                 ((*ladder_ctx).internals.ladder_network_flags[column - 1] & (*ladder_ctx).internals.flags_mask[row]));
                     }
-
-                    (*ladder_ctx).ladder.last_instr = (*ladder_ctx).exec_network.cells[row][column].code;
-                    (*ladder_ctx).ladder.last_instr_err = ins_err;
-                    (*ladder_ctx).ladder.last_instr_network = network;
-                    (*ladder_ctx).ladder.last_instr_cell[0] = row;
-                    (*ladder_ctx).ladder.last_instr_cell[1] = column;
-
 
                     if (ins_err != LADDER_INS_ERR_OK) {
                         (*ladder_ctx).ladder.state = LADDER_ST_INV;
