@@ -1,0 +1,88 @@
+/*
+ * Copyright 2025 Emiliano Gonzalez (egonzalez . hiperion @ gmail . com))
+ * * Project Site: https://github.com/hiperiondev/ladderlib *
+ *
+ * This is based on other projects:
+ *    PLsi (https://github.com/ElPercha/PLsi)
+ *
+ *    please contact their authors for more information.
+ *
+ * This is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3, or (at your option)
+ * any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this software; see the file COPYING.  If not, write to
+ * the Free Software Foundation, Inc., 51 Franklin Street,
+ * Boston, MA 02110-1301, USA.
+ *
+ */
+
+#include <stdbool.h>
+#include <stdint.h>
+#include <time.h>
+#include <errno.h>
+
+#include "ladder.h"
+#include "port_dummy.h"
+
+int dummy_delay(long msec) {
+    struct timespec ts;
+    int res;
+
+    if (msec < 0) {
+        errno = EINVAL;
+        return -1;
+    }
+
+    ts.tv_sec = msec / 1000;
+    ts.tv_nsec = (msec % 1000) * 1000000;
+
+    do {
+        res = nanosleep(&ts, &ts);
+    } while (res && errno == EINTR);
+
+    return res;
+}
+
+int32_t dummy_micros(void) {
+    struct timespec ts;
+
+    clock_gettime(CLOCK_MONOTONIC, &ts);
+
+    return (int32_t) (ts.tv_nsec * 1000);
+}
+
+void dummy_read_inputs_local(ladder_ctx_t *ladder_ctx) {
+
+}
+
+void dummy_write_outputs_local(ladder_ctx_t *ladder_ctx) {
+
+}
+
+void dummy_read_inputs_remote(ladder_ctx_t *ladder_ctx) {
+
+}
+
+void dummy_write_outputs_remote(ladder_ctx_t *ladder_ctx) {
+
+}
+
+bool dummy_external_on_scan(ladder_ctx_t *ladder_ctx) {
+    return false;
+}
+
+bool dummy_external_on_task(ladder_ctx_t *ladder_ctx) {
+    return false;
+}
+
+void dummy_panic(ladder_ctx_t *ladder_ctx) {
+
+}
