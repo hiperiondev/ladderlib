@@ -28,7 +28,7 @@
 
 #include "ladder.h"
 #include "ladder_internals.h"
-#include "ladder_utils.h"
+#include "ladder_print.h"
 #include "ladder_instructions.h"
 
 static const char *fn_str_graph[] = {
