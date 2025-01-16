@@ -103,14 +103,12 @@
 #define QTY_R 2000
 
 static void load_demo_1(ladder_ctx_t *ladder_ctx) {
-    //--------------------------------------------------
     // NETWORK 0
-    //--------------------------------------------------
     (*ladder_ctx).network[0].cells[0][0].code = LADDER_INS_NO;
     (*ladder_ctx).network[0].cells[0][0].data = 500;
     (*ladder_ctx).network[0].cells[0][0].type = LADDER_TYPE_M;
 
-    (*ladder_ctx).network[0].cells[0][1].code = LADDER_INS_COIL_;
+    (*ladder_ctx).network[0].cells[0][1].code = LADDER_INS_COIL;
     (*ladder_ctx).network[0].cells[0][1].data = 0;
     (*ladder_ctx).network[0].cells[0][1].type = LADDER_TYPE_Q;
 
@@ -118,7 +116,7 @@ static void load_demo_1(ladder_ctx_t *ladder_ctx) {
     (*ladder_ctx).network[0].cells[1][0].data = 501;
     (*ladder_ctx).network[0].cells[1][0].type = LADDER_TYPE_M;
 
-    (*ladder_ctx).network[0].cells[1][1].code = LADDER_INS_COIL_;
+    (*ladder_ctx).network[0].cells[1][1].code = LADDER_INS_COIL;
     (*ladder_ctx).network[0].cells[1][1].data = 1;
     (*ladder_ctx).network[0].cells[1][1].type = LADDER_TYPE_Q;
 
@@ -126,19 +124,16 @@ static void load_demo_1(ladder_ctx_t *ladder_ctx) {
     (*ladder_ctx).network[0].cells[2][0].data = 502;
     (*ladder_ctx).network[0].cells[2][0].type = LADDER_TYPE_M;
 
-    (*ladder_ctx).network[0].cells[2][1].code = LADDER_INS_COIL_;
+    (*ladder_ctx).network[0].cells[2][1].code = LADDER_INS_COIL;
     (*ladder_ctx).network[0].cells[2][1].data = 2;
     (*ladder_ctx).network[0].cells[2][1].type = LADDER_TYPE_Q;
 
-    //--------------------------------------------------
     // NETWORK 1
-    //--------------------------------------------------
-
     (*ladder_ctx).network[1].cells[0][0].code = LADDER_INS_NO;
     (*ladder_ctx).network[1].cells[0][0].data = 503;
     (*ladder_ctx).network[1].cells[0][0].type = LADDER_TYPE_M;
 
-    (*ladder_ctx).network[1].cells[0][1].code = LADDER_INS_COIL_;
+    (*ladder_ctx).network[1].cells[0][1].code = LADDER_INS_COIL;
     (*ladder_ctx).network[1].cells[0][1].data = 3;
     (*ladder_ctx).network[1].cells[0][1].type = LADDER_TYPE_Q;
 
@@ -146,7 +141,7 @@ static void load_demo_1(ladder_ctx_t *ladder_ctx) {
     (*ladder_ctx).network[1].cells[1][0].data = 504;
     (*ladder_ctx).network[1].cells[1][0].type = LADDER_TYPE_M;
 
-    (*ladder_ctx).network[1].cells[1][1].code = LADDER_INS_COIL_;
+    (*ladder_ctx).network[1].cells[1][1].code = LADDER_INS_COIL;
     (*ladder_ctx).network[1].cells[1][1].data = 4;
     (*ladder_ctx).network[1].cells[1][1].type = LADDER_TYPE_Q;
 
@@ -154,14 +149,11 @@ static void load_demo_1(ladder_ctx_t *ladder_ctx) {
     (*ladder_ctx).network[1].cells[2][0].data = 505;
     (*ladder_ctx).network[1].cells[2][0].type = LADDER_TYPE_M;
 
-    (*ladder_ctx).network[1].cells[2][1].code = LADDER_INS_COIL_;
+    (*ladder_ctx).network[1].cells[2][1].code = LADDER_INS_COIL;
     (*ladder_ctx).network[1].cells[2][1].data = 5;
     (*ladder_ctx).network[1].cells[2][1].type = LADDER_TYPE_Q;
 
-    //--------------------------------------------------
     // NETWORK 2
-    //--------------------------------------------------
-
     (*ladder_ctx).network[2].cells[0][0].code = LADDER_INS_MOVE;
     (*ladder_ctx).network[2].cells[0][0].data = 500;
     (*ladder_ctx).network[2].cells[0][0].type = LADDER_TYPE_D;

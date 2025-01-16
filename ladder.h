@@ -84,7 +84,7 @@ typedef enum LADDER_INSTRUCTIONS {
     LADDER_INS_NC,    /**< Instruction NC */
     LADDER_INS_RE,    /**< Instruction RE */
     LADDER_INS_FE,    /**< Instruction FE */
-    LADDER_INS_COIL_, /**< Instruction COIL_ */
+    LADDER_INS_COIL,  /**< Instruction COIL */
     LADDER_INS_COILL, /**< Instruction COILL */
     LADDER_INS_COILU, /**< Instruction COILU */
     LADDER_INS_TON,   /**< Instruction TON */
