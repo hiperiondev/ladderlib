@@ -64,10 +64,6 @@
 static const char *const DAYS_ARR[] = { "SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT" };
 static const char *const MONTHS_ARR[] = { "FOO", "JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC" };
 
-// Time functions from standard library.
-// This part defines: cron_mktime: create time_t from tm
-//                    cron_time:   create tm from time_t
-
 time_t cron_mktime(struct tm* tm) {
     return mktime(tm);
 }

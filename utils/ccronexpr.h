@@ -25,6 +25,19 @@
  *
  */
 
+///////////////////////////////////////// expression /////////////////////////////////////////
+//                                                                                          //
+// .------------------- seconds (0 - 59)                                                    //
+// |  .---------------- minute (0 - 59)                                                     //
+// |  |  .------------- hour (0 - 23)                                                       //
+// |  |  |  .---------- day of month (1 - 31)                                               //
+// |  |  |  |  .------- month (1 - 12) or jan,feb,mar,apr ...                               //
+// |  |  |  |  |  .---- day of week (0 - 6) (sunday=0 or 7) or sun,mon,tue,wed,thu,fri,sat  //
+// |  |  |  |  |  |                                                                         //
+// *  *  *  *  *  *                                                                         //
+//                                                                                          //
+//////////////////////////////////////////////////////////////////////////////////////////////
+
 // Cron doesn't decide calendar, it follows it.
 #ifndef CCRONEXPR_H
 #define CCRONEXPR_H
@@ -35,20 +48,22 @@
 #define CRON_INVALID_INSTANT ((time_t) -1)
 #define EXPR_YEARS_LENGTH    29
 
+/**
+ * @enum CRONEXPR_ERR
+ * @brief cronexpr errors
+ *
+ */
 typedef enum CRONEXPR_ERR {
     CRONEXPR_ERR_OK,                       // ok
     CRONEXPR_ERR_NULLEXP,                  // invalid NULL expression
     CRONEXPR_ERR_NULLTARG,                 // invalid NULL target
     CRONEXPR_ERR_INVNUMFIELDS,             // invalid number of fields, expression must consist of 5-7 fields
     CRONEXPR_ERR_REBOOT,                   // reboot not implemented
-    //...//
-    CRONEXPR_ERR_FAIL                      // generic fail
-
 } cron_expr_err_t;
 
 /**
  * @struct cron_expr_s
- * @brief
+ * @brief Parsed cron representation
  *
  */
 typedef struct cron_expr_s {
@@ -72,8 +87,7 @@ typedef struct cron_expr_s {
 
 /**
  * @fn cron_expr_err_t cron_parse_expr(const char *expression, cron_expr_t *target, const char **error)
- * @brief Uses the specified expression to calculate the next 'fire' date after the specified date
- * All dates are processed as UTC (GMT) dates without timezones information.
+ * @brief Uses the specified expression to calculate the next 'fire' date after the specified date.
  *
  * @param expression cron expression as null-terminated string, should be no longer that 256 bytes
  * @param pointer    to cron expression structure, it's client code responsibility to free/destroy it afterwards
@@ -83,8 +97,7 @@ cron_expr_err_t cron_parse_expr(const char *expression, cron_expr_t *target);
 
 /**
  * @fn time_t cron_next(cron_expr_t *expr, time_t date)
- * @brief Uses the specified expression to calculate the next 'fire' date after the specified date
- * All dates are processed as UTC (GMT) dates without timezones information.
+ * @brief Uses the specified expression to calculate the next 'fire' date after the specified date.
  *
  * @param expr  parsed cron expression to use in next date calculation
  * @param date  start date to start calculation from
@@ -95,7 +108,6 @@ time_t cron_next(cron_expr_t *expr, time_t date);
 /**
  * @fn time_t cron_prev(cron_expr_t *expr, time_t date)
  * @brief Uses the specified expression to calculate the previous 'fire' date after the specified date.
- * All dates are processed as UTC (GMT) dates without timezones information.
  *
  * @param expr parsed cron expression to use in previous date calculation
  * @param date start date to start calculation from
