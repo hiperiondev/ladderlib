@@ -44,7 +44,7 @@ void ladder_task(void *parameters) {
             printf("        STATE: %s (%d)\n", ladder_state_str[(*ladder_ctx).ladder.state], (*ladder_ctx).ladder.state);
             printf("  INSTRUCTION: %s (%d)\n", fn_str[(*ladder_ctx).ladder.last_instr], (*ladder_ctx).ladder.last_instr);
             printf("      NETWORK: %d\n", (*ladder_ctx).ladder.last_instr_network);
-            printf("         CELL: %d, %d\n", (*ladder_ctx).ladder.last_instr_cell[0], (*ladder_ctx).ladder.last_instr_cell[1]);
+            printf("         CELL: %d, %d\n", (*ladder_ctx).ladder.last_instr_cell_row, (*ladder_ctx).ladder.last_instr_cell_column);
             printf("        ERROR: %s (%d)\n", fn_err_str[(*ladder_ctx).ladder.last_instr_err], (*ladder_ctx).ladder.last_instr_err);
             printf("-------------------------------\n\n");
 #endif

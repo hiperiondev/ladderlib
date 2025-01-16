@@ -36,7 +36,7 @@
  * @brief Enable debug mode
  *
  */
-//#define DEBUG
+#define DEBUG
 
 #ifdef DEBUG
 extern const char *ladder_state_str[];
@@ -190,21 +190,22 @@ typedef struct ladder_timer_s{
  *
  */
 typedef struct ladder_s {
-    uint16_t state;              /**< State */
-     uint8_t last_instr;         /**< Last executed instruction */
-    uint32_t last_instr_network; /**< Last executed network*/
-    uint32_t last_instr_cell[2]; /**< Last executed cell */
-     uint8_t last_instr_err;     /**< Last executed error */
-    uint32_t qty_m;              /**< Quantity of regular flags*/
-    uint32_t qty_i;              /**< Quantity of digital inputs */
-    uint32_t qty_q;              /**< Quantity of digital outputs */
-    uint32_t qty_iw;             /**< Quantity of analog inputs */
-    uint32_t qty_qw;             /**< Quantity of analog outputs */
-    uint32_t qty_c;              /**< Quantity of counters */
-    uint32_t qty_t;              /**< Quantity of timers*/
-    uint32_t qty_d;              /**< Quantity of regular registers */
-    uint32_t qty_r;              /**< Quantity of floating point registers*/
-    uint32_t total_networks;     /**< Quantity of networks*/
+    uint16_t state;                  /**< State */
+     uint8_t last_instr;             /**< Last executed instruction */
+    uint32_t last_instr_network;     /**< Last executed network */
+    uint32_t last_instr_cell_column; /**< Last executed cell column */
+    uint32_t last_instr_cell_row;    /**< Last executed cell row */
+     uint8_t last_instr_err;         /**< Last executed error */
+    uint32_t qty_m;                  /**< Quantity of regular flags */
+    uint32_t qty_i;                  /**< Quantity of digital inputs */
+    uint32_t qty_q;                  /**< Quantity of digital outputs */
+    uint32_t qty_iw;                 /**< Quantity of analog inputs */
+    uint32_t qty_qw;                 /**< Quantity of analog outputs */
+    uint32_t qty_c;                  /**< Quantity of counters */
+    uint32_t qty_t;                  /**< Quantity of timers */
+    uint32_t qty_d;                  /**< Quantity of regular registers */
+    uint32_t qty_r;                  /**< Quantity of floating point registers */
+    uint32_t total_networks;         /**< Quantity of networks */
 } ladder_t;
 
 typedef struct ladder_ctx_s ladder_ctx_t;

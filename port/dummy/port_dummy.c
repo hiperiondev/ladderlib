@@ -26,11 +26,66 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <time.h>
 #include <errno.h>
 
 #include "ladder.h"
 #include "port_dummy.h"
+
+static const char *_ladder_state_str[] = {
+        "STOPPED",   //
+        "RUNNING",   //
+        "ERROR",     //
+        "EXIT_TASK", //
+        "INVALID",   //
+};
+
+static const char *_fn_str[] = {
+        "NOP",   //
+        "CONN",  //
+        "NEG",   //
+        "NO",    //
+        "NC",    //
+        "RE",    //
+        "FE",    //
+        "COIL",  //
+        "COILL", //
+        "COILU", //
+        "TON",   //
+        "TOFF",  //
+        "TP",    //
+        "CTU",   //
+        "CTD",   //
+        "MOVE",  //
+        "SUB",   //
+        "ADD",   //
+        "MUL",   //
+        "DIV",   //
+        "MOD",   //
+        "SHL",   //
+        "SHR",   //
+        "ROL",   //
+        "ROR",   //
+        "AND",   //
+        "OR",    //
+        "XOR",   //
+        "NOT",   //
+        "EQ",    //
+        "GT",    //
+        "GE",    //
+        "LT",    //
+        "LE",    //
+        "NE",    //
+        };
+
+static const char *_fn_err_str[] = {
+        "OK",
+        "GETPREVVAL",
+        "GETDATAVAL",
+        // [...] //
+        "FAIL",
+};
 
 int dummy_delay(long msec) {
     struct timespec ts;
@@ -84,5 +139,11 @@ bool dummy_external_on_task(ladder_ctx_t *ladder_ctx) {
 }
 
 void dummy_panic(ladder_ctx_t *ladder_ctx) {
-
+    printf("------------ PANIC ------------\n");
+    printf("        STATE: %s (%d)\n", _ladder_state_str[(*ladder_ctx).ladder.state], (*ladder_ctx).ladder.state);
+    printf("  INSTRUCTION: %s (%d)\n", _fn_str[(*ladder_ctx).ladder.last_instr], (*ladder_ctx).ladder.last_instr);
+    printf("      NETWORK: %d\n", (*ladder_ctx).ladder.last_instr_network);
+    printf("         CELL: %d, %d\n", (*ladder_ctx).ladder.last_instr_cell_row, (*ladder_ctx).ladder.last_instr_cell_column);
+    printf("        ERROR: %s (%d)\n", _fn_err_str[(*ladder_ctx).ladder.last_instr_err], (*ladder_ctx).ladder.last_instr_err);
+    printf("-------------------------------\n\n");
 }

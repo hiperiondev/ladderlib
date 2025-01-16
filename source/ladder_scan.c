@@ -72,13 +72,12 @@ static ladder_logic const fn_ladder[] = {
 
 void ladder_scan(ladder_ctx_t *ladder_ctx) {
     ladder_ins_err_t ins_err;
-    uint32_t f;
 
     for (uint32_t network = 0; network < (*ladder_ctx).ladder.total_networks; network++) {
         (*ladder_ctx).exec_network = (*ladder_ctx).network[network];
 
         // resets dynamic flags before to start each network
-        for (f = 0; f < NET_COLUMNS - 1; f++) {
+        for (uint32_t f = 0; f < NET_COLUMNS - 1; f++) {
             (*ladder_ctx).internals.ladder_network_flags[f] = 0;
         }
 
@@ -104,8 +103,8 @@ void ladder_scan(ladder_ctx_t *ladder_ctx) {
                 (*ladder_ctx).ladder.last_instr = (*ladder_ctx).exec_network.cells[row][column].code;
                 (*ladder_ctx).ladder.last_instr_err = ins_err;
                 (*ladder_ctx).ladder.last_instr_network = network;
-                (*ladder_ctx).ladder.last_instr_cell[0] = row;
-                (*ladder_ctx).ladder.last_instr_cell[1] = column;
+                (*ladder_ctx).ladder.last_instr_cell_row = row;
+                (*ladder_ctx).ladder.last_instr_cell_column = column;
 
                 // evaluation for an invalid code if the cell is not part of an instruction that uses more than one cell
                 // plc to error state and serial log else, do not process, it was processed before
