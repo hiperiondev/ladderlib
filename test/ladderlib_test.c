@@ -103,7 +103,7 @@
  */
 #define QTY_R 2000
 
-static void load_demo(ladder_ctx_t *ladder_ctx) {
+static void load_demo_1(ladder_ctx_t *ladder_ctx) {
     //--------------------------------------------------
     // NETWORK 0
     //--------------------------------------------------
@@ -207,7 +207,7 @@ int main(void) {
     ladder_ctx.ladder.state = LADDER_ST_RUNNING;
 
     printf("Load demo program\n\n");
-    load_demo(&ladder_ctx);
+    load_demo_1(&ladder_ctx);
 
     ladder_print(&ladder_ctx);
 

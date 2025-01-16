@@ -130,10 +130,10 @@ void ladder_print(ladder_ctx_t *ladder_ctx) {
         printf("Network: %d\n", n);
         (*ladder_ctx).exec_network = (*ladder_ctx).network[n];
 
-        for (uint32_t c = 0; c < NET_COLUMNS; c++) {
+        for (uint32_t r = 0; r < NET_ROWS; r++) {
             printf("|");
 
-            for (uint32_t r = 0; r < NET_ROWS; r++) {
+            for (uint32_t c = 0; c < NET_COLUMNS; c++) {
                 if ((*ladder_ctx).exec_network.cells[r][c].code < LADDER_INS_INV) {
                     printf("%s", fn_str_graph[(*ladder_ctx).exec_network.cells[r][c].code]);
                 } else {
@@ -147,7 +147,7 @@ void ladder_print(ladder_ctx_t *ladder_ctx) {
 
             printf("|\n|");
 
-            for (uint32_t r = 0; r < NET_ROWS; r++) {
+            for (uint32_t c = 0; c < NET_COLUMNS; c++) {
                 if ((*ladder_ctx).exec_network.cells[r][c].code < LADDER_INS_INV && (*ladder_ctx).exec_network.cells[r][c].code > 1) {
                     printf(" {%s %04d}", dt_graph[(*ladder_ctx).exec_network.cells[r][c].type], (*ladder_ctx).exec_network.cells[r][c].data);
                 } else {
@@ -160,7 +160,7 @@ void ladder_print(ladder_ctx_t *ladder_ctx) {
                 }
             }
             printf("|\n");
-            printf( "|%*s|\n", NET_ROWS * 10, "");
+            printf( "|%*s|\n", NET_COLUMNS * 10, "");
         }
         printf("\n\n");
     }
