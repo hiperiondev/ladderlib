@@ -27,6 +27,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "ladder.h"
 #include "ladder_internals.h"
@@ -77,15 +78,13 @@ void ladder_scan(ladder_ctx_t *ladder_ctx) {
         (*ladder_ctx).exec_network = (*ladder_ctx).network[network];
 
         // resets dynamic flags before to start each network
-        for (uint32_t f = 0; f < NET_COLUMNS - 1; f++) {
-            (*ladder_ctx).internals.ladder_network_flags[f] = 0;
-        }
+        memset((*ladder_ctx).internals.ladder_network_flags, 0, (NET_COLUMNS - 1) * sizeof(uint16_t));
 
         // call ladder instructions
         for (uint32_t column = 0; column < NET_COLUMNS; column++) {
             for (uint32_t row = 0; row < NET_ROWS; row++) {
 #ifdef DEBUG
-                printf("   -          Network: %d [%d, %d]\n", network, row, column);
+                printf("   -          Network: %d [r:%d, c:%d]\n", network, row, column);
                 printf("   -    Code (%s): %u (%s)\n", (*ladder_ctx).exec_network.cells[row][column].code >= LADDER_INS_INV ? "masked" : "notmsk",
                         (*ladder_ctx).exec_network.cells[row][column].code & LADDER_INS_CELL_CODE_MASK,
                         ((*ladder_ctx).exec_network.cells[row][column].code & LADDER_INS_CELL_CODE_MASK) > 34 ?

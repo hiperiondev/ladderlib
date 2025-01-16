@@ -35,10 +35,9 @@
 /**
  * @def TOTAL_NETWORKS
  * @brief Total Networks.
- *     Max quantity tested = 500 (for 6 x 5 matrix)
- *     Max stable quantity = 400 (for 6 x 5 matrix)
+ *
  */
-#define TOTAL_NETWORKS 400 //
+#define TOTAL_NETWORKS 400
 
 /**
  * @def QTY_M
