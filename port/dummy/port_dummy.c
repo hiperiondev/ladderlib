@@ -123,7 +123,8 @@ void dummy_write_outputs_local(ladder_ctx_t *ladder_ctx) {
 }
 
 void dummy_read_inputs_remote(ladder_ctx_t *ladder_ctx) {
-
+    printf("%02d-%02d-%02d-%02d-%02d-%02d-%02d-%02d\r", (*ladder_ctx).memory.Q[0], (*ladder_ctx).memory.Q[1], (*ladder_ctx).memory.Q[2],
+            (*ladder_ctx).memory.Q[3], (*ladder_ctx).memory.Q[4], (*ladder_ctx).memory.Q[5], (*ladder_ctx).memory.Q[6], (*ladder_ctx).memory.Q[7]);
 }
 
 void dummy_write_outputs_remote(ladder_ctx_t *ladder_ctx) {
@@ -139,7 +140,7 @@ bool dummy_external_on_task(ladder_ctx_t *ladder_ctx) {
 }
 
 void dummy_panic(ladder_ctx_t *ladder_ctx) {
-    printf("------------ PANIC ------------\n");
+    printf("--------- dummy PANIC ---------\n");
     printf("        STATE: %s (%d)\n", _ladder_state_str[(*ladder_ctx).ladder.state], (*ladder_ctx).ladder.state);
     printf("  INSTRUCTION: %s (%d)\n", _fn_str[(*ladder_ctx).ladder.last_instr], (*ladder_ctx).ladder.last_instr);
     printf("      NETWORK: %d\n", (*ladder_ctx).ladder.last_instr_network);

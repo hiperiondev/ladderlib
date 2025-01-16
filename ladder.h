@@ -36,7 +36,7 @@
  * @brief Enable debug mode
  *
  */
-#define DEBUG
+//#define DEBUG
 
 #ifdef DEBUG
 extern const char *ladder_state_str[];
@@ -179,9 +179,9 @@ typedef struct ladder_network_s {
  * @brief Timers
  *
  */
-typedef struct ladder_timer_s{
-    unsigned long time_stamp; /**< 32bits same as unsigned int */
-         uint16_t acc;        /**< */
+typedef struct ladder_timer_s {
+    uint32_t time_stamp; /**< */
+    uint16_t acc;        /**< */
 } ladder_timer_t;
 
 /**

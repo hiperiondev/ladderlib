@@ -61,9 +61,6 @@ void ladder_task(void *parameters) {
             (*ladder_ctx).io.external_on_task(ladder_ctx);
 
         // ladder program scan
-        //     read inputs
-        //     evaluate logic
-        //     write outputs
         ladder_scan_time(ladder_ctx);
 
         (*ladder_ctx).io.read_inputs_local(ladder_ctx);

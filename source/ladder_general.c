@@ -62,73 +62,40 @@ const char *ladder_type_str[] = {
 #endif
 
 void ladder_scan_time(ladder_ctx_t *ladder_ctx) {
-    uint32_t scanTimeMicros = (uint32_t)(*ladder_ctx).io.micros();
+    uint32_t scanTimeMicros = (uint32_t) (*ladder_ctx).io.micros();
     (*ladder_ctx).internals.ladder_actual_scan_time = scanTimeMicros - (*ladder_ctx).internals.ladder_start_time;
     (*ladder_ctx).internals.ladder_start_time = scanTimeMicros;
 }
 
 void ladder_save_previous_values(ladder_ctx_t *ladder_ctx) {
-    for (uint32_t i = 0; i < (*ladder_ctx).ladder.qty_m; i++) {
-        (*ladder_ctx).prev_scan_vals.Mh[i] = (*ladder_ctx).memory.M[i];
-    }
-    for (uint32_t i = 0; i < (*ladder_ctx).ladder.qty_i; i++) {
-        (*ladder_ctx).prev_scan_vals.Ih[i] = (*ladder_ctx).memory.I[i];
-    }
-    for (uint32_t i = 0; i < (*ladder_ctx).ladder.qty_q; i++) {
-        (*ladder_ctx).prev_scan_vals.Qh[i] = (*ladder_ctx).memory.Q[i];
-    }
-    for (uint32_t i = 0; i < (*ladder_ctx).ladder.qty_c; i++) {
-        (*ladder_ctx).prev_scan_vals.Crh[i] = (*ladder_ctx).memory.Cr[i];
-        (*ladder_ctx).prev_scan_vals.Cdh[i] = (*ladder_ctx).memory.Cd[i];
-    }
-    for (uint32_t i = 0; i < (*ladder_ctx).ladder.qty_t; i++) {
-        (*ladder_ctx).prev_scan_vals.Tdh[i] = (*ladder_ctx).memory.Td[i];
-        (*ladder_ctx).prev_scan_vals.Trh[i] = (*ladder_ctx).memory.Tr[i];
-    }
+    memcpy((*ladder_ctx).prev_scan_vals.Mh, (*ladder_ctx).memory.M, (*ladder_ctx).ladder.qty_m * sizeof(uint8_t));
+    memcpy((*ladder_ctx).prev_scan_vals.Ih, (*ladder_ctx).memory.I, (*ladder_ctx).ladder.qty_i * sizeof(uint8_t));
+    memcpy((*ladder_ctx).prev_scan_vals.Qh, (*ladder_ctx).memory.Q, (*ladder_ctx).ladder.qty_q * sizeof(uint8_t));
+    memcpy((*ladder_ctx).prev_scan_vals.Crh, (*ladder_ctx).memory.Cr, (*ladder_ctx).ladder.qty_c * sizeof(uint8_t));
+    memcpy((*ladder_ctx).prev_scan_vals.Cdh, (*ladder_ctx).memory.Cd, (*ladder_ctx).ladder.qty_c * sizeof(uint8_t));
+    memcpy((*ladder_ctx).prev_scan_vals.Tdh, (*ladder_ctx).memory.Td, (*ladder_ctx).ladder.qty_t * sizeof(uint8_t));
+    memcpy((*ladder_ctx).prev_scan_vals.Trh, (*ladder_ctx).memory.Tr, (*ladder_ctx).ladder.qty_t * sizeof(uint8_t));
 }
 
 void ladder_clear_memory(ladder_ctx_t *ladder_ctx) {
-    for (uint32_t i = 0; i < (*ladder_ctx).ladder.qty_m; i++) {
-        (*ladder_ctx).prev_scan_vals.Mh[i] = 0;
-        (*ladder_ctx).memory.M[i] = 0;
-    }
-    for (uint32_t i = 0; i < (*ladder_ctx).ladder.qty_i; i++) {
-        (*ladder_ctx).prev_scan_vals.Ih[i] = 0;
-        (*ladder_ctx).memory.I[i] = 0;
-    }
-    for (uint32_t i = 0; i < (*ladder_ctx).ladder.qty_q; i++) {
-        (*ladder_ctx).prev_scan_vals.Qh[i] = 0;
-        (*ladder_ctx).memory.Q[i] = 0;
-    }
-    for (uint32_t i = 0; i < (*ladder_ctx).ladder.qty_c; i++) {
-        (*ladder_ctx).prev_scan_vals.Cdh[i] = 0;
-        (*ladder_ctx).memory.Cd[i] = 0;
-        (*ladder_ctx).prev_scan_vals.Crh[i] = 0;
-        (*ladder_ctx).memory.Cr[i] = 0;
-    }
-    for (uint32_t i = 0; i < (*ladder_ctx).ladder.qty_t; i++) {
-        (*ladder_ctx).prev_scan_vals.Tdh[i] = 0;
-        (*ladder_ctx).memory.Td[i] = 0;
-        (*ladder_ctx).prev_scan_vals.Trh[i] = 0;
-        (*ladder_ctx).memory.Tr[i] = 0;
-    }
+    memset((*ladder_ctx).prev_scan_vals.Mh, 0, (*ladder_ctx).ladder.qty_m * sizeof(uint8_t));
+    memset((*ladder_ctx).memory.M, 0, (*ladder_ctx).ladder.qty_m * sizeof(uint8_t));
+    memset((*ladder_ctx).prev_scan_vals.Ih, 0, (*ladder_ctx).ladder.qty_i * sizeof(uint8_t));
+    memset((*ladder_ctx).memory.I, 0, (*ladder_ctx).ladder.qty_i * sizeof(uint8_t));
+    memset((*ladder_ctx).prev_scan_vals.Qh, 0, (*ladder_ctx).ladder.qty_q * sizeof(uint8_t));
+    memset((*ladder_ctx).memory.Q, 0, (*ladder_ctx).ladder.qty_q * sizeof(uint8_t));
+    memset((*ladder_ctx).prev_scan_vals.Cdh, 0, (*ladder_ctx).ladder.qty_c * sizeof(uint8_t));
+    memset((*ladder_ctx).memory.Cd, 0, (*ladder_ctx).ladder.qty_c * sizeof(uint8_t));
+    memset((*ladder_ctx).prev_scan_vals.Crh, 0, (*ladder_ctx).ladder.qty_c * sizeof(uint8_t));
+    memset((*ladder_ctx).memory.Cr, 0, (*ladder_ctx).ladder.qty_c * sizeof(uint8_t));
+    memset((*ladder_ctx).prev_scan_vals.Tdh, 0, (*ladder_ctx).ladder.qty_t * sizeof(uint8_t));
+    memset((*ladder_ctx).memory.Td, 0, (*ladder_ctx).ladder.qty_t * sizeof(uint8_t));
+    memset((*ladder_ctx).prev_scan_vals.Trh, 0, (*ladder_ctx).ladder.qty_t * sizeof(uint8_t));
+    memset((*ladder_ctx).memory.Tr, 0, (*ladder_ctx).ladder.qty_t * sizeof(uint8_t));
 }
 
 void ladder_clear_program(ladder_ctx_t *ladder_ctx) {
-    for (uint32_t n = 0; n < (*ladder_ctx).ladder.total_networks ; n++) {
-        (*ladder_ctx).network[n].bars[0] = 0;
-        (*ladder_ctx).network[n].bars[1] = 0;
-        (*ladder_ctx).network[n].bars[2] = 0;
-        (*ladder_ctx).network[n].bars[3] = 0;
-        (*ladder_ctx).network[n].bars[4] = 0;
-        for (uint32_t c = 0; c < NET_COLUMNS; c++) {
-            for (uint32_t r = 0; r < NET_ROWS; r++) {
-                (*ladder_ctx).network[n].cells[r][c].code = 0;
-                (*ladder_ctx).network[n].cells[r][c].data = 0;
-                (*ladder_ctx).network[n].cells[r][c].type = 0;
-            }
-        }
-    }
+    memset((*ladder_ctx).network, 0, (*ladder_ctx).ladder.total_networks * sizeof(ladder_network_t));
 }
 
 bool ladder_ctx_init(ladder_ctx_t *ladder_ctx, uint32_t networks_qty, uint32_t qty_m, uint32_t qty_i, uint32_t qty_q, uint32_t qty_iw, uint32_t qty_qw,
