@@ -4,6 +4,7 @@
  *
  * This is based on other projects:
  *    PLsi (https://github.com/ElPercha/PLsi)
+ *    ccronexpr (https://github.com/staticlibs/ccronexpr)
  *
  *    please contact their authors for more information.
  *
