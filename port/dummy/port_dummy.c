@@ -34,16 +34,14 @@
 #include "ladder.h"
 #include "port_dummy.h"
 
-static const char *_ladder_state_str[] = {
-        "STOPPED",   //
+static const char *_ladder_state_str[] = { "STOPPED",   //
         "RUNNING",   //
         "ERROR",     //
         "EXIT_TASK", //
         "INVALID",   //
-};
+        };
 
-static const char *_fn_str[] = {
-        "NOP",   //
+static const char *_fn_str[] = { "NOP",   //
         "CONN",  //
         "NEG",   //
         "NO",    //
@@ -80,13 +78,9 @@ static const char *_fn_str[] = {
         "NE",    //
         };
 
-static const char *_fn_err_str[] = {
-        "OK",
-        "GETPREVVAL",
-        "GETDATAVAL",
-        // [...] //
-        "FAIL",
-};
+static const char *_fn_err_str[] = { "OK", "GETPREVVAL", "GETDATAVAL",
+// [...] //
+        "FAIL", };
 
 int dummy_delay(long msec) {
     struct timespec ts;
@@ -116,12 +110,17 @@ int32_t dummy_micros(void) {
 }
 
 void dummy_read_inputs_local(ladder_ctx_t *ladder_ctx) {
-
+    printf("I0-I1-I2-I3-I4-I5-I6-I7\n");
+    printf("%02d-%02d-%02d-%02d-%02d-%02d-%02d-%02d\n", (*ladder_ctx).memory.I[0], (*ladder_ctx).memory.I[1], (*ladder_ctx).memory.I[2],
+            (*ladder_ctx).memory.I[3], (*ladder_ctx).memory.I[4], (*ladder_ctx).memory.I[5], (*ladder_ctx).memory.I[6], (*ladder_ctx).memory.I[7]);
+    printf("\n");
 }
 
 void dummy_write_outputs_local(ladder_ctx_t *ladder_ctx) {
+    printf("Q0-Q1-Q2-Q3-Q4-Q5-Q6-Q7\n");
     printf("%02d-%02d-%02d-%02d-%02d-%02d-%02d-%02d\r", (*ladder_ctx).memory.Q[0], (*ladder_ctx).memory.Q[1], (*ladder_ctx).memory.Q[2],
             (*ladder_ctx).memory.Q[3], (*ladder_ctx).memory.Q[4], (*ladder_ctx).memory.Q[5], (*ladder_ctx).memory.Q[6], (*ladder_ctx).memory.Q[7]);
+    printf("\033[A\033[A\033[A\033[A");
 }
 
 void dummy_read_inputs_remote(ladder_ctx_t *ladder_ctx) {
