@@ -30,11 +30,14 @@
 #include <stdio.h>
 #include <time.h>
 #include <errno.h>
+#include <termios.h>
+#include <unistd.h>
 
 #include "ladder.h"
 #include "port_dummy.h"
 
-static const char *_ladder_state_str[] = { "STOPPED",   //
+static const char *_ladder_state_str[] = {
+        "STOPPED",   //
         "RUNNING",   //
         "ERROR",     //
         "EXIT_TASK", //
@@ -78,9 +81,15 @@ static const char *_fn_str[] = { "NOP",   //
         "NE",    //
         };
 
-static const char *_fn_err_str[] = { "OK", "GETPREVVAL", "GETDATAVAL",
-// [...] //
-        "FAIL", };
+static const char *_fn_err_str[] = {
+        "OK",         //
+        "GETPREVVAL", //
+        "GETDATAVAL", //
+        // [...] //
+        "FAIL",       //
+        };
+
+char ch = 0;
 
 int dummy_delay(long msec) {
     struct timespec ts;
@@ -103,24 +112,69 @@ int dummy_delay(long msec) {
 
 int32_t dummy_micros(void) {
     struct timespec ts;
-
     clock_gettime(CLOCK_MONOTONIC, &ts);
 
     return (int32_t) (ts.tv_nsec * 1000);
 }
 
 void dummy_read_inputs_local(ladder_ctx_t *ladder_ctx) {
-    printf("I0-I1-I2-I3-I4-I5-I6-I7\n");
-    printf("%02d-%02d-%02d-%02d-%02d-%02d-%02d-%02d\n", (*ladder_ctx).memory.I[0], (*ladder_ctx).memory.I[1], (*ladder_ctx).memory.I[2],
-            (*ladder_ctx).memory.I[3], (*ladder_ctx).memory.I[4], (*ladder_ctx).memory.I[5], (*ladder_ctx).memory.I[6], (*ladder_ctx).memory.I[7]);
-    printf("\n");
+    struct termios orig_term, raw_term;
+
+    // Get terminal settings and save a copy for later
+    tcgetattr(STDIN_FILENO, &orig_term);
+    raw_term = orig_term;
+
+    // Turn off echoing and canonical mode
+    raw_term.c_lflag &= ~(ECHO | ICANON);
+
+    // Set min character limit and timeout to 0 so read() returns immediately
+    // whether there is a character available or not
+    raw_term.c_cc[VMIN] = 0;
+    raw_term.c_cc[VTIME] = 0;
+
+    // Apply new terminal settings
+    tcsetattr(STDIN_FILENO, TCSANOW, &raw_term);
+
+    int len = read(STDIN_FILENO, &ch, 1);
+    if (len != 1)
+        ch = 0;
+
+    // Make sure no characters are left in the input stream as
+    // plenty of keys emit ESC sequences, otherwise they'll appear
+    // on the command-line after we exit.
+    while (read(STDIN_FILENO, &ch, 1) == 1)
+        ;
+
+    // Restore original terminal settings
+    tcsetattr(STDIN_FILENO, TCSANOW, &orig_term);
+
+    if (ch > 47 && ch < 56)
+        (*ladder_ctx).memory.I[ch - 48] = (*ladder_ctx).memory.I[ch - 48] > 0 ? 0 : 1;
+
+    printf("Toggle I: 0-7                                                  \n");
+    printf("-----------------------                                                  \n");
+
+    printf("I0-I1-I2-I3-I4-I5-I6-I7                              \n");
+    printf("%02d-%02d-%02d-%02d-%02d-%02d-%02d-%02d                              \n", (*ladder_ctx).memory.I[0], (*ladder_ctx).memory.I[1],
+            (*ladder_ctx).memory.I[2], (*ladder_ctx).memory.I[3], (*ladder_ctx).memory.I[4], (*ladder_ctx).memory.I[5], (*ladder_ctx).memory.I[6],
+            (*ladder_ctx).memory.I[7]);
+    printf("                                                     \n");
 }
 
 void dummy_write_outputs_local(ladder_ctx_t *ladder_ctx) {
-    printf("Q0-Q1-Q2-Q3-Q4-Q5-Q6-Q7\n");
-    printf("%02d-%02d-%02d-%02d-%02d-%02d-%02d-%02d\r", (*ladder_ctx).memory.Q[0], (*ladder_ctx).memory.Q[1], (*ladder_ctx).memory.Q[2],
+    printf("M0-M1-M2-M3-M4-M5-M6-M7                                \n");
+    printf("%02d-%02d-%02d-%02d-%02d-%02d-%02d-%02d                              \n", (*ladder_ctx).memory.M[0], (*ladder_ctx).memory.M[1],
+            (*ladder_ctx).memory.M[2], (*ladder_ctx).memory.M[3], (*ladder_ctx).memory.M[4], (*ladder_ctx).memory.M[5], (*ladder_ctx).memory.M[6],
+            (*ladder_ctx).memory.M[7]);
+
+    printf("                                                     \n");
+
+    printf("Q0-Q1-Q2-Q3-Q4-Q5-Q6-Q7                                \n");
+    printf("%02d-%02d-%02d-%02d-%02d-%02d-%02d-%02d                              \n", (*ladder_ctx).memory.Q[0], (*ladder_ctx).memory.Q[1], (*ladder_ctx).memory.Q[2],
             (*ladder_ctx).memory.Q[3], (*ladder_ctx).memory.Q[4], (*ladder_ctx).memory.Q[5], (*ladder_ctx).memory.Q[6], (*ladder_ctx).memory.Q[7]);
-    printf("\033[A\033[A\033[A\033[A");
+
+    printf("-----------------------                                                     \n                                                     ");
+    printf("\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A");
 }
 
 void dummy_read_inputs_remote(ladder_ctx_t *ladder_ctx) {
