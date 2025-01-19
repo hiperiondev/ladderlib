@@ -124,18 +124,18 @@ bool ladder_ctx_init(ladder_ctx_t *ladder_ctx, uint32_t networks_qty, uint32_t q
     (*ladder_ctx).memory.M = calloc(qty_m, sizeof(uint8_t));
     (*ladder_ctx).memory.I = calloc(qty_i, sizeof(uint8_t));
     (*ladder_ctx).memory.Q = calloc(qty_q, sizeof(uint8_t));
-    (*ladder_ctx).memory.Cr = calloc(qty_c, sizeof(uint8_t));
-    (*ladder_ctx).memory.Cd = calloc(qty_c, sizeof(uint8_t));
-    (*ladder_ctx).memory.Tr = calloc(qty_t, sizeof(uint8_t));
-    (*ladder_ctx).memory.Td = calloc(qty_t, sizeof(uint8_t));
+    (*ladder_ctx).memory.Cr = calloc(qty_c, sizeof(bool));
+    (*ladder_ctx).memory.Cd = calloc(qty_c, sizeof(bool));
+    (*ladder_ctx).memory.Tr = calloc(qty_t, sizeof(bool));
+    (*ladder_ctx).memory.Td = calloc(qty_t, sizeof(bool));
 
     (*ladder_ctx).prev_scan_vals.Mh = calloc(qty_m, sizeof(uint8_t));
     (*ladder_ctx).prev_scan_vals.Ih = calloc(qty_i, sizeof(uint8_t));
     (*ladder_ctx).prev_scan_vals.Qh = calloc(qty_q, sizeof(uint8_t));
-    (*ladder_ctx).prev_scan_vals.Crh = calloc(qty_c, sizeof(uint8_t));
-    (*ladder_ctx).prev_scan_vals.Cdh = calloc(qty_c, sizeof(uint8_t));
-    (*ladder_ctx).prev_scan_vals.Trh = calloc(qty_t, sizeof(uint8_t));
-    (*ladder_ctx).prev_scan_vals.Tdh = calloc(qty_t, sizeof(uint8_t));
+    (*ladder_ctx).prev_scan_vals.Crh = calloc(qty_c, sizeof(bool));
+    (*ladder_ctx).prev_scan_vals.Cdh = calloc(qty_c, sizeof(bool));
+    (*ladder_ctx).prev_scan_vals.Trh = calloc(qty_t, sizeof(bool));
+    (*ladder_ctx).prev_scan_vals.Tdh = calloc(qty_t, sizeof(bool));
 
     (*ladder_ctx).registers.IW = calloc(qty_iw, sizeof(uint16_t));
     (*ladder_ctx).registers.QW = calloc(qty_qw, sizeof(uint16_t));

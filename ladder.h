@@ -318,10 +318,10 @@ typedef struct ladder_memory_s {
     uint8_t *M;  /**< Regular flags */
     uint8_t *I;  /**< Digital Inputs */
     uint8_t *Q;  /**< Digital Outputs */
-    uint8_t *Cr; /**< Counter running */
-    uint8_t *Cd; /**< Counter done */
-    uint8_t *Tr; /**< Timer running */
-    uint8_t *Td; /**< Timer done */
+       bool *Cr; /**< Counter running */
+       bool *Cd; /**< Counter done */
+       bool *Tr; /**< Timer running */
+       bool *Td; /**< Timer done */
 } ladder_memory_t;
 
 /**

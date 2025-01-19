@@ -68,6 +68,8 @@ static const char *fn_str_graph[] = {
         "---(LT )--", //
         "---(LE )--", //
         "---(NE )--", //
+        "---(-?-)--", //
+        "-----|----", //
         };
 
 static const char *fn_masked_str_graph[] = {
@@ -106,6 +108,8 @@ static const char *fn_masked_str_graph[] = {
         "---[LT ]--", //
         "---[LE ]--", //
         "---[NE ]--", //
+        "---[-?-]--", //
+        "----[|]---", //
         };
 
 static const char *dt_graph[] = {
