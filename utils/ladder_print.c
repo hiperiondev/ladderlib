@@ -74,7 +74,7 @@ static const char *fn_str_graph_1[] = {
         "-------|--------", // 1
         };
 
-static const char *fn_masked_str_graph_1[] = {
+static const char *fn_masked_str_graph_open[] = {
         "----------------",           // 1
         "----------------",           // 1
         "-------!--------",           // 1
@@ -115,7 +115,7 @@ static const char *fn_masked_str_graph_1[] = {
         };
 
 
-static const char *fn_masked_str_graph_3[] = {
+static const char *fn_masked_str_graph_close[] = {
         "----------------",           // 1
         "----------------",           // 1
         "-------!--------",           // 1
@@ -187,14 +187,13 @@ void ladder_print(ladder_ctx_t *ladder_ctx) {
                     if (fn_cells_qty[(*ladder_ctx).exec_network.cells[r][c].code] == 1) {
                         printf("%s", fn_str_graph_1[(*ladder_ctx).exec_network.cells[r][c].code]);
                     } else {
-                        printf("%s", fn_masked_str_graph_1[(*ladder_ctx).exec_network.cells[r][c].code]);
+                        printf("%s", fn_masked_str_graph_open[(*ladder_ctx).exec_network.cells[r][c].code]);
                     }
                 } else {
                     if (((*ladder_ctx).exec_network.cells[r][c].code & LADDER_INS_CELL_CODE_MASK) < LADDER_INS_INV) {
                         if (fn_cells_qty[(*ladder_ctx).exec_network.cells[r][c].code] == 2) {
-                            printf("%s", fn_masked_str_graph_3[(*ladder_ctx).exec_network.cells[r][c].code & LADDER_INS_CELL_CODE_MASK]);
+                            printf("%s", fn_masked_str_graph_close[(*ladder_ctx).exec_network.cells[r][c].code & LADDER_INS_CELL_CODE_MASK]);
                         } else {
-                            // 3 cells
                             if ((*ladder_ctx).exec_network.cells[r - 1][c].code > LADDER_INS_INV) {
                                 printf("---\u230a %s %04d \u230b--", dt_graph[(*ladder_ctx).exec_network.cells[r][c].type],
                                         (*ladder_ctx).exec_network.cells[r][c].data);
@@ -203,7 +202,7 @@ void ladder_print(ladder_ctx_t *ladder_ctx) {
                             }
                         }
                     } else {
-                        printf("-(-?-)-");
+                        printf("------(-?-)-----");
                     }
                 }
             }
@@ -216,15 +215,11 @@ void ladder_print(ladder_ctx_t *ladder_ctx) {
                 if ((*ladder_ctx).exec_network.cells[r][c].code < LADDER_INS_INV && (*ladder_ctx).exec_network.cells[r][c].code > 1) {
                     printf("   | %s %04d |  ", dt_graph[(*ladder_ctx).exec_network.cells[r][c].type], (*ladder_ctx).exec_network.cells[r][c].data);
                 } else {
-                    if (!(((*ladder_ctx).exec_network.cells[r][c].code & LADDER_INS_CELL_CODE_MASK) < LADDER_INS_INV
-                            && (*ladder_ctx).exec_network.cells[r][c].code > 1)) {
-                        if ((*ladder_ctx).exec_network.cells[(r > 0 ? r - 1 : 0)][c].code > LADDER_INS_INV)
-                            printf("   |         |  ");
-                        else
-                            printf("                ");
-                    } else {
+                    if ((*ladder_ctx).exec_network.cells[r][c].code > LADDER_INS_INV
+                            && (*ladder_ctx).exec_network.cells[(r < NET_COLUMNS - 1 ? r + 1 : NET_COLUMNS - 1)][c].code > LADDER_INS_INV)
+                        printf("   |         |  ");
+                    else
                         printf("                ");
-                    }
                 }
             }
             printf("|\n");
