@@ -28,42 +28,42 @@
 // +--------------------------------------+-------+---------+------+------------+-------+-------+------+------+------+-------+-------+-------+-------+
 // |              function                | instr | symbol  | rows | val 0      | val 1 | val 2 | in 0 | in 1 | in 2 | out 0 | out 1 | out 2 | notes |
 // +--------------------------------------+-------+---------+------+------------+-------+-------+------+------+------+-------+-------+-------+-------+
-// | Not operation                        | NOP   | ------- |   1  | none       | none  | none  | none | none | none | ????  | ????  | ????  |       |
-// | Horizontal Connection                | CONN  | ------- |   1  | none       | none  | none  | ???? | ???? | ???? | ????  | ????  | ????  |       |
-// | Vertical Bar                         | BAR   | ---|--- |   1  | none       | none  | none  | ???? | ???? | ???? | ????  | ????  | ????  |       |
-// | Horizontal Connection with Inversion | NEG   | ---!--- |   1  | none       | none  | none  | ???? | ???? | ???? | ????  | ????  | ????  |       |
-// | Normal Open Contact                  | NO    | --| |-- |   1  | any        | none  | none  | ???? | ???? | ???? | ????  | ????  | ????  |       |
-// | Normal Closed Contact                | NC    | --|/|-- |   1  | any        | none  | none  | ???? | ???? | ???? | ????  | ????  | ????  |       |
-// | Rise Edge Contact                    | RE    | -(RE )- |   1  | any        | none  | none  | ???? | ???? | ???? | ????  | ????  | ????  |       |
-// | Fall Edge Contact                    | FE    | -(FE )- |   1  | any        | none  | none  | ???? | ???? | ???? | ????  | ????  | ????  |       |
-// | Coil                                 | COIL  | --( )-- |   1  | M or Q     | none  | none  | ???? | ???? | ???? | ????  | ????  | ????  |       |
-// | Latch Coil                           | COILL | --(L)-- |   1  | M or Q     | none  | none  | ???? | ???? | ???? | ????  | ????  | ????  |       |
-// | Unlatch Coil                         | COILU | --(U)-- |   1  | M or Q     | none  | none  | ???? | ???? | ???? | ????  | ????  | ????  |       |
-// | Timer On                             | TON   | -(TON)- |   2  | timer id   | ????  | ????  | ???? | ???? | ???? | ????  | ????  | ????  |       |
-// | Timer Off                            | TOFF  | -(TOF)- |   2  | timer id   | ????  | ????  | ???? | ???? | ???? | ????  | ????  | ????  |       |
-// | Timer Pulse                          | TP    | -(TP )- |   2  | timer id   | ????  | ????  | ???? | ???? | ???? | ????  | ????  | ????  |       |
-// | Counter Up                           | CTU   | -(CTU)- |   2  | counter id | ????  | ????  | ???? | ???? | ???? | ????  | ????  | ????  |       |
-// | Counter Down                         | CTD   | -(CTD)- |   2  | counter id | ????  | ????  | ???? | ???? | ???? | ????  | ????  | ????  |       |
-// | Register Transfer                    | MOVE  | -(MOV)- |   2  | ????       | ????  | ????  | ???? | ???? | ???? | ????  | ????  | ????  |       |
-// | Arithmetic Subtraction               | SUB   | -(SUB)- |   3  | ????       | ????  | ????  | ???? | ???? | ???? | ????  | ????  | ????  |       |
-// | Arithmetic Addition                  | ADD   | -(ADD)- |   3  | ????       | ????  | ????  | ???? | ???? | ???? | ????  | ????  | ????  |       |
-// | Arithmetic Multiplication            | MUL   | -(MUL)- |   3  | ????       | ????  | ????  | ???? | ???? | ???? | ????  | ????  | ????  |       |
-// | Arithmetic Division                  | DIV   | -(DIV)- |   3  | ????       | ????  | ????  | ???? | ???? | ???? | ????  | ????  | ????  |       |
-// | Division Module                      | MOD   | -(MOD)- |   3  | ????       | ????  | ????  | ???? | ???? | ???? | ????  | ????  | ????  |       |
-// | Bit Shifting Left                    | SHL   | -(SHL)- |   2  | ????       | ????  | ????  | ???? | ???? | ???? | ????  | ????  | ????  |       |
-// | Bit Shifting Right                   | SHR   | -(SHR)- |   2  | ????       | ????  | ????  | ???? | ???? | ???? | ????  | ????  | ????  |       |
-// | Bit Rotation Left                    | ROL   | -(ROL)- |   2  | ????       | ????  | ????  | ???? | ???? | ???? | ????  | ????  | ????  |       |
-// | Bit Rotation Right                   | ROR   | -(ROR)- |   2  | ????       | ????  | ????  | ???? | ???? | ???? | ????  | ????  | ????  |       |
-// | Bitwise AND                          | AND   | -(AND)- |   3  | ????       | ????  | ????  | ???? | ???? | ???? | ????  | ????  | ????  |       |
-// | Bitwise OR                           | OR    | -(OR )- |   3  | ????       | ????  | ????  | ???? | ???? | ???? | ????  | ????  | ????  |       |
-// | Bitwise XOR                          | XOR   | -(XOR)- |   3  | ????       |  ????  | ????  | ???? | ???? | ???? | ????  | ????  | ????  |       |
-// | Bitwise NOT                          | NOT   | -(NOT)- |   2  | ????       | ????  | ????  | ???? | ???? | ???? | ????  | ????  | ????  |       |
-// | Equal to                             | EQ    | -(EQ )- |   ?  | ????       |  ????  | ????  | ???? | ???? | ???? | ????  | ????  | ????  |       |
-// | Greater than                         | GT    | -(GT )- |   ?  | ????       | ????  | ????  | ???? | ???? | ???? | ????  | ????  | ????  |       |
-// | Greater than or Equal to             | GE    | -(GE )- |   ?  | ????       | ????  | ????  | ???? | ???? | ???? | ????  | ????  | ????  |       |
-// | Less than                            | LT    | -(LT )- |   ?  | ????       | ????  | ????  | ???? | ???? | ???? | ????  | ????  | ????  |       |
-// | Less than or Equal to                | LE    | -(LE )- |   ?  | ????       | ????  | ????  | ???? | ???? | ???? | ????  | ????  | ????  |       |
-// | Not Equal to                         | NE    | -(NE )- |   ?  | ????       | ????  | ????  | ???? | ???? | ???? | ????  | ????  | ????  |       |
+// | Not operation                        | NOP   | ------- |   1  | none       | none  | none  | none | none | none | none  | none  | none  |       |
+// | Horizontal Connection                | CONN  | ------- |   1  | none       | none  | none  | none | none | none | none  | none  | none  |       |
+// | Vertical Bar                         | BAR   | ---|--- |   1  | none       | none  | none  | none | none | none | none  | none  | none  |       |
+// | Horizontal Connection with Inversion | NEG   | ---!--- |   1  | none       | none  | none  | none | none | none | none  | none  | none  |       |
+// | Normal Open Contact                  | NO    | --| |-- |   1  | any        | none  | none  | none | none | none | none  | none  | none  |       |
+// | Normal Closed Contact                | NC    | --|/|-- |   1  | any        | none  | none  | none | none | none | none  | none  | none  |       |
+// | Rise Edge Contact                    | RE    | -(RE )- |   1  | any        | none  | none  | none | none | none | none  | none  | none  |       |
+// | Fall Edge Contact                    | FE    | -(FE )- |   1  | any        | none  | none  | none | none | none | none  | none  | none  |       |
+// | Coil                                 | COIL  | --( )-- |   1  | M or Q     | none  | none  | none | none | none | none  | none  | none  |       |
+// | Latch Coil                           | COILL | --(L)-- |   1  | M or Q     | none  | none  | none | none | none | none  | none  | none  |       |
+// | Unlatch Coil                         | COILU | --(U)-- |   1  | M or Q     | none  | none  | none | none | none | none  | none  | none  |       |
+// | Timer On                             | TON   | -(TON)- |   2  | timer id   | none  | none  | none | none | none | none  | none  | none  |       |
+// | Timer Off                            | TOFF  | -(TOF)- |   2  | timer id   | none  | none  | none | none | none | none  | none  | none  |       |
+// | Timer Pulse                          | TP    | -(TP )- |   2  | timer id   | none  | none  | none | none | none | none  | none  | none  |       |
+// | Counter Up                           | CTU   | -(CTU)- |   2  | counter id | none  | none  | none | none | none | none  | none  | none  |       |
+// | Counter Down                         | CTD   | -(CTD)- |   2  | counter id | none  | none  | none | none | none | none  | none  | none  |       |
+// | Register Transfer                    | MOVE  | -(MOV)- |   2  | none       | none  | none  | none | none | none | none  | none  | none  |       |
+// | Arithmetic Subtraction               | SUB   | -(SUB)- |   3  | none       | none  | none  | none | none | none | none  | none  | none  |       |
+// | Arithmetic Addition                  | ADD   | -(ADD)- |   3  | none       | none  | none  | none | none | none | none  | none  | none  |       |
+// | Arithmetic Multiplication            | MUL   | -(MUL)- |   3  | none       | none  | none  | none | none | none | none  | none  | none  |       |
+// | Arithmetic Division                  | DIV   | -(DIV)- |   3  | none       | none  | none  | none | none | none | none  | none  | none  |       |
+// | Division Module                      | MOD   | -(MOD)- |   3  | none       | none  | none  | none | none | none | none  | none  | none  |       |
+// | Bit Shifting Left                    | SHL   | -(SHL)- |   2  | none       | none  | none  | none | none | none | none  | none  | none  |       |
+// | Bit Shifting Right                   | SHR   | -(SHR)- |   2  | none       | none  | none  | none | none | none | none  | none  | none  |       |
+// | Bit Rotation Left                    | ROL   | -(ROL)- |   2  | none       | none  | none  | none | none | none | none  | none  | none  |       |
+// | Bit Rotation Right                   | ROR   | -(ROR)- |   2  | none       | none  | none  | none | none | none | none  | none  | none  |       |
+// | Bitwise AND                          | AND   | -(AND)- |   3  | none       | none  | none  | none | none | none | none  | none  | none  |       |
+// | Bitwise OR                           | OR    | -(OR )- |   3  | none       | none  | none  | none | none | none | none  | none  | none  |       |
+// | Bitwise XOR                          | XOR   | -(XOR)- |   3  | none       | none  | none  | none | none | none | none  | none  | none  |       |
+// | Bitwise NOT                          | NOT   | -(NOT)- |   2  | none       | none  | none  | none | none | none | none  | none  | none  |       |
+// | Equal to                             | EQ    | -(EQ )- |   2  | none       | none  | none  | none | none | none | none  | none  | none  |       |
+// | Greater than                         | GT    | -(GT )- |   2  | none       | none  | none  | none | none | none | none  | none  | none  |       |
+// | Greater than or Equal to             | GE    | -(GE )- |   2  | none       | none  | none  | none | none | none | none  | none  | none  |       |
+// | Less than                            | LT    | -(LT )- |   2  | none       | none  | none  | none | none | none | none  | none  | none  |       |
+// | Less than or Equal to                | LE    | -(LE )- |   2  | none       | none  | none  | none | none | none | none  | none  | none  |       |
+// | Not Equal to                         | NE    | -(NE )- |   2  | none       | none  | none  | none | none | none | none  | none  | none  |       |
 // +--------------------------------------+-------+---------+------+------------+-------+-------+------+------+------+-------+-------+-------+-------+
 
 #ifndef LADDER_LOGIC_INSTRUCTIONS_H
