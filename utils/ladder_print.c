@@ -190,9 +190,9 @@ void ladder_print(ladder_ctx_t *ladder_ctx) {
                         printf("%s", fn_masked_str_graph_open[(*ladder_ctx).exec_network.cells[r][c].code]);
                     }
                 } else {
-                    if (((*ladder_ctx).exec_network.cells[r][c].code & LADDER_INS_CELL_CODE_MASK) < LADDER_INS_INV) {
+                    if (((*ladder_ctx).exec_network.cells[r][c].code & (~LADDER_INS_MASK)) < LADDER_INS_INV) {
                         if (fn_cells_qty[(*ladder_ctx).exec_network.cells[r][c].code] == 2) {
-                            printf("%s", fn_masked_str_graph_close[(*ladder_ctx).exec_network.cells[r][c].code & LADDER_INS_CELL_CODE_MASK]);
+                            printf("%s", fn_masked_str_graph_close[(*ladder_ctx).exec_network.cells[r][c].code & (~LADDER_INS_MASK)]);
                         } else {
                             if ((*ladder_ctx).exec_network.cells[r - 1][c].code > LADDER_INS_INV) {
                                 printf("---\u230a %s %04d \u230b--", dt_graph[(*ladder_ctx).exec_network.cells[r][c].type],

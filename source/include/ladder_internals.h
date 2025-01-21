@@ -38,7 +38,7 @@
  * @fn void ladder_clear_memory(ladder_ctx_t *ladder_ctx)
  * @brief Deletes PLC Memory Areas
  *
- * @param ladder_ctx
+ * @param ladder_ctx Ladder context
  */
 void ladder_clear_memory(ladder_ctx_t *ladder_ctx);
 
@@ -46,59 +46,59 @@ void ladder_clear_memory(ladder_ctx_t *ladder_ctx);
  * @fn void ladder_scan_time(ladder_ctx_t *ladder_ctx)
  * @brief Calculate Scan Time in us
  *
- * @param ladder_ctx
+ * @param ladder_ctx Ladder context
  */
 void ladder_scan_time(ladder_ctx_t *ladder_ctx);
 
 /**
- * @fn void ladder_scan_plc(ladder_ctx_t *ladder_ctx, ladder_network_t networks[])
+ * @fn void ladder_scan_plc(ladder_ctx_t *ladder_ctx)
  * @brief ladder logic execution (scan)
  *
- * @param ladder_ctx
- * @param networks
+ * @param ladder_ctx Ladder context
  */
 void ladder_scan(ladder_ctx_t *ladder_ctx);
 
 /**
  * @fn void ladder_save_previous_values(ladder_ctx_t *ladder_ctx)
- * @brief Copy values to history for RE and FE instructions
+ * @brief Copy values to history
  *
- * @param ladder_ctx
+ * @param ladder_ctx Ladder context
  */
 void ladder_save_previous_values(ladder_ctx_t *ladder_ctx);
 
 /**
  * @fn ladder_ins_err_t ladder_get_data_value(ladder_ctx_t *ladder_ctx, uint32_t row, uint32_t column, int *value)
- * @brief
+ * @brief Get values
  *
- * @param ladder_ctx
- * @param row
- * @param column
- * @param value
- * @return
+ * @param ladder_ctx Ladder context
+ * @param row Ladder row
+ * @param column Ladder column
+ * @param value Value
+ * @return Status
  */
 ladder_ins_err_t ladder_get_data_value(ladder_ctx_t *ladder_ctx, uint32_t row, uint32_t column, int *value);
 
 /**
  * @fn ladder_ins_err_t ladder_get_previous_value(ladder_ctx_t *ladder_ctx, uint32_t row, uint32_t column, int *value)
- * @brief
+ * @brief Get history values
  *
- * @param ladder_ctx
- * @param row
- * @param column
- * @param value
- * @return
+ * @param ladder_ctx Ladder context
+ * @param row Ladder row
+ * @param column Ladder column
+ * @param value Value
+ * @return Status
  */
 ladder_ins_err_t ladder_get_previous_value(ladder_ctx_t *ladder_ctx, uint32_t row, uint32_t column, int *value);
 
 /**
  * @fn void ladder_set_data_value(ladder_ctx_t *ladder_ctx, uint32_t row, uint32_t column, int value)
- * @brief
+ * @brief Set values
  *
- * @param ladder_ctx
- * @param row
- * @param column
- * @param value
+ * @param ladder_ctx Ladder context
+ * @param row Ladder row
+ * @param column Ladder column
+ * @param value Value
+ * @return Status
  */
 void ladder_set_data_value(ladder_ctx_t *ladder_ctx, uint32_t row, uint32_t column, int value);
 

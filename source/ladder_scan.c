@@ -109,7 +109,7 @@ void ladder_scan(ladder_ctx_t *ladder_ctx) {
                 // evaluation for an invalid code if the cell is not part of an instruction that uses more than one cell
                 // plc to error state and serial log else, do not process, it was processed before
                 if ((*ladder_ctx).exec_network.cells[row][column].code >= LADDER_INS_INV) {
-                    if (((*ladder_ctx).exec_network.cells[row][column].code & LADDER_INS_CELL_CODE_MASK) >= LADDER_INS_INV) {
+                    if (((*ladder_ctx).exec_network.cells[row][column].code & (~LADDER_INS_MASK)) >= LADDER_INS_INV) {
 #ifdef DEBUG
                         printf("TASK LADDER INSTRUCTION CODE INVALID: \n");
                         printf("   - Network: %d\n", network);

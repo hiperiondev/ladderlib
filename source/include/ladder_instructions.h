@@ -25,6 +25,7 @@
  *
  */
 
+// TODO: incomplete!
 // +--------------------------------------+-------+---------+------+------------+-------+-------+------+------+------+-------+-------+-------+-------+
 // |              function                | instr | symbol  | rows | val 0      | val 1 | val 2 | in 0 | in 1 | in 2 | out 0 | out 1 | out 2 | notes |
 // +--------------------------------------+-------+---------+------+------------+-------+-------+------+------+------+-------+-------+-------+-------+
@@ -44,7 +45,7 @@
 // | Timer Pulse                          | TP    | -(TP )- |   2  | timer id   | none  | none  | none | none | none | none  | none  | none  |       |
 // | Counter Up                           | CTU   | -(CTU)- |   2  | counter id | none  | none  | none | none | none | none  | none  | none  |       |
 // | Counter Down                         | CTD   | -(CTD)- |   2  | counter id | none  | none  | none | none | none | none  | none  | none  |       |
-// | Register Transfer                    | MOVE  | -(MOV)- |   2  | none       | none  | none  | none | none | none | none  | none  | none  |       |
+// | Register Transfer                    | MOVE  | -(MOV)- |   2  | any        | any   | none  | none | none | none | none  | none  | none  |       |
 // | Arithmetic Subtraction               | SUB   | -(SUB)- |   3  | none       | none  | none  | none | none | none | none  | none  | none  |       |
 // | Arithmetic Addition                  | ADD   | -(ADD)- |   3  | none       | none  | none  | none | none | none | none  | none  | none  |       |
 // | Arithmetic Multiplication            | MUL   | -(MUL)- |   3  | none       | none  | none  | none | none | none | none  | none  | none  |       |
@@ -54,10 +55,10 @@
 // | Bit Shifting Right                   | SHR   | -(SHR)- |   2  | none       | none  | none  | none | none | none | none  | none  | none  |       |
 // | Bit Rotation Left                    | ROL   | -(ROL)- |   2  | none       | none  | none  | none | none | none | none  | none  | none  |       |
 // | Bit Rotation Right                   | ROR   | -(ROR)- |   2  | none       | none  | none  | none | none | none | none  | none  | none  |       |
-// | Bitwise AND                          | AND   | -(AND)- |   3  | none       | none  | none  | none | none | none | none  | none  | none  |       |
-// | Bitwise OR                           | OR    | -(OR )- |   3  | none       | none  | none  | none | none | none | none  | none  | none  |       |
-// | Bitwise XOR                          | XOR   | -(XOR)- |   3  | none       | none  | none  | none | none | none | none  | none  | none  |       |
-// | Bitwise NOT                          | NOT   | -(NOT)- |   2  | none       | none  | none  | none | none | none | none  | none  | none  |       |
+// | Bitwise AND                          | AND   | -(AND)- |   3  | any        | any   | any   | none | none | none | none  | none  | none  |       |
+// | Bitwise OR                           | OR    | -(OR )- |   3  | any        | any   | any   | none | none | none | none  | none  | none  |       |
+// | Bitwise XOR                          | XOR   | -(XOR)- |   3  | any        | any   | any   | none | none | none | none  | none  | none  |       |
+// | Bitwise NOT                          | NOT   | -(NOT)- |   2  | any        | any   | none  | none | none | none | none  | none  | none  |       |
 // | Equal to                             | EQ    | -(EQ )- |   2  | none       | none  | none  | none | none | none | none  | none  | none  |       |
 // | Greater than                         | GT    | -(GT )- |   2  | none       | none  | none  | none | none | none | none  | none  | none  |       |
 // | Greater than or Equal to             | GE    | -(GE )- |   2  | none       | none  | none  | none | none | none | none  | none  | none  |       |
@@ -91,7 +92,7 @@ typedef enum LADDER_INS_ERROR {
  * @fn  ladder_ins_err_t (*ladder_logic)(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag)
  * @brief Instruction prototype
  *
- * @param ladder_ctx
+ * @param ladder_ctx Ladder context
  * @param column
  * @param row
  * @param flag
@@ -103,91 +104,91 @@ typedef ladder_ins_err_t (*ladder_logic)(ladder_ctx_t *ladder_ctx, uint32_t colu
  * @fn ladder_ins_err_t execNop(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag)
  * @brief No operation
  *
- * @param ladder_ctx
- * @param column
- * @param row
- * @param flag
- * @return
+ * @param ladder_ctx Ladder context
+ * @param column Column
+ * @param row Row
+ * @param flag Flag
+ * @return Status
  */
 ladder_ins_err_t execNop(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag);
 
 /**
  * @fn ladder_ins_err_t execConn(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag)
- * @brief Normally open contact
+ * @brief Connector
  *
- * @param ladder_ctx
- * @param column
- * @param row
- * @param flag
- * @return
+ * @param ladder_ctx Ladder context
+ * @param column Column
+ * @param row Row
+ * @param flag Flag
+ * @return Status
  */
 ladder_ins_err_t execConn(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag);
 
 /**
  * @fn ladder_ins_err_t execNeg(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag)
- * @brief
+ * @brief Negate
  *
- * @param ladder_ctx
- * @param column
- * @param row
- * @param flag
- * @return
+ * @param ladder_ctx Ladder context
+ * @param column Column
+ * @param row Row
+ * @param flag Flag
+ * @return Status
  */
 ladder_ins_err_t execNeg(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag);
 
 /**
  * @fn ladder_ins_err_t execNO(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag)
- * @brief
+ * @brief Normally open contact
  *
- * @param ladder_ctx
- * @param column
- * @param row
- * @param flag
- * @return
+ * @param ladder_ctx Ladder context
+ * @param column Column
+ * @param row Row
+ * @param flag Flag
+ * @return Status
  */
 ladder_ins_err_t execNO(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag);
 
 /**
  * @fn ladder_ins_err_t execNC(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag)
- * @brief
+ * @brief Normally closed contact
  *
- * @param ladder_ctx
- * @param column
- * @param row
- * @param flag
- * @return
+ * @param ladder_ctx Ladder context
+ * @param column Column
+ * @param row Row
+ * @param flag Flag
+ * @return Status
  */
 ladder_ins_err_t execNC(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag);
 
 /**
  * @fn ladder_ins_err_t execRE(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag)
- * @brief
+ * @brief  Rise Edge Contact
  *
- * @param ladder_ctx
- * @param column
- * @param row
- * @param flag
- * @return
+ * @param ladder_ctx Ladder context
+ * @param column Column
+ * @param row Row
+ * @param flag Flag
+ * @return Status
  */
 ladder_ins_err_t execRE(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag);
 
 /**
  * @fn ladder_ins_err_t execFE(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag)
- * @brief
+ * @brief Fall Edge Contact
  *
- * @param ladder_ctx
- * @param column
- * @param row
- * @param flag
- * @return
+ * @param ladder_ctx Ladder context
+ * @param column Column
+ * @param row Row
+ * @param flag Flag
+ * @return Status
  */
 ladder_ins_err_t execFE(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag);
 
 /**
  * @fn ladder_ins_err_t execCoil(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag)
- * @brief
+ * @brief Coil
  *
- * @param ladder_ctx
+ * @param ladder_ctx Ladder context
  * @param column
  * @param row
  * @param flag
@@ -197,9 +198,9 @@ ladder_ins_err_t execCoil(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t ro
 
 /**
  * @fn ladder_ins_err_t execCoilL(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag)
- * @brief
+ * @brief Latch coil
  *
- * @param ladder_ctx
+ * @param ladder_ctx Ladder context
  * @param column
  * @param row
  * @param flag
@@ -209,9 +210,9 @@ ladder_ins_err_t execCoilL(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t r
 
 /**
  * @fn ladder_ins_err_t execCoilU(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag)
- * @brief
+ * @brief Unlatch coil
  *
- * @param ladder_ctx
+ * @param ladder_ctx Ladder context
  * @param column
  * @param row
  * @param flag
@@ -221,9 +222,9 @@ ladder_ins_err_t execCoilU(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t r
 
 /**
  * @fn ladder_ins_err_t execTON(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag)
- * @brief
+ * @brief Timer on
  *
- * @param ladder_ctx
+ * @param ladder_ctx Ladder context
  * @param column
  * @param row
  * @param flag
@@ -233,217 +234,217 @@ ladder_ins_err_t execTON(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row
 
 /**
  * @fn ladder_ins_err_t execTOFF(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag)
- * @brief
+ * @brief Timer off
  *
- * @param ladder_ctx
- * @param column
- * @param row
- * @param flag
- * @return
+ * @param ladder_ctx Ladder context
+ * @param column Column
+ * @param row Row
+ * @param flag Flag
+ * @return Status
  */
 ladder_ins_err_t execTOFF(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag);
 
 /**
  * @fn ladder_ins_err_t execTP(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag)
- * @brief
+ * @brief Timer pulse
  *
- * @param ladder_ctx
- * @param column
- * @param row
- * @param flag
- * @return
+ * @param ladder_ctx Ladder context
+ * @param column Column
+ * @param row Row
+ * @param flag Flag
+ * @return Status
  */
 ladder_ins_err_t execTP(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag);
 
 /**
  * @fn ladder_ins_err_t execCTU(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag)
- * @brief
+ * @brief Counter up
  *
- * @param ladder_ctx
- * @param column
- * @param row
- * @param flag
- * @return
+ * @param ladder_ctx Ladder context
+ * @param column Column
+ * @param row Row
+ * @param flag Flag
+ * @return Status
  */
 ladder_ins_err_t execCTU(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag);
 
 /**
  * @fn ladder_ins_err_t execCTD(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag)
- * @brief
+ * @brief Counter down
  *
- * @param ladder_ctx
- * @param column
- * @param row
- * @param flag
- * @return
+ * @param ladder_ctx Ladder context
+ * @param column Column
+ * @param row Row
+ * @param flag Flag
+ * @return Status
  */
 ladder_ins_err_t execCTD(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag);
 
 /**
  * @fn ladder_ins_err_t execMOVE(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag)
- * @brief
+ * @brief Register move
  *
- * @param ladder_ctx
- * @param column
- * @param row
- * @param flag
- * @return
+ * @param ladder_ctx Ladder context
+ * @param column Column
+ * @param row Row
+ * @param flag Flag
+ * @return Status
  */
 ladder_ins_err_t execMOVE(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag);
 
 /**
  * @fn ladder_ins_err_t execSUB(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag)
- * @brief
+ * @brief Arithmetic subtraction
  *
- * @param ladder_ctx
- * @param column
- * @param row
- * @param flag
- * @return
+ * @param ladder_ctx Ladder context
+ * @param column Column
+ * @param row Row
+ * @param flag Flag
+ * @return Status
  */
 ladder_ins_err_t execSUB(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag);
 
 /**
  * @fn ladder_ins_err_t execADD(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag)
- * @brief
+ * @brief Arithmetic addition
  *
- * @param ladder_ctx
- * @param column
- * @param row
- * @param flag
- * @return
+ * @param ladder_ctx Ladder context
+ * @param column Column
+ * @param row Row
+ * @param flag Flag
+ * @return Status
  */
 ladder_ins_err_t execADD(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag);
 
 /**
  * @fn ladder_ins_err_t execMUL(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag)
- * @brief
+ * @brief Arithmetic multiplication
  *
- * @param ladder_ctx
- * @param column
- * @param row
- * @param flag
- * @return
+ * @param ladder_ctx Ladder context
+ * @param column Column
+ * @param row Row
+ * @param flag Flag
+ * @return Status
  */
 ladder_ins_err_t execMUL(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag);
 
 /**
  * @fn ladder_ins_err_t execDIV(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag)
- * @brief
+ * @brief Arithmetic division
  *
- * @param ladder_ctx
- * @param column
- * @param row
- * @param flag
- * @return
+ * @param ladder_ctx Ladder context
+ * @param column Column
+ * @param row Row
+ * @param flag Flag
+ * @return Status
  */
 ladder_ins_err_t execDIV(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag);
 
 /**
  * @fn ladder_ins_err_t execMOD(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag)
- * @brief
+ * @brief Arithmetic division module
  *
- * @param ladder_ctx
- * @param column
- * @param row
- * @param flag
- * @return
+ * @param ladder_ctx Ladder context
+ * @param column Column
+ * @param row Row
+ * @param flag Flag
+ * @return Status
  */
 ladder_ins_err_t execMOD(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag);
 
 /**
  * @fn ladder_ins_err_t execSHL(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag)
- * @brief
+ * @brief Bit shifting left
  *
- * @param ladder_ctx
- * @param column
- * @param row
- * @param flag
- * @return
+ * @param ladder_ctx Ladder context
+ * @param column Column
+ * @param row Row
+ * @param flag Flag
+ * @return Status
  */
 ladder_ins_err_t execSHL(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag);
 
 /**
  * @fn ladder_ins_err_t execSHR(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag)
- * @brief
+ * @brief Bit shifting right
  *
- * @param ladder_ctx
- * @param column
- * @param row
- * @param flag
- * @return
+ * @param ladder_ctx Ladder context
+ * @param column Column
+ * @param row Row
+ * @param flag Flag
+ * @return Status
  */
 ladder_ins_err_t execSHR(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag);
 
 /**
  * @fn ladder_ins_err_t execROL(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag)
- * @brief
+ * @brief Bit rotate left
  *
- * @param ladder_ctx
- * @param column
- * @param row
- * @param flag
- * @return
+ * @param ladder_ctx Ladder context
+ * @param column Column
+ * @param row Row
+ * @param flag Flag
+ * @return Status
  */
 ladder_ins_err_t execROL(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag);
 
 /**
  * @fn ladder_ins_err_t execROR(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag)
- * @brief
+ * @brief Bit rotate right
  *
- * @param ladder_ctx
- * @param column
- * @param row
- * @param flag
- * @return
+ * @param ladder_ctx Ladder context
+ * @param column Column
+ * @param row Row
+ * @param flag Flag
+ * @return Status
  */
 ladder_ins_err_t execROR(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag);
 
 /**
  * @fn ladder_ins_err_t execAND(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag)
- * @brief
+ * @brief Bitwise AND
  *
- * @param ladder_ctx
- * @param column
- * @param row
- * @param flag
- * @return
+ * @param ladder_ctx Ladder context
+ * @param column Column
+ * @param row Row
+ * @param flag Flag
+ * @return Status
  */
 ladder_ins_err_t execAND(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag);
 
 /**
  * @fn ladder_ins_err_t execOR(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag)
- * @brief
+ * @brief Bitwise OR
  *
- * @param ladder_ctx
- * @param column
- * @param row
- * @param flag
- * @return
+ * @param ladder_ctx Ladder context
+ * @param column Column
+ * @param row Row
+ * @param flag Flag
+ * @return Status
  */
 ladder_ins_err_t execOR(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag);
 
 /**
  * @fn ladder_ins_err_t execXOR(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag)
- * @brief
+ * @brief Bitwise XOR
  *
- * @param ladder_ctx
- * @param column
- * @param row
- * @param flag
- * @return
+ * @param ladder_ctx Ladder context
+ * @param column Column
+ * @param row Row
+ * @param flag Flag
+ * @return Status
  */
 ladder_ins_err_t execXOR(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag);
 
 /**
  * @fn ladder_ins_err_t execNOT(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag)
- * @brief
+ * @brief Bitwise NOT
  *
- * @param ladder_ctx
- * @param column
- * @param row
- * @param flag
- * @return
+ * @param ladder_ctx Ladder context
+ * @param column Column
+ * @param row Row
+ * @param flag Flag
+ * @return Status
  */
 ladder_ins_err_t execNOT(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag);
 
@@ -451,71 +452,71 @@ ladder_ins_err_t execNOT(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row
  * @fn ladder_ins_err_t execEQ(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag)
  * @brief
  *
- * @param ladder_ctx
- * @param column
- * @param row
- * @param flag
- * @return
+ * @param ladder_ctx Ladder context
+ * @param column Column
+ * @param row Row
+ * @param flag Flag
+ * @return Status
  */
 ladder_ins_err_t execEQ(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag);
 
 /**
  * @fn ladder_ins_err_t execGT(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag)
- * @brief
+ * @brief Comparison equal to
  *
- * @param ladder_ctx
- * @param column
- * @param row
- * @param flag
- * @return
+ * @param ladder_ctx Ladder context
+ * @param column Column
+ * @param row Row
+ * @param flag Flag
+ * @return Status
  */
 ladder_ins_err_t execGT(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag);
 
 /**
  * @fn ladder_ins_err_t execGE(ladder_ctx_t*, int, int, int)
- * @brief
+ * @brief Comparison greater than
  *
- * @param ladder_ctx
- * @param column
- * @param row
- * @param flag
- * @return
+ * @param ladder_ctx Ladder context
+ * @param column Column
+ * @param row Row
+ * @param flag Flag
+ * @return Status
  */
 ladder_ins_err_t execGE(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag);
 
 /**
  * @fn ladder_ins_err_t execLT(ladder_ctx_t*, int, int, int)
- * @brief
+ * @brief Comparison lesser than
  *
- * @param ladder_ctx
- * @param column
- * @param row
- * @param flag
- * @return
+ * @param ladder_ctx Ladder context
+ * @param column Column
+ * @param row Row
+ * @param flag Flag
+ * @return Status
  */
 ladder_ins_err_t execLT(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag);
 
 /**
  * @fn ladder_ins_err_t execLE(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag)
- * @brief
+ * @brief Comparison lesser or equal
  *
- * @param ladder_ctx
- * @param column
- * @param row
- * @param flag
- * @return
+ * @param ladder_ctx Ladder context
+ * @param column Column
+ * @param row Row
+ * @param flag Flag
+ * @return Status
  */
 ladder_ins_err_t execLE(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag);
 
 /**
  * @fn ladder_ins_err_t execNE(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag)
- * @brief
+ * @brief Comparison not equal
  *
- * @param ladder_ctx
- * @param column
- * @param row
- * @param flag
- * @return
+ * @param ladder_ctx Ladder context
+ * @param column Column
+ * @param row Row
+ * @param flag Flag
+ * @return Status
  */
 ladder_ins_err_t execNE(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag);
 

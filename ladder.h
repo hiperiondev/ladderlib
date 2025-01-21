@@ -58,18 +58,11 @@ extern const char *ladder_type_str[];
 #define NET_ROWS 5
 
 /**
- * @def LADDER_INS_CELL_USED_MASK
- * @brief
+ * @def LADDER_INS_MASK
+ * @brief Masked cell. For use on multiple cell instruction
  *
  */
-#define LADDER_INS_CELL_USED_MASK 0xf000
-
-/**
- * @def LADDER_INS_CELL_CODE_MASK
- * @brief
- *
- */
-#define LADDER_INS_CELL_CODE_MASK 0x0fff
+#define LADDER_INS_MASK 0xf000
 
 /**
  * @enum LADDER_INSTRUCTIONS
@@ -212,79 +205,79 @@ typedef struct ladder_ctx_s ladder_ctx_t;
 
 /**
  * @fn void (*_read_inputs_local)(ladder_ctx_t *ladder_ctx)
- * @brief
+ * @brief Read local hardware values
  *
- * @param ladder_ctx_t
+ * @param ladder_ctx_t Ladder context
  */
 typedef void (*_read_inputs_local)(ladder_ctx_t *ladder_ctx);
 
 /**
  * @fn void (*_write_outputs_local)(ladder_ctx_t *ladder_ctx)
- * @brief
+ * @brief Write local hardware values
  *
- * @param ladder_ctx_t
+ * @param ladder_ctx_t Ladder context
  */
 typedef void (*_write_outputs_local)(ladder_ctx_t *ladder_ctx);
 
 /**
  * @fn void (*_read_inputs_remote)(ladder_ctx_t *ladder_ctx)
- * @brief
+ * @brief Read remote hardware values
  *
- * @param ladder_ctx_t
+ * @param ladder_ctx_t Ladder context
  */
 typedef void (*_read_inputs_remote)(ladder_ctx_t *ladder_ctx);
 
 /**
  * @fn void (*_write_outputs_remote)(ladder_ctx_t *ladder_ctx
- * @brief
+ * @brief Write remote hardware values
  *
- * @param ladder_ctx_t
+ * @param ladder_ctx_t Ladder context
  */
 typedef void (*_write_outputs_remote)(ladder_ctx_t *ladder_ctx);
 
 /**
  * @fn bool (*_external_on_scan)(ladder_ctx_t *ladder_ctx)
- * @brief
+ * @brief Manage for every scan cycle
  *
- * @param ladder_ctx_t
+ * @param ladder_ctx_t Ladder context
  */
 typedef bool (*_external_on_scan)(ladder_ctx_t *ladder_ctx);
 
 /**
  * @fn bool (*_external_on_task)(ladder_ctx_t *ladder_ctx)
- * @brief
+ * @brief Manage for every task cycle
  *
- * @param ladder_ctx_t
+ * @param ladder_ctx_t Ladder context
  */
 typedef bool (*_external_on_task)(ladder_ctx_t *ladder_ctx);
 
 /**
  * @fn void (*_panic)(ladder_ctx_t *ladder_ctx)
- * @brief
+ * @brief Panic management
  *
- * @param ladder_ctx
+ * @param ladder_ctx Ladder context
  */
 typedef void (*_panic)(ladder_ctx_t *ladder_ctx);
 
 /**
  * @fn void (*_end_task)(void)
- * @brief
+ * @brief Function for end task
  *
  */
 typedef void (*_end_task)(void);
 
 /**
  * @fn int (*_delay)(long msec)
- * @brief
+ * @brief Delay in milliseconds
  *
- * @param msec
+ * @param msec Milliseconds
  * @return
  */
 typedef int (*_delay)(long msec);
 
 /**
  * @fn int32_t (*_micros)(void)
- * @brief
+ * @brief Microseconds from system start
  *
  * @return
  */
@@ -296,17 +289,17 @@ typedef int32_t (*_micros)(void);
  *
  */
 typedef struct ladder_io_s {
-       _read_inputs_local read_inputs_local;    /**< */
-     _write_outputs_local write_outputs_local;  /**< */
-      _read_inputs_remote read_inputs_remote;   /**< */
-    _write_outputs_remote write_outputs_remote; /**< */
-        _external_on_scan external_on_scan;     /**< */
-        _external_on_task external_on_task;     /**< */
-                   _panic panic;                /**< */
-                _end_task end_task;             /**< */
+       _read_inputs_local read_inputs_local;    /**< Read local hardware values */
+     _write_outputs_local write_outputs_local;  /**< Write local hardware values */
+      _read_inputs_remote read_inputs_remote;   /**< Read remote hardware values */
+    _write_outputs_remote write_outputs_remote; /**< Write local hardware values */
+        _external_on_scan external_on_scan;     /**< Manage for every scan cycle */
+        _external_on_task external_on_task;     /**< Manage for every task cycle */
+                   _panic panic;                /**< Manage panic state*/
+                _end_task end_task;             /**< Function for end task */
 
-    _micros micros; /**< */
-     _delay delay;  /**< */
+    _micros micros; /**< Microseconds from system start */
+     _delay delay;  /**< Delay in milliseconds */
 } ladder_io_t;
 
 /**
@@ -386,8 +379,8 @@ typedef struct ladder_ctx_s {
         uint32_t qty_c, uint32_t qty_t, uint32_t qty_d, uint32_t qty_r)
  * @brief
  *
- * @param ladder_ctx
- * @return
+ * @param ladder_ctx Ladder context
+ * @return Status
  */
 bool ladder_ctx_init(ladder_ctx_t *ladder_ctx, uint32_t networks_qty, uint32_t qty_m, uint32_t qty_i, uint32_t qty_q, uint32_t qty_iw, uint32_t qty_qw,
         uint32_t qty_c, uint32_t qty_t, uint32_t qty_d, uint32_t qty_r);
@@ -396,25 +389,24 @@ bool ladder_ctx_init(ladder_ctx_t *ladder_ctx, uint32_t networks_qty, uint32_t q
  * @fn bool ladder_ctx_deinit(ladder_ctx_t *ladder_ctx)
  * @brief
  *
- * @param ladder_ctx
- * @return
+ * @param ladder_ctx Ladder context
+ * @return Status
  */
 bool ladder_ctx_deinit(ladder_ctx_t *ladder_ctx);
 
 /**
  * @fn void ladder_task(void *parameters)
- * @brief
+ * @brief Main task
  *
- * @param parameters
+ * @param parameters  void ladder context pointer
  */
 void ladder_task(void *parameters);
 
 /**
- * @fn void ladder_clear_program(ladder_ctx_t *ladder_ctx, ladder_network_t networks[])
- * @brief Deletes all Networks (all values to 0)
+ * @fn void ladder_clear_program(ladder_ctx_t *ladder_ctx)
+ * @brief Deletes all networks (all values to 0)
  *
- * @param ladder_ctx
- * @param networks
+ * @param ladder_ctx Ladder context
  */
 void ladder_clear_program(ladder_ctx_t *ladder_ctx);
 
