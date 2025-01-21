@@ -36,7 +36,7 @@
 
 /**
  * @fn void ladder_clear_memory(ladder_ctx_t *ladder_ctx)
- * @brief Deletes PLC Memory Areas
+ * @brief Delete memory areas
  *
  * @param ladder_ctx Ladder context
  */
@@ -44,7 +44,7 @@ void ladder_clear_memory(ladder_ctx_t *ladder_ctx);
 
 /**
  * @fn void ladder_scan_time(ladder_ctx_t *ladder_ctx)
- * @brief Calculate Scan Time in us
+ * @brief Calculate scan time in us
  *
  * @param ladder_ctx Ladder context
  */
@@ -52,7 +52,7 @@ void ladder_scan_time(ladder_ctx_t *ladder_ctx);
 
 /**
  * @fn void ladder_scan_plc(ladder_ctx_t *ladder_ctx)
- * @brief ladder logic execution (scan)
+ * @brief Execute ladder logic
  *
  * @param ladder_ctx Ladder context
  */

@@ -285,7 +285,7 @@ typedef int32_t (*_micros)(void);
 
 /**
  * @struct ladder_io_s
- * @brief
+ * @brief Hardware functions
  *
  */
 typedef struct ladder_io_s {
@@ -298,13 +298,13 @@ typedef struct ladder_io_s {
                    _panic panic;                /**< Manage panic state*/
                 _end_task end_task;             /**< Function for end task */
 
-    _micros micros; /**< Microseconds from system start */
-     _delay delay;  /**< Delay in milliseconds */
+                  _micros micros;               /**< Microseconds from system start */
+                   _delay delay;                /**< Delay in milliseconds */
 } ladder_io_t;
 
 /**
  * @struct ladder_memory_s
- * @brief Memory types definitions
+ * @brief Memory registers
  * Byte is used for Bits for increased performance of Scan time
  */
 typedef struct ladder_memory_s {
@@ -319,7 +319,7 @@ typedef struct ladder_memory_s {
 
 /**
  * @struct ladder_prev_scan_vals_s
- * @brief Bits Previous Scan Values (history) for FE and RE instructions
+ * @brief Previous Scan Values (history)
  *
  */
 typedef struct ladder_prev_scan_vals_s {
@@ -334,11 +334,11 @@ typedef struct ladder_prev_scan_vals_s {
 
 /**
  * @struct ladder_registers_s
- * @brief Registers declaration
+ * @brief Registers
  *
  */
 typedef struct ladder_registers_s {
-    uint16_t *IW; /**< Analog Inputs  (word) */
+    uint16_t *IW; /**< Analog Inputs (word) */
     uint16_t *QW; /**< Analog Outputs (word) */
     uint16_t *C;  /**< Counter registers (16 bits) */
      int16_t *D;  /**< Regular registers (signed 16 bits) */
@@ -347,7 +347,7 @@ typedef struct ladder_registers_s {
 
 /**
  * @struct plc_internals_s
- * @brief
+ * @brief Scan internals
  *
  */
 typedef struct ladder_internals_s {
@@ -359,7 +359,7 @@ typedef struct ladder_internals_s {
 
 /**
  * @struct ladder_ctx_s
- * @brief
+ * @brief Ladder context
  *
  */
 typedef struct ladder_ctx_s {

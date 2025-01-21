@@ -80,12 +80,16 @@ extern const char *fn_str[];
 extern const char *fn_err_str[];
 #endif
 
+/**
+ * @enum LADDER_INS_ERROR
+ * @brief Instruction status
+ *
+ */
 typedef enum LADDER_INS_ERROR {
-    LADDER_INS_ERR_OK,         //
-    LADDER_INS_ERR_GETPREVVAL, //
-    LADDER_INS_ERR_GETDATAVAL, //
-    // [...] //
-    LADDER_INS_ERR_FAIL,       //
+    LADDER_INS_ERR_OK,        /**< OK */
+    LADDER_INS_ERR_GETPREVVAL,/**< Error get previous value */
+    LADDER_INS_ERR_GETDATAVAL,/**< Error get data value */
+    LADDER_INS_ERR_FAIL,      /**< Generic fail */
 } ladder_ins_err_t;
 
 /**
@@ -96,7 +100,7 @@ typedef enum LADDER_INS_ERROR {
  * @param column
  * @param row
  * @param flag
- * @return
+ * @return Status
  */
 typedef ladder_ins_err_t (*ladder_logic)(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag);
 

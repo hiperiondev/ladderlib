@@ -30,6 +30,12 @@
 
 #include "ladder.h"
 
+/**
+ * @fn void ladder_print(ladder_ctx_t *ladder_ctx)
+ * @brief Print networks in ascii graphical format
+ *
+ * @param ladder_ctx
+ */
 void ladder_print(ladder_ctx_t *ladder_ctx);
 
 #endif /* INCLUDE_LADDER_UTILS_H_ */
