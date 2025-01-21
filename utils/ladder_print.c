@@ -32,8 +32,6 @@
 #include "ladder_print.h"
 #include "ladder_instructions.h"
 
-static const uint8_t fn_cells_qty[] = {1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 2, 2, 2, 2, 3, 3, 3, 2, 2, 2, 2, 2, 2, 2, 1, 1};
-
 static const char *fn_str_graph_1[] = {
         "----------------", // 1
         "----------------", // 1
@@ -143,14 +141,14 @@ void ladder_print(ladder_ctx_t *ladder_ctx) {
             // function
             for (uint32_t c = 0; c < LADDER_NET_COLUMNS; c++) {
                 if ((*ladder_ctx).exec_network.cells[r][c].code < LADDER_INS_INV) {
-                    if (fn_cells_qty[(*ladder_ctx).exec_network.cells[r][c].code] == 1) {
+                    if (ladder_fn_io[(*ladder_ctx).exec_network.cells[r][c].code].cells == 1) {
                         printf("%s", fn_str_graph_1[(*ladder_ctx).exec_network.cells[r][c].code]);
                     } else {
                         printf("%s", fn_masked_str_graph_open[(*ladder_ctx).exec_network.cells[r][c].code]);
                     }
                 } else {
                     if (((*ladder_ctx).exec_network.cells[r][c].code & (~LADDER_INS_MASK)) < LADDER_INS_INV) {
-                        if (fn_cells_qty[(*ladder_ctx).exec_network.cells[r][c].code] == 2) {
+                        if (ladder_fn_io[(*ladder_ctx).exec_network.cells[r][c].code & (~LADDER_INS_MASK)].cells == 2) {
                             printf("---\u230a %s %04d \u230b--", dt_graph[(*ladder_ctx).exec_network.cells[r][c].type],
                                     (*ladder_ctx).exec_network.cells[r][c].data);
                         } else {

@@ -118,6 +118,8 @@ const ladder_instructions_io_t ladder_fn_io[] = {
         { 1, 1, 2 }, // LT
         { 1, 1, 2 }, // LE
         { 1, 1, 2 }, // NE
+        { 1, 1, 1 }, // INV
+        { 1, 1, 1 }, // BAR
         };
 
 ladder_ins_err_t execNop(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag) {
