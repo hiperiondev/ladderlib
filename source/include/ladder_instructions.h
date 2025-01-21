@@ -94,7 +94,7 @@ typedef enum LADDER_INS_ERROR {
 
 /**
  * @struct ladder_instructions_io_s
- * @brief Instruction input, output and occupied cells
+ * @brief Instruction inputs, outputs and occupied cells
  *
  */
 typedef struct ladder_instructions_io_s {
@@ -106,16 +106,16 @@ typedef struct ladder_instructions_io_s {
 extern const ladder_instructions_io_t ladder_fn_io[];
 
 /**
- * @fn  ladder_ins_err_t (*ladder_logic)(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag)
+ * @fn  ladder_ins_err_t (*ladder_fn)(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag)
  * @brief Instruction prototype
  *
  * @param ladder_ctx Ladder context
- * @param column
- * @param row
- * @param flag
+ * @param column Column
+ * @param row Row
+ * @param flag Flag
  * @return Status
  */
-typedef ladder_ins_err_t (*ladder_logic)(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag);
+typedef ladder_ins_err_t (*ladder_fn_t)(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag);
 
 /**
  * @fn ladder_ins_err_t execNop(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag)

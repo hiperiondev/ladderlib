@@ -34,7 +34,7 @@
 #include "ladder_instructions.h"
 #include "ladder_internals.h"
 
-static ladder_logic const fn_ladder[] = {
+static ladder_fn_t const ladder_function[] = {
         execNop,   //
         execConn,  //
         execNeg,   //
@@ -127,12 +127,12 @@ void ladder_scan(ladder_ctx_t *ladder_ctx) {
                 if ((*ladder_ctx).exec_network.cells[row][column].code != 0) {
                     if (column == 0) {
                         if ((*ladder_ctx).ladder.status == LADDER_ST_RUNNING) {
-                            ins_err = fn_ladder[(*ladder_ctx).exec_network.cells[row][column].code](ladder_ctx, column, row, 1);
+                            ins_err = ladder_function[(*ladder_ctx).exec_network.cells[row][column].code](ladder_ctx, column, row, 1);
                         } else {
-                            ins_err = fn_ladder[(*ladder_ctx).exec_network.cells[row][column].code](ladder_ctx, column, row, 0);
+                            ins_err = ladder_function[(*ladder_ctx).exec_network.cells[row][column].code](ladder_ctx, column, row, 0);
                         }
                     } else {
-                        ins_err = fn_ladder[(*ladder_ctx).exec_network.cells[row][column].code](ladder_ctx, column, row,
+                        ins_err = ladder_function[(*ladder_ctx).exec_network.cells[row][column].code](ladder_ctx, column, row,
                                 ((*ladder_ctx).scan_internals.network_flags[column - 1] & (*ladder_ctx).scan_internals.flags_mask[row]));
                     }
 
