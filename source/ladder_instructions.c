@@ -81,6 +81,45 @@ const char *fn_err_str[] = {
 };
 #endif
 
+const ladder_instructions_io_t ladder_fn_io[] = {
+      // in,ou,cells
+        { 1, 1, 1 }, // NOP
+        { 1, 1, 1 }, // CONN
+        { 1, 1, 1 }, // NEG
+        { 1, 1, 1 }, // NO
+        { 1, 1, 1 }, // NC
+        { 1, 1, 1 }, // RE
+        { 1, 1, 1 }, // FE
+        { 1, 1, 1 }, // COIL
+        { 1, 1, 1 }, // COILL
+        { 1, 1, 1 }, // COILU
+        { 1, 2, 2 }, // TON
+        { 1, 2, 2 }, // TOFF
+        { 1, 2, 2 }, // TP
+        { 2, 2, 2 }, // CTU
+        { 2, 2, 2 }, // CTD
+        { 1, 1, 2 }, // MOVE
+        { 1, 3, 3 }, // SUB
+        { 1, 1, 3 }, // ADD
+        { 1, 1, 3 }, // MUL
+        { 1, 2, 3 }, // DIV
+        { 1, 1, 3 }, // MOD
+        { 1, 1, 2 }, // SHL
+        { 1, 1, 2 }, // SHR
+        { 1, 1, 2 }, // ROL
+        { 1, 1, 2 }, // ROR
+        { 1, 1, 3 }, // AND
+        { 1, 1, 3 }, // OR
+        { 1, 2, 3 }, // XOR
+        { 1, 1, 2 }, // NOT
+        { 1, 1, 2 }, // EQ
+        { 1, 1, 2 }, // GT
+        { 1, 1, 2 }, // GE
+        { 1, 1, 2 }, // LT
+        { 1, 1, 2 }, // LE
+        { 1, 1, 2 }, // NE
+        };
+
 ladder_ins_err_t execNop(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag) {
     return LADDER_INS_ERR_OK;
 }

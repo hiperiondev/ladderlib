@@ -114,47 +114,6 @@ static const char *fn_masked_str_graph_open[] = {
         "------|---------",           // 1
         };
 
-
-static const char *fn_masked_str_graph_close[] = {
-        "----------------",           // 1
-        "----------------",           // 1
-        "-------!--------",           // 1
-        "------| |-------",           // 1
-        "------|/|-------",           // 1
-        "------(RE )-----",           // 1
-        "------(FE )-----",           // 1
-        "------( )-------",           // 1
-        "------(L)-------",           // 1
-        "------(U)-------",           // 1
-        "---\u230a  TON    \u230b--", // 2
-        "---\u230a  TFF    \u230b--", // 2
-        "---\u230a  TP     \u230b--", // 2
-        "---\u230a  CTU    \u230b--", // 2
-        "---\u230a  CTD    \u230b--", // 2
-        "---\u230a  MOV    \u230b--", // 2
-        "---\u230a  SUB    \u230b--", // 3
-        "---\u230a  ADD    \u230b--", // 3
-        "---\u230a  MUL    \u230b--", // 3
-        "---\u230a  DIV    \u230b--", // 3
-        "---\u230a  MOD    \u230b--", // 3
-        "---\u230a  SHL    \u230b--", // 2
-        "---\u230a  SHR    \u230b--", // 2
-        "---\u230a  ROL    \u230b--", // 2
-        "---\u230a  ROR    \u230b--", // 2
-        "---\u230a  AND    \u230b--", // 3
-        "---\u230a  OR     \u230b--", // 3
-        "---\u230a  XOR    \u230b--", // 3
-        "---\u230a  NOT    \u230b--", // 2
-        "---\u230a  EQ     \u230b--", // 2
-        "---\u230a  GT     \u230b--", // 2
-        "---\u230a  GE     \u230b--", // 2
-        "---\u230a  LT     \u230b--", // 2
-        "---\u230a  LE     \u230b--", // 2
-        "---\u230a  NE     \u230b--", // 2
-        "------(-?-)-----",           // 1
-        "------|---------",           // 1
-        };
-
 static const char *dt_graph[] = {
         " M", //
         " Q", //
@@ -192,7 +151,8 @@ void ladder_print(ladder_ctx_t *ladder_ctx) {
                 } else {
                     if (((*ladder_ctx).exec_network.cells[r][c].code & (~LADDER_INS_MASK)) < LADDER_INS_INV) {
                         if (fn_cells_qty[(*ladder_ctx).exec_network.cells[r][c].code] == 2) {
-                            printf("%s", fn_masked_str_graph_close[(*ladder_ctx).exec_network.cells[r][c].code & (~LADDER_INS_MASK)]);
+                            printf("---\u230a %s %04d \u230b--", dt_graph[(*ladder_ctx).exec_network.cells[r][c].type],
+                                    (*ladder_ctx).exec_network.cells[r][c].data);
                         } else {
                             if ((*ladder_ctx).exec_network.cells[r - 1][c].code > LADDER_INS_INV) {
                                 printf("---\u230a %s %04d \u230b--", dt_graph[(*ladder_ctx).exec_network.cells[r][c].type],

@@ -122,9 +122,14 @@ static void load_demo(ladder_ctx_t *ladder_ctx) {
     (*ladder_ctx).network[0].cells[2][0].type = LADDER_TYPE_M;
 
     // stop
-    (*ladder_ctx).network[0].cells[0][1].code = LADDER_INS_NC;
+    (*ladder_ctx).network[0].cells[0][1].code = LADDER_INS_TON;
     (*ladder_ctx).network[0].cells[0][1].data = 1;
     (*ladder_ctx).network[0].cells[0][1].type = LADDER_TYPE_I;
+
+    // stop
+    (*ladder_ctx).network[0].cells[1][1].code = LADDER_INS_TON;
+    (*ladder_ctx).network[0].cells[1][1].data = 1;
+    (*ladder_ctx).network[0].cells[1][1].type = LADDER_TYPE_I;
 
     // timer supply
     (*ladder_ctx).network[0].cells[0][2].code = LADDER_INS_COIL;
