@@ -39,7 +39,7 @@
 //#define DEBUG
 
 #ifdef DEBUG
-extern const char *ladder_state_str[];
+extern const char *ladder_status_str[];
 extern const char *ladder_type_str[];
 #endif
 
@@ -295,7 +295,7 @@ typedef struct ladder_io_s {
     _write_outputs_remote write_outputs_remote; /**< Write local hardware values */
         _external_on_scan external_on_scan;     /**< Manage for every scan cycle */
         _external_on_task external_on_task;     /**< Manage for every task cycle */
-                   _panic panic;                /**< Manage panic state*/
+                   _panic panic;                /**< Manage panic status */
                 _end_task end_task;             /**< Function for end task */
 
                   _micros micros;               /**< Microseconds from system start */

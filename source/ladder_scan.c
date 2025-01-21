@@ -31,8 +31,8 @@
 #include <string.h>
 
 #include "ladder.h"
-#include "ladder_internals.h"
 #include "ladder_instructions.h"
+#include "ladder_internals.h"
 
 static ladder_logic const fn_ladder[] = {
         execNop,   //
@@ -87,9 +87,9 @@ void ladder_scan(ladder_ctx_t *ladder_ctx) {
 #ifdef DEBUG
                 printf("   -          Network: %d [r:%d, c:%d]\n", network, row, column);
                 printf("   -    Code (%s): %u (%s)\n", (*ladder_ctx).exec_network.cells[row][column].code >= LADDER_INS_INV ? "masked" : "notmsk",
-                        (*ladder_ctx).exec_network.cells[row][column].code & LADDER_INS_CELL_CODE_MASK,
-                        ((*ladder_ctx).exec_network.cells[row][column].code & LADDER_INS_CELL_CODE_MASK) > 34 ?
-                                "???" : fn_str[(*ladder_ctx).exec_network.cells[row][column].code & LADDER_INS_CELL_CODE_MASK]);
+                        (*ladder_ctx).exec_network.cells[row][column].code & LADDER_INS_MASK,
+                        ((*ladder_ctx).exec_network.cells[row][column].code & LADDER_INS_MASK) > 34 ?
+                                "???" : fn_str[(*ladder_ctx).exec_network.cells[row][column].code & LADDER_INS_MASK]);
                 printf("   -             Type: %s (%u)\n",
                         ladder_type_str[(
                                 (*ladder_ctx).exec_network.cells[row][column].type >= LADDER_TYPE_INV ?
@@ -107,7 +107,7 @@ void ladder_scan(ladder_ctx_t *ladder_ctx) {
                 (*ladder_ctx).ladder.last_instr_cell_column = column;
 
                 // evaluation for an invalid code if the cell is not part of an instruction that uses more than one cell
-                // plc to error state and serial log else, do not process, it was processed before
+                // plc to error status and serial log else, do not process, it was processed before
                 if ((*ladder_ctx).exec_network.cells[row][column].code >= LADDER_INS_INV) {
                     if (((*ladder_ctx).exec_network.cells[row][column].code & (~LADDER_INS_MASK)) >= LADDER_INS_INV) {
 #ifdef DEBUG

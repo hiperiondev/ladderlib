@@ -42,7 +42,7 @@ void ladder_task(void *parameters) {
         if ((*ladder_ctx).ladder.status != LADDER_ST_RUNNING) {
 #ifdef DEBUG
             printf("------------ PANIC ------------\n");
-            printf("        STATE: %s (%d)\n", ladder_state_str[(*ladder_ctx).ladder.state], (*ladder_ctx).ladder.state);
+            printf("       STATUS: %s (%d)\n", ladder_status_str[(*ladder_ctx).ladder.status], (*ladder_ctx).ladder.status);
             printf("  INSTRUCTION: %s (%d)\n", fn_str[(*ladder_ctx).ladder.last_instr], (*ladder_ctx).ladder.last_instr);
             printf("      NETWORK: %d\n", (*ladder_ctx).ladder.last_instr_network);
             printf("         CELL: %d, %d\n", (*ladder_ctx).ladder.last_instr_cell_row, (*ladder_ctx).ladder.last_instr_cell_column);

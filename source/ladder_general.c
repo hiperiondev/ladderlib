@@ -34,7 +34,7 @@
 #include "ladder_internals.h"
 
 #ifdef DEBUG
-const char *ladder_state_str[] = {
+const char *ladder_status_str[] = {
         "STOPPED",   //
         "RUNNING",   //
         "ERROR",     //
