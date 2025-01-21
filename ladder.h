@@ -143,7 +143,7 @@ typedef enum LADDER_TYPE {
     LADDER_TYPE_K,   /**< Type K */
     LADDER_TYPE_R,   /**< Type R */
     LADDER_TYPE_KR,  /**< Type KR */
-    LADDER_TYPE_INV, /**< first invalid */
+    LADDER_TYPE_INV, /**< First invalid */
 } ladder_type_t;
 
 /**
@@ -173,13 +173,13 @@ typedef struct ladder_network_s {
  *
  */
 typedef struct ladder_timer_s {
-    uint32_t time_stamp; /**< */
-    uint16_t acc;        /**< */
+    uint32_t time_stamp; /**< Time stamp */
+    uint16_t acc;        /**< Activated counter */
 } ladder_timer_t;
 
 /**
  * @struct ladder_s
- * @brief
+ * @brief Ladder internal context
  *
  */
 typedef struct ladder_s {
@@ -346,16 +346,16 @@ typedef struct ladder_registers_s {
 } ladder_registers_t;
 
 /**
- * @struct plc_internals_s
+ * @struct plc_scan_internals_s
  * @brief Scan internals
  *
  */
-typedef struct ladder_internals_s {
-         uint16_t flags_mask[NET_ROWS];                  /**< */
-         uint16_t ladder_network_flags[NET_COLUMNS - 1]; /**< */
-         uint32_t ladder_actual_scan_time;               /**< */
-         uint32_t ladder_start_time;                     /**< */
-} ladder_internals_t;
+typedef struct ladder_scan_internals_s {
+         uint16_t flags_mask[NET_ROWS];                  /**< Masks */
+         uint16_t ladder_network_flags[NET_COLUMNS - 1]; /**< Flags */
+         uint32_t ladder_actual_scan_time;               /**< Actual scan time */
+         uint32_t ladder_start_time;                     /**< Start time for calculate scan time */
+} ladder_scan_internals_t;
 
 /**
  * @struct ladder_ctx_s
@@ -369,7 +369,7 @@ typedef struct ladder_ctx_s {
   ladder_prev_scan_vals_t prev_scan_vals;           /**< */
        ladder_registers_t registers;                /**< */
            ladder_timer_t *timers;                  /**< */
-       ladder_internals_t internals;                /**< */
+  ladder_scan_internals_t scan_internals;           /**< */
          ladder_network_t *network;                 /**< */
          ladder_network_t exec_network;             /**< network in execution */
 } ladder_ctx_t;

@@ -64,8 +64,8 @@ const char *ladder_type_str[] = {
 
 void ladder_scan_time(ladder_ctx_t *ladder_ctx) {
     uint32_t scanTimeMicros = (uint32_t) (*ladder_ctx).io.micros();
-    (*ladder_ctx).internals.ladder_actual_scan_time = scanTimeMicros - (*ladder_ctx).internals.ladder_start_time;
-    (*ladder_ctx).internals.ladder_start_time = scanTimeMicros;
+    (*ladder_ctx).scan_internals.ladder_actual_scan_time = scanTimeMicros - (*ladder_ctx).scan_internals.ladder_start_time;
+    (*ladder_ctx).scan_internals.ladder_start_time = scanTimeMicros;
 }
 
 void ladder_save_previous_values(ladder_ctx_t *ladder_ctx) {
@@ -101,12 +101,12 @@ void ladder_clear_program(ladder_ctx_t *ladder_ctx) {
 
 bool ladder_ctx_init(ladder_ctx_t *ladder_ctx, uint32_t networks_qty, uint32_t qty_m, uint32_t qty_i, uint32_t qty_q, uint32_t qty_iw, uint32_t qty_qw,
         uint32_t qty_c, uint32_t qty_t, uint32_t qty_d, uint32_t qty_r) {
-    memset((*ladder_ctx).internals.flags_mask, 0, NET_ROWS * sizeof(uint16_t));
-    (*ladder_ctx).internals.flags_mask[0] = 0x0001;     //
-    (*ladder_ctx).internals.flags_mask[1] = 0x0002;     //
-    (*ladder_ctx).internals.flags_mask[2] = 0x0004;     //
-    (*ladder_ctx).internals.flags_mask[3] = 0x0008;     //
-    (*ladder_ctx).internals.flags_mask[4] = 0x0010;     //
+    memset((*ladder_ctx).scan_internals.flags_mask, 0, NET_ROWS * sizeof(uint16_t));
+    (*ladder_ctx).scan_internals.flags_mask[0] = 0x0001;     //
+    (*ladder_ctx).scan_internals.flags_mask[1] = 0x0002;     //
+    (*ladder_ctx).scan_internals.flags_mask[2] = 0x0004;     //
+    (*ladder_ctx).scan_internals.flags_mask[3] = 0x0008;     //
+    (*ladder_ctx).scan_internals.flags_mask[4] = 0x0010;     //
 
     (*ladder_ctx).io.read_inputs_local = NULL;
     (*ladder_ctx).io.write_outputs_local = NULL;
