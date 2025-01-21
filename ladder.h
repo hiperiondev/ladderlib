@@ -363,21 +363,21 @@ typedef struct ladder_scan_internals_s {
  *
  */
 typedef struct ladder_ctx_s {
-                 ladder_t ladder;                   /**< */
-              ladder_io_t io;                       /**< */
-          ladder_memory_t memory;                   /**< */
-  ladder_prev_scan_vals_t prev_scan_vals;           /**< */
-       ladder_registers_t registers;                /**< */
-           ladder_timer_t *timers;                  /**< */
-  ladder_scan_internals_t scan_internals;           /**< */
-         ladder_network_t *network;                 /**< */
-         ladder_network_t exec_network;             /**< network in execution */
+                 ladder_t ladder;                   /**< Internals */
+              ladder_io_t io;                       /**< I/O hardware functions */
+          ladder_memory_t memory;                   /**< Memory */
+  ladder_prev_scan_vals_t prev_scan_vals;           /**< Previous scan values */
+       ladder_registers_t registers;                /**< Registers */
+           ladder_timer_t *timers;                  /**< Timers */
+  ladder_scan_internals_t scan_internals;           /**< Scan internals */
+         ladder_network_t *network;                 /**< Networks */
+         ladder_network_t exec_network;             /**< Network in execution */
 } ladder_ctx_t;
 
 /**
  * @fn bool ladder_ctx_init(ladder_ctx_t *ladder_ctx, uint32_t networks_qty, uint32_t qty_m, uint32_t qty_i, uint32_t qty_q, uint32_t qty_iw, uint32_t qty_qw,
         uint32_t qty_c, uint32_t qty_t, uint32_t qty_d, uint32_t qty_r)
- * @brief
+ * @brief Initialize context
  *
  * @param ladder_ctx Ladder context
  * @return Status
@@ -387,7 +387,7 @@ bool ladder_ctx_init(ladder_ctx_t *ladder_ctx, uint32_t networks_qty, uint32_t q
 
 /**
  * @fn bool ladder_ctx_deinit(ladder_ctx_t *ladder_ctx)
- * @brief
+ * @brief Delete context
  *
  * @param ladder_ctx Ladder context
  * @return Status
