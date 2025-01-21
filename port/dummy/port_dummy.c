@@ -36,7 +36,7 @@
 #include "ladder.h"
 #include "port_dummy.h"
 
-static const char *_ladder_state_str[] = {
+static const char *_ladder_status_str[] = {
         "STOPPED",   //
         "RUNNING",   //
         "ERROR",     //
@@ -44,7 +44,8 @@ static const char *_ladder_state_str[] = {
         "INVALID",   //
         };
 
-static const char *_fn_str[] = { "NOP",   //
+static const char *_fn_str[] = {
+        "NOP",   //
         "CONN",  //
         "NEG",   //
         "NO",    //
@@ -195,7 +196,7 @@ bool dummy_external_on_task(ladder_ctx_t *ladder_ctx) {
 
 void dummy_panic(ladder_ctx_t *ladder_ctx) {
     printf("--------- dummy PANIC ---------\n");
-    printf("        STATE: %s (%d)\n", _ladder_state_str[(*ladder_ctx).ladder.state], (*ladder_ctx).ladder.state);
+    printf("        STATE: %s (%d)\n", _ladder_status_str[(*ladder_ctx).ladder.status], (*ladder_ctx).ladder.status);
     printf("  INSTRUCTION: %s (%d)\n", _fn_str[(*ladder_ctx).ladder.last_instr], (*ladder_ctx).ladder.last_instr);
     printf("      NETWORK: %d\n", (*ladder_ctx).ladder.last_instr_network);
     printf("         CELL: %d, %d\n", (*ladder_ctx).ladder.last_instr_cell_row, (*ladder_ctx).ladder.last_instr_cell_column);

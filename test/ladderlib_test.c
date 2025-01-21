@@ -173,7 +173,7 @@ int main(void) {
     ladder_ctx.io.micros = dummy_micros;
     ladder_ctx.io.delay = dummy_delay;
 
-    ladder_ctx.ladder.state = LADDER_ST_RUNNING;
+    ladder_ctx.ladder.status = LADDER_ST_RUNNING;
 
     printf("Load demo program\n\n");
     load_demo(&ladder_ctx);

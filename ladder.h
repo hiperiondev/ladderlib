@@ -114,13 +114,13 @@ typedef enum LADDER_INSTRUCTIONS {
  * @brief General status
  *
  */
-enum LADDER_STATUS {
+typedef enum LADDER_STATUS {
     LADDER_ST_STOPPED,  /**< Stopped */
     LADDER_ST_RUNNING,  /**< Running */
     LADDER_ST_ERROR,    /**< Error */
     LADDER_ST_EXIT_TSK, /**< Exit task */
     LADDER_ST_INV,      /**< Invalid */
-};
+} ladder_status_t;
 
 /**
  * @enum LADDER_TYPE
@@ -164,7 +164,7 @@ typedef struct ladder_cell_s {
  */
 typedef struct ladder_network_s {
     ladder_cell_t cells[LADDER_NET_ROWS][LADDER_NET_COLUMNS]; /**< Cells */
-         uint16_t bars[LADDER_NET_COLUMNS - 1];               /**< Bars */
+         uint32_t bars[LADDER_NET_COLUMNS - 1];               /**< Bars */
 } ladder_network_t;
 
 /**
@@ -174,7 +174,7 @@ typedef struct ladder_network_s {
  */
 typedef struct ladder_timer_s {
     uint32_t time_stamp; /**< Time stamp */
-    uint16_t acc;        /**< Activated counter */
+    uint32_t acc;        /**< Activated counter */
 } ladder_timer_t;
 
 /**
@@ -183,22 +183,22 @@ typedef struct ladder_timer_s {
  *
  */
 typedef struct ladder_s {
-    uint16_t state;                  /**< State */
-     uint8_t last_instr;             /**< Last executed instruction */
-    uint32_t last_instr_network;     /**< Last executed network */
-    uint32_t last_instr_cell_column; /**< Last executed cell column */
-    uint32_t last_instr_cell_row;    /**< Last executed cell row */
-     uint8_t last_instr_err;         /**< Last executed error */
-    uint32_t qty_m;                  /**< Quantity of regular flags */
-    uint32_t qty_i;                  /**< Quantity of digital inputs */
-    uint32_t qty_q;                  /**< Quantity of digital outputs */
-    uint32_t qty_iw;                 /**< Quantity of analog inputs */
-    uint32_t qty_qw;                 /**< Quantity of analog outputs */
-    uint32_t qty_c;                  /**< Quantity of counters */
-    uint32_t qty_t;                  /**< Quantity of timers */
-    uint32_t qty_d;                  /**< Quantity of regular registers */
-    uint32_t qty_r;                  /**< Quantity of floating point registers */
-    uint32_t total_networks;         /**< Quantity of networks */
+    ladder_status_t status;                 /**< State */
+            uint8_t last_instr;             /**< Last executed instruction */
+           uint32_t last_instr_network;     /**< Last executed network */
+           uint32_t last_instr_cell_column; /**< Last executed cell column */
+           uint32_t last_instr_cell_row;    /**< Last executed cell row */
+            uint8_t last_instr_err;         /**< Last executed error */
+           uint32_t qty_m;                  /**< Quantity of regular flags */
+           uint32_t qty_i;                  /**< Quantity of digital inputs */
+           uint32_t qty_q;                  /**< Quantity of digital outputs */
+           uint32_t qty_iw;                 /**< Quantity of analog inputs */
+           uint32_t qty_qw;                 /**< Quantity of analog outputs */
+           uint32_t qty_c;                  /**< Quantity of counters */
+           uint32_t qty_t;                  /**< Quantity of timers */
+           uint32_t qty_d;                  /**< Quantity of regular registers */
+           uint32_t qty_r;                  /**< Quantity of floating point registers */
+           uint32_t total_networks;         /**< Quantity of networks */
 } ladder_t;
 
 typedef struct ladder_ctx_s ladder_ctx_t;

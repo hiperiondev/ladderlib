@@ -37,9 +37,9 @@ void ladder_task(void *parameters) {
     ladder_ctx_t *ladder_ctx = (ladder_ctx_t*) parameters;
 
     // task main loop
-    while ((*ladder_ctx).ladder.state != LADDER_ST_EXIT_TSK) {
+    while ((*ladder_ctx).ladder.status != LADDER_ST_EXIT_TSK) {
 
-        if ((*ladder_ctx).ladder.state != LADDER_ST_RUNNING) {
+        if ((*ladder_ctx).ladder.status != LADDER_ST_RUNNING) {
 #ifdef DEBUG
             printf("------------ PANIC ------------\n");
             printf("        STATE: %s (%d)\n", ladder_state_str[(*ladder_ctx).ladder.state], (*ladder_ctx).ladder.state);
@@ -52,8 +52,8 @@ void ladder_task(void *parameters) {
             (*ladder_ctx).io.panic(ladder_ctx);
         }
 
-        while ((*ladder_ctx).ladder.state != LADDER_ST_RUNNING) {
-            if ((*ladder_ctx).ladder.state == LADDER_ST_EXIT_TSK)
+        while ((*ladder_ctx).ladder.status != LADDER_ST_RUNNING) {
+            if ((*ladder_ctx).ladder.status == LADDER_ST_EXIT_TSK)
                 return;
         }
 

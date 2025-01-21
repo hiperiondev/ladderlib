@@ -336,7 +336,7 @@ ladder_ins_err_t execTP(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row,
 ladder_ins_err_t execCTU(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag) {
     // reset counter
     if (column == 0) {
-        if ((*ladder_ctx).ladder.state == LADDER_ST_RUNNING) {
+        if ((*ladder_ctx).ladder.status == LADDER_ST_RUNNING) {
             (*ladder_ctx).registers.C[(*ladder_ctx).exec_network.cells[row][column].data] = 0;
             (*ladder_ctx).memory.Cd[(*ladder_ctx).exec_network.cells[row][column].data] = false;
             (*ladder_ctx).memory.Cr[(*ladder_ctx).exec_network.cells[row][column].data] = false;
@@ -383,7 +383,7 @@ ladder_ins_err_t execCTU(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row
 ladder_ins_err_t execCTD(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag) {
     // reset counter
     if (column == 0) {
-        if ((*ladder_ctx).ladder.state == LADDER_ST_RUNNING) {
+        if ((*ladder_ctx).ladder.status == LADDER_ST_RUNNING) {
             (*ladder_ctx).registers.C[(*ladder_ctx).exec_network.cells[row][column].data] = (*ladder_ctx).exec_network.cells[row + 1][column].data;
             (*ladder_ctx).memory.Cd[(*ladder_ctx).exec_network.cells[row][column].data] = false;
             (*ladder_ctx).memory.Cr[(*ladder_ctx).exec_network.cells[row][column].data] = false;

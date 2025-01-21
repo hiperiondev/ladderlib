@@ -117,7 +117,7 @@ void ladder_scan(ladder_ctx_t *ladder_ctx) {
                         printf("   - Type: %u\n", (*ladder_ctx).exec_network.cells[row][column].type);
                         printf("   - Data: %u\n", (*ladder_ctx).exec_network.cells[row][column].data);
 #endif
-                        (*ladder_ctx).ladder.state = LADDER_ST_INV;
+                        (*ladder_ctx).ladder.status = LADDER_ST_INV;
                         return;
                     }
                     (*ladder_ctx).exec_network.cells[row][column].code = 0;
@@ -126,7 +126,7 @@ void ladder_scan(ladder_ctx_t *ladder_ctx) {
                 // execute instruction
                 if ((*ladder_ctx).exec_network.cells[row][column].code != 0) {
                     if (column == 0) {
-                        if ((*ladder_ctx).ladder.state == LADDER_ST_RUNNING) {
+                        if ((*ladder_ctx).ladder.status == LADDER_ST_RUNNING) {
                             ins_err = fn_ladder[(*ladder_ctx).exec_network.cells[row][column].code](ladder_ctx, column, row, 1);
                         } else {
                             ins_err = fn_ladder[(*ladder_ctx).exec_network.cells[row][column].code](ladder_ctx, column, row, 0);
@@ -137,7 +137,7 @@ void ladder_scan(ladder_ctx_t *ladder_ctx) {
                     }
 
                     if (ins_err != LADDER_INS_ERR_OK) {
-                        (*ladder_ctx).ladder.state = LADDER_ST_INV;
+                        (*ladder_ctx).ladder.status = LADDER_ST_INV;
                         return;
                     }
                 }
