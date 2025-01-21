@@ -101,7 +101,7 @@ void ladder_clear_program(ladder_ctx_t *ladder_ctx) {
 
 bool ladder_ctx_init(ladder_ctx_t *ladder_ctx, uint32_t networks_qty, uint32_t qty_m, uint32_t qty_i, uint32_t qty_q, uint32_t qty_iw, uint32_t qty_qw,
         uint32_t qty_c, uint32_t qty_t, uint32_t qty_d, uint32_t qty_r) {
-    memset((*ladder_ctx).scan_internals.flags_mask, 0, NET_ROWS * sizeof(uint16_t));
+    memset((*ladder_ctx).scan_internals.flags_mask, 0, LADDER_NET_ROWS * sizeof(uint16_t));
     (*ladder_ctx).scan_internals.flags_mask[0] = 0x0001;     //
     (*ladder_ctx).scan_internals.flags_mask[1] = 0x0002;     //
     (*ladder_ctx).scan_internals.flags_mask[2] = 0x0004;     //

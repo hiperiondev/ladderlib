@@ -44,18 +44,18 @@ extern const char *ladder_type_str[];
 #endif
 
 /**
- * @def NET_COLUMNS
+ * @def LADDER_NET_COLUMNS
  * @brief Network Logic matrix columns size
  *
  */
-#define NET_COLUMNS 6
+#define LADDER_NET_COLUMNS 6
 
 /**
- * @def NET_ROWS
+ * @def LADDER_NET_ROWS
  * @brief Network Logic matrix rows size
  *
  */
-#define NET_ROWS 5
+#define LADDER_NET_ROWS 5
 
 /**
  * @def LADDER_INS_MASK
@@ -163,8 +163,8 @@ typedef struct ladder_cell_s {
  *
  */
 typedef struct ladder_network_s {
-    ladder_cell_t cells[NET_ROWS][NET_COLUMNS]; /**< Cells */
-         uint16_t bars[NET_COLUMNS - 1];        /**< Bars */
+    ladder_cell_t cells[LADDER_NET_ROWS][LADDER_NET_COLUMNS]; /**< Cells */
+         uint16_t bars[LADDER_NET_COLUMNS - 1];               /**< Bars */
 } ladder_network_t;
 
 /**
@@ -179,7 +179,7 @@ typedef struct ladder_timer_s {
 
 /**
  * @struct ladder_s
- * @brief Ladder internal context
+ * @brief Ladder internals
  *
  */
 typedef struct ladder_s {
@@ -351,10 +351,10 @@ typedef struct ladder_registers_s {
  *
  */
 typedef struct ladder_scan_internals_s {
-         uint16_t flags_mask[NET_ROWS];                  /**< Masks */
-         uint16_t ladder_network_flags[NET_COLUMNS - 1]; /**< Flags */
-         uint32_t ladder_actual_scan_time;               /**< Actual scan time */
-         uint32_t ladder_start_time;                     /**< Start time for calculate scan time */
+         uint16_t flags_mask[LADDER_NET_ROWS];                  /**< Masks */
+         uint16_t ladder_network_flags[LADDER_NET_COLUMNS - 1]; /**< Flags */
+         uint32_t ladder_actual_scan_time;                      /**< Actual scan time */
+         uint32_t ladder_start_time;                            /**< Start time for calculate scan time */
 } ladder_scan_internals_t;
 
 /**

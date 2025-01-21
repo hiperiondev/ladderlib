@@ -79,11 +79,11 @@ void ladder_scan(ladder_ctx_t *ladder_ctx) {
         (*ladder_ctx).exec_network = (*ladder_ctx).network[network];
 
         // resets dynamic flags before to start each network
-        memset((*ladder_ctx).scan_internals.ladder_network_flags, 0, (NET_COLUMNS - 1) * sizeof(uint16_t));
+        memset((*ladder_ctx).scan_internals.ladder_network_flags, 0, (LADDER_NET_COLUMNS - 1) * sizeof(uint16_t));
 
         // call ladder instructions
-        for (uint32_t column = 0; column < NET_COLUMNS; column++) {
-            for (uint32_t row = 0; row < NET_ROWS; row++) {
+        for (uint32_t column = 0; column < LADDER_NET_COLUMNS; column++) {
+            for (uint32_t row = 0; row < LADDER_NET_ROWS; row++) {
 #ifdef DEBUG
                 printf("   -          Network: %d [r:%d, c:%d]\n", network, row, column);
                 printf("   -    Code (%s): %u (%s)\n", (*ladder_ctx).exec_network.cells[row][column].code >= LADDER_INS_INV ? "masked" : "notmsk",
@@ -144,8 +144,8 @@ void ladder_scan(ladder_ctx_t *ladder_ctx) {
             }
 
             // update dynamic flags vs bars (not for last column)
-            if ((column < NET_COLUMNS - 1) && ((*ladder_ctx).scan_internals.ladder_network_flags[column] != 0)) {
-                for (uint32_t i = 0; i < NET_ROWS - 1; i++) {
+            if ((column < LADDER_NET_COLUMNS - 1) && ((*ladder_ctx).scan_internals.ladder_network_flags[column] != 0)) {
+                for (uint32_t i = 0; i < LADDER_NET_ROWS - 1; i++) {
                     (*ladder_ctx).scan_internals.ladder_network_flags[column] = (*ladder_ctx).scan_internals.ladder_network_flags[column]
                             | (((*ladder_ctx).scan_internals.ladder_network_flags[column] & (*ladder_ctx).exec_network.bars[column]) << 1);
                     (*ladder_ctx).scan_internals.ladder_network_flags[column] = (*ladder_ctx).scan_internals.ladder_network_flags[column]
