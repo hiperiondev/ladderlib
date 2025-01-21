@@ -46,14 +46,14 @@ extern const char *ladder_type_str[];
 /**
  * @def LADDER_NET_COLUMNS
  * @brief Network Logic matrix columns size
- *
+ * Maximum: 32
  */
 #define LADDER_NET_COLUMNS 6
 
 /**
  * @def LADDER_NET_ROWS
  * @brief Network Logic matrix rows size
- *
+ * Maximum: 32
  */
 #define LADDER_NET_ROWS 5
 
@@ -351,10 +351,10 @@ typedef struct ladder_registers_s {
  *
  */
 typedef struct ladder_scan_internals_s {
-         uint16_t flags_mask[LADDER_NET_ROWS];                  /**< Masks */
-         uint16_t ladder_network_flags[LADDER_NET_COLUMNS - 1]; /**< Flags */
-         uint32_t ladder_actual_scan_time;                      /**< Actual scan time */
-         uint32_t ladder_start_time;                            /**< Start time for calculate scan time */
+         uint32_t flags_mask[LADDER_NET_ROWS];           /**< Masks */
+         uint32_t network_flags[LADDER_NET_COLUMNS - 1]; /**< Flags */
+         uint32_t actual_scan_time;                      /**< Actual scan time */
+         uint32_t start_time;                            /**< Start time for calculate scan time */
 } ladder_scan_internals_t;
 
 /**

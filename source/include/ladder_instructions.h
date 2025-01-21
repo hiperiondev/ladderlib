@@ -477,7 +477,7 @@ ladder_ins_err_t execEQ(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row,
 ladder_ins_err_t execGT(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag);
 
 /**
- * @fn ladder_ins_err_t execGE(ladder_ctx_t*, int, int, int)
+ * @fn ladder_ins_err_t execGE(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag)
  * @brief Comparison greater than
  *
  * @param ladder_ctx Ladder context
@@ -489,7 +489,7 @@ ladder_ins_err_t execGT(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row,
 ladder_ins_err_t execGE(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag);
 
 /**
- * @fn ladder_ins_err_t execLT(ladder_ctx_t*, int, int, int)
+ * @fn ladder_ins_err_t execLT(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag)
  * @brief Comparison lesser than
  *
  * @param ladder_ctx Ladder context

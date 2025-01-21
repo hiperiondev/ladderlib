@@ -87,7 +87,7 @@ ladder_ins_err_t execNop(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row
 
 ladder_ins_err_t execConn(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag) {
     if (flag) {
-        (*ladder_ctx).scan_internals.ladder_network_flags[column] = (*ladder_ctx).scan_internals.ladder_network_flags[column]
+        (*ladder_ctx).scan_internals.network_flags[column] = (*ladder_ctx).scan_internals.network_flags[column]
                 | (*ladder_ctx).scan_internals.flags_mask[row];
     }
 
@@ -96,7 +96,7 @@ ladder_ins_err_t execConn(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t ro
 
 ladder_ins_err_t execNeg(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag) {
     if (!flag) {
-        (*ladder_ctx).scan_internals.ladder_network_flags[column] = (*ladder_ctx).scan_internals.ladder_network_flags[column]
+        (*ladder_ctx).scan_internals.network_flags[column] = (*ladder_ctx).scan_internals.network_flags[column]
                 | (*ladder_ctx).scan_internals.flags_mask[row];
     }
 
@@ -110,7 +110,7 @@ ladder_ins_err_t execNO(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row,
         return LADDER_INS_ERR_GETDATAVAL;
 
     if ((flag) && data) {
-        (*ladder_ctx).scan_internals.ladder_network_flags[column] = (*ladder_ctx).scan_internals.ladder_network_flags[column]
+        (*ladder_ctx).scan_internals.network_flags[column] = (*ladder_ctx).scan_internals.network_flags[column]
                 | (*ladder_ctx).scan_internals.flags_mask[row];
     }
 
@@ -124,7 +124,7 @@ ladder_ins_err_t execNC(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row,
         return LADDER_INS_ERR_GETDATAVAL;
 
     if ((flag) && !data) {
-        (*ladder_ctx).scan_internals.ladder_network_flags[column] = (*ladder_ctx).scan_internals.ladder_network_flags[column]
+        (*ladder_ctx).scan_internals.network_flags[column] = (*ladder_ctx).scan_internals.network_flags[column]
                 | (*ladder_ctx).scan_internals.flags_mask[row];
     }
 
@@ -140,7 +140,7 @@ ladder_ins_err_t execRE(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row,
         return LADDER_INS_ERR_GETPREVVAL;
 
     if ((flag) && data && !prev_val) {
-        (*ladder_ctx).scan_internals.ladder_network_flags[column] = (*ladder_ctx).scan_internals.ladder_network_flags[column]
+        (*ladder_ctx).scan_internals.network_flags[column] = (*ladder_ctx).scan_internals.network_flags[column]
                 | (*ladder_ctx).scan_internals.flags_mask[row];
     }
 
@@ -156,7 +156,7 @@ ladder_ins_err_t execFE(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row,
         return LADDER_INS_ERR_GETPREVVAL;
 
     if ((flag) && !data && prev_val) {
-        (*ladder_ctx).scan_internals.ladder_network_flags[column] = (*ladder_ctx).scan_internals.ladder_network_flags[column]
+        (*ladder_ctx).scan_internals.network_flags[column] = (*ladder_ctx).scan_internals.network_flags[column]
                 | (*ladder_ctx).scan_internals.flags_mask[row];
     }
 
@@ -166,7 +166,7 @@ ladder_ins_err_t execFE(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row,
 ladder_ins_err_t execCoil(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag) {
     if (flag) {
         ladder_set_data_value(ladder_ctx, row, column, 1);
-        (*ladder_ctx).scan_internals.ladder_network_flags[column] = (*ladder_ctx).scan_internals.ladder_network_flags[column]
+        (*ladder_ctx).scan_internals.network_flags[column] = (*ladder_ctx).scan_internals.network_flags[column]
                 | (*ladder_ctx).scan_internals.flags_mask[row];
     } else {
         ladder_set_data_value(ladder_ctx, row, column, 0);
@@ -178,7 +178,7 @@ ladder_ins_err_t execCoil(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t ro
 ladder_ins_err_t execCoilL(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag) {
     if (flag) {
         ladder_set_data_value(ladder_ctx, row, column, 1);
-        (*ladder_ctx).scan_internals.ladder_network_flags[column] = (*ladder_ctx).scan_internals.ladder_network_flags[column]
+        (*ladder_ctx).scan_internals.network_flags[column] = (*ladder_ctx).scan_internals.network_flags[column]
                 | (*ladder_ctx).scan_internals.flags_mask[row];
     }
 
@@ -188,7 +188,7 @@ ladder_ins_err_t execCoilL(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t r
 ladder_ins_err_t execCoilU(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag) {
     if (flag) {
         ladder_set_data_value(ladder_ctx, row, column, 0);
-        (*ladder_ctx).scan_internals.ladder_network_flags[column] = (*ladder_ctx).scan_internals.ladder_network_flags[column]
+        (*ladder_ctx).scan_internals.network_flags[column] = (*ladder_ctx).scan_internals.network_flags[column]
                 | (*ladder_ctx).scan_internals.flags_mask[row];
     }
 
@@ -228,12 +228,12 @@ ladder_ins_err_t execTON(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row
 
     // copy timer flags to dynamic flags on network
     if ((*ladder_ctx).memory.Td[(*ladder_ctx).exec_network.cells[row][column].data]) {
-        (*ladder_ctx).scan_internals.ladder_network_flags[column] = (*ladder_ctx).scan_internals.ladder_network_flags[column]
+        (*ladder_ctx).scan_internals.network_flags[column] = (*ladder_ctx).scan_internals.network_flags[column]
                 | (*ladder_ctx).scan_internals.flags_mask[row];
     }
 
     if ((*ladder_ctx).memory.Tr[(*ladder_ctx).exec_network.cells[row][column].data]) {
-        (*ladder_ctx).scan_internals.ladder_network_flags[column] = (*ladder_ctx).scan_internals.ladder_network_flags[column]
+        (*ladder_ctx).scan_internals.network_flags[column] = (*ladder_ctx).scan_internals.network_flags[column]
                 | (*ladder_ctx).scan_internals.flags_mask[row + 1];
     }
 
@@ -277,12 +277,12 @@ ladder_ins_err_t execTOFF(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t ro
 
     // copy timer flags to dynamic flags on network
     if ((*ladder_ctx).memory.Td[(*ladder_ctx).exec_network.cells[row][column].data]) {
-        (*ladder_ctx).scan_internals.ladder_network_flags[column] = (*ladder_ctx).scan_internals.ladder_network_flags[column]
+        (*ladder_ctx).scan_internals.network_flags[column] = (*ladder_ctx).scan_internals.network_flags[column]
                 | (*ladder_ctx).scan_internals.flags_mask[row];
     }
 
     if ((*ladder_ctx).memory.Tr[(*ladder_ctx).exec_network.cells[row][column].data]) {
-        (*ladder_ctx).scan_internals.ladder_network_flags[column] = (*ladder_ctx).scan_internals.ladder_network_flags[column]
+        (*ladder_ctx).scan_internals.network_flags[column] = (*ladder_ctx).scan_internals.network_flags[column]
                 | (*ladder_ctx).scan_internals.flags_mask[row + 1];
     }
 
@@ -321,12 +321,12 @@ ladder_ins_err_t execTP(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row,
 
     // copy timer flags to dynamic flags on network
     if ((*ladder_ctx).memory.Td[(*ladder_ctx).exec_network.cells[row][column].data]) {
-        (*ladder_ctx).scan_internals.ladder_network_flags[column] = (*ladder_ctx).scan_internals.ladder_network_flags[column]
+        (*ladder_ctx).scan_internals.network_flags[column] = (*ladder_ctx).scan_internals.network_flags[column]
                 | (*ladder_ctx).scan_internals.flags_mask[row];
     }
 
     if ((*ladder_ctx).memory.Tr[(*ladder_ctx).exec_network.cells[row][column].data]) {
-        (*ladder_ctx).scan_internals.ladder_network_flags[column] = (*ladder_ctx).scan_internals.ladder_network_flags[column]
+        (*ladder_ctx).scan_internals.network_flags[column] = (*ladder_ctx).scan_internals.network_flags[column]
                 | (*ladder_ctx).scan_internals.flags_mask[row + 1];
     }
 
@@ -342,7 +342,7 @@ ladder_ins_err_t execCTU(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row
             (*ladder_ctx).memory.Cr[(*ladder_ctx).exec_network.cells[row][column].data] = false;
         }
     } else {
-        if ((*ladder_ctx).scan_internals.ladder_network_flags[column - 1] & (*ladder_ctx).scan_internals.flags_mask[row + 1]) {
+        if ((*ladder_ctx).scan_internals.network_flags[column - 1] & (*ladder_ctx).scan_internals.flags_mask[row + 1]) {
             (*ladder_ctx).registers.C[(*ladder_ctx).exec_network.cells[row][column].data] = 0;
             (*ladder_ctx).memory.Cd[(*ladder_ctx).exec_network.cells[row][column].data] = false;
             (*ladder_ctx).memory.Cr[(*ladder_ctx).exec_network.cells[row][column].data] = false;
@@ -368,12 +368,12 @@ ladder_ins_err_t execCTU(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row
 
     // copy counter flags to dynamic flags on network
     if ((*ladder_ctx).memory.Cd[(*ladder_ctx).exec_network.cells[row][column].data] && flag) {
-        (*ladder_ctx).scan_internals.ladder_network_flags[column] = (*ladder_ctx).scan_internals.ladder_network_flags[column]
+        (*ladder_ctx).scan_internals.network_flags[column] = (*ladder_ctx).scan_internals.network_flags[column]
                 | (*ladder_ctx).scan_internals.flags_mask[row];
     }
 
     if ((*ladder_ctx).memory.Cr[(*ladder_ctx).exec_network.cells[row][column].data] && flag) {
-        (*ladder_ctx).scan_internals.ladder_network_flags[column] = (*ladder_ctx).scan_internals.ladder_network_flags[column]
+        (*ladder_ctx).scan_internals.network_flags[column] = (*ladder_ctx).scan_internals.network_flags[column]
                 | (*ladder_ctx).scan_internals.flags_mask[row + 1];
     }
 
@@ -389,7 +389,7 @@ ladder_ins_err_t execCTD(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row
             (*ladder_ctx).memory.Cr[(*ladder_ctx).exec_network.cells[row][column].data] = false;
         }
     } else {
-        if ((*ladder_ctx).scan_internals.ladder_network_flags[column - 1] & (*ladder_ctx).scan_internals.flags_mask[row + 1]) {
+        if ((*ladder_ctx).scan_internals.network_flags[column - 1] & (*ladder_ctx).scan_internals.flags_mask[row + 1]) {
             (*ladder_ctx).registers.C[(*ladder_ctx).exec_network.cells[row][column].data] = (*ladder_ctx).exec_network.cells[row + 1][column].data;
             (*ladder_ctx).memory.Cd[(*ladder_ctx).exec_network.cells[row][column].data] = false;
             (*ladder_ctx).memory.Cr[(*ladder_ctx).exec_network.cells[row][column].data] = false;
@@ -415,12 +415,12 @@ ladder_ins_err_t execCTD(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row
 
     // copy counter flags to dynamic flags on network
     if ((*ladder_ctx).memory.Cd[(*ladder_ctx).exec_network.cells[row][column].data] && flag) {
-        (*ladder_ctx).scan_internals.ladder_network_flags[column] = (*ladder_ctx).scan_internals.ladder_network_flags[column]
+        (*ladder_ctx).scan_internals.network_flags[column] = (*ladder_ctx).scan_internals.network_flags[column]
                 | (*ladder_ctx).scan_internals.flags_mask[row];
     }
 
     if ((*ladder_ctx).memory.Cr[(*ladder_ctx).exec_network.cells[row][column].data] && flag) {
-        (*ladder_ctx).scan_internals.ladder_network_flags[column] = (*ladder_ctx).scan_internals.ladder_network_flags[column]
+        (*ladder_ctx).scan_internals.network_flags[column] = (*ladder_ctx).scan_internals.network_flags[column]
                 | (*ladder_ctx).scan_internals.flags_mask[row + 1];
     }
 
@@ -435,7 +435,7 @@ ladder_ins_err_t execMOVE(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t ro
 
     if (flag) {
         ladder_set_data_value(ladder_ctx, row + 1, column, data);
-        (*ladder_ctx).scan_internals.ladder_network_flags[column] = (*ladder_ctx).scan_internals.ladder_network_flags[column]
+        (*ladder_ctx).scan_internals.network_flags[column] = (*ladder_ctx).scan_internals.network_flags[column]
                 | (*ladder_ctx).scan_internals.flags_mask[row];
     }
 
@@ -451,13 +451,13 @@ ladder_ins_err_t execSUB(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row
             return LADDER_INS_ERR_GETDATAVAL;
 
         if (auxValue1 > auxValue2) {
-            (*ladder_ctx).scan_internals.ladder_network_flags[column] = (*ladder_ctx).scan_internals.ladder_network_flags[column]
+            (*ladder_ctx).scan_internals.network_flags[column] = (*ladder_ctx).scan_internals.network_flags[column]
                     | (*ladder_ctx).scan_internals.flags_mask[row];
         } else if (auxValue1 == auxValue2) {
-            (*ladder_ctx).scan_internals.ladder_network_flags[column] = (*ladder_ctx).scan_internals.ladder_network_flags[column]
+            (*ladder_ctx).scan_internals.network_flags[column] = (*ladder_ctx).scan_internals.network_flags[column]
                     | (*ladder_ctx).scan_internals.flags_mask[row + 1];
         } else {
-            (*ladder_ctx).scan_internals.ladder_network_flags[column] = (*ladder_ctx).scan_internals.ladder_network_flags[column]
+            (*ladder_ctx).scan_internals.network_flags[column] = (*ladder_ctx).scan_internals.network_flags[column]
                     | (*ladder_ctx).scan_internals.flags_mask[row + 2];
         }
         ladder_set_data_value(ladder_ctx, row + 2, column, auxValue1 - auxValue2);
@@ -475,7 +475,7 @@ ladder_ins_err_t execADD(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row
 
     if (flag) {
         ladder_set_data_value(ladder_ctx, row + 2, column, data1 + data2);
-        (*ladder_ctx).scan_internals.ladder_network_flags[column] = (*ladder_ctx).scan_internals.ladder_network_flags[column]
+        (*ladder_ctx).scan_internals.network_flags[column] = (*ladder_ctx).scan_internals.network_flags[column]
                 | (*ladder_ctx).scan_internals.flags_mask[row];
     }
 
@@ -491,7 +491,7 @@ ladder_ins_err_t execMUL(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row
 
     if (flag) {
         ladder_set_data_value(ladder_ctx, row + 2, column, data1 * data2);
-        (*ladder_ctx).scan_internals.ladder_network_flags[column] = (*ladder_ctx).scan_internals.ladder_network_flags[column]
+        (*ladder_ctx).scan_internals.network_flags[column] = (*ladder_ctx).scan_internals.network_flags[column]
                 | (*ladder_ctx).scan_internals.flags_mask[row];
     }
 
@@ -508,11 +508,11 @@ ladder_ins_err_t execDIV(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row
     if (flag) {
         if (data2 == 0) {
             ladder_set_data_value(ladder_ctx, row + 2, column, 0);
-            (*ladder_ctx).scan_internals.ladder_network_flags[column] = (*ladder_ctx).scan_internals.ladder_network_flags[column]
+            (*ladder_ctx).scan_internals.network_flags[column] = (*ladder_ctx).scan_internals.network_flags[column]
                     | (*ladder_ctx).scan_internals.flags_mask[row + 2];
         } else {
             ladder_set_data_value(ladder_ctx, row + 2, column, data1 / data2);
-            (*ladder_ctx).scan_internals.ladder_network_flags[column] = (*ladder_ctx).scan_internals.ladder_network_flags[column]
+            (*ladder_ctx).scan_internals.network_flags[column] = (*ladder_ctx).scan_internals.network_flags[column]
                     | (*ladder_ctx).scan_internals.flags_mask[row];
         }
     }
@@ -529,7 +529,7 @@ ladder_ins_err_t execMOD(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row
 
     if (flag) {
         ladder_set_data_value(ladder_ctx, row + 2, column, data1 % data2);
-        (*ladder_ctx).scan_internals.ladder_network_flags[column] = (*ladder_ctx).scan_internals.ladder_network_flags[column]
+        (*ladder_ctx).scan_internals.network_flags[column] = (*ladder_ctx).scan_internals.network_flags[column]
                 | (*ladder_ctx).scan_internals.flags_mask[row];
     }
 
@@ -544,7 +544,7 @@ ladder_ins_err_t execSHL(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row
 
     if (flag) {
         ladder_set_data_value(ladder_ctx, row + 1, column, data << 1);
-        (*ladder_ctx).scan_internals.ladder_network_flags[column] = (*ladder_ctx).scan_internals.ladder_network_flags[column]
+        (*ladder_ctx).scan_internals.network_flags[column] = (*ladder_ctx).scan_internals.network_flags[column]
                 | (*ladder_ctx).scan_internals.flags_mask[row];
     }
 
@@ -559,7 +559,7 @@ ladder_ins_err_t execSHR(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row
 
     if (flag) {
         ladder_set_data_value(ladder_ctx, row + 1, column, data >> 1);
-        (*ladder_ctx).scan_internals.ladder_network_flags[column] = (*ladder_ctx).scan_internals.ladder_network_flags[column]
+        (*ladder_ctx).scan_internals.network_flags[column] = (*ladder_ctx).scan_internals.network_flags[column]
                 | (*ladder_ctx).scan_internals.flags_mask[row];
     }
 
@@ -583,7 +583,7 @@ ladder_ins_err_t execROL(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row
         }
         ladder_set_data_value(ladder_ctx, row + 1, column, auxValue);
 
-        (*ladder_ctx).scan_internals.ladder_network_flags[column] = (*ladder_ctx).scan_internals.ladder_network_flags[column]
+        (*ladder_ctx).scan_internals.network_flags[column] = (*ladder_ctx).scan_internals.network_flags[column]
                 | (*ladder_ctx).scan_internals.flags_mask[row];
     }
 
@@ -607,7 +607,7 @@ ladder_ins_err_t execROR(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row
         }
         ladder_set_data_value(ladder_ctx, row + 1, column, auxValue);
 
-        (*ladder_ctx).scan_internals.ladder_network_flags[column] = (*ladder_ctx).scan_internals.ladder_network_flags[column]
+        (*ladder_ctx).scan_internals.network_flags[column] = (*ladder_ctx).scan_internals.network_flags[column]
                 | (*ladder_ctx).scan_internals.flags_mask[row];
     }
 
@@ -623,7 +623,7 @@ ladder_ins_err_t execAND(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row
 
     if (flag) {
         ladder_set_data_value(ladder_ctx, row + 2, column, data1 & data2);
-        (*ladder_ctx).scan_internals.ladder_network_flags[column] = (*ladder_ctx).scan_internals.ladder_network_flags[column]
+        (*ladder_ctx).scan_internals.network_flags[column] = (*ladder_ctx).scan_internals.network_flags[column]
                 | (*ladder_ctx).scan_internals.flags_mask[row];
     }
 
@@ -639,7 +639,7 @@ ladder_ins_err_t execOR(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row,
 
     if (flag) {
         ladder_set_data_value(ladder_ctx, row + 2, column, data1 | data2);
-        (*ladder_ctx).scan_internals.ladder_network_flags[column] = (*ladder_ctx).scan_internals.ladder_network_flags[column]
+        (*ladder_ctx).scan_internals.network_flags[column] = (*ladder_ctx).scan_internals.network_flags[column]
                 | (*ladder_ctx).scan_internals.flags_mask[row];
     }
 
@@ -655,7 +655,7 @@ ladder_ins_err_t execXOR(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row
 
     if (flag) {
         ladder_set_data_value(ladder_ctx, row + 2, column, data1 ^ data2);
-        (*ladder_ctx).scan_internals.ladder_network_flags[column] = (*ladder_ctx).scan_internals.ladder_network_flags[column]
+        (*ladder_ctx).scan_internals.network_flags[column] = (*ladder_ctx).scan_internals.network_flags[column]
                 | (*ladder_ctx).scan_internals.flags_mask[row];
     }
 
@@ -670,7 +670,7 @@ ladder_ins_err_t execNOT(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row
 
     if (flag) {
         ladder_set_data_value(ladder_ctx, row + 1, column, ~data);
-        (*ladder_ctx).scan_internals.ladder_network_flags[column] = (*ladder_ctx).scan_internals.ladder_network_flags[column]
+        (*ladder_ctx).scan_internals.network_flags[column] = (*ladder_ctx).scan_internals.network_flags[column]
                 | (*ladder_ctx).scan_internals.flags_mask[row];
     }
 
@@ -686,7 +686,7 @@ ladder_ins_err_t execEQ(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row,
 
     if (flag) {
         if (data1 == data2) {
-            (*ladder_ctx).scan_internals.ladder_network_flags[column] = (*ladder_ctx).scan_internals.ladder_network_flags[column]
+            (*ladder_ctx).scan_internals.network_flags[column] = (*ladder_ctx).scan_internals.network_flags[column]
                     | (*ladder_ctx).scan_internals.flags_mask[row];
         }
     }
@@ -703,7 +703,7 @@ ladder_ins_err_t execGT(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row,
 
     if (flag) {
         if (data1 > data2) {
-            (*ladder_ctx).scan_internals.ladder_network_flags[column] = (*ladder_ctx).scan_internals.ladder_network_flags[column]
+            (*ladder_ctx).scan_internals.network_flags[column] = (*ladder_ctx).scan_internals.network_flags[column]
                     | (*ladder_ctx).scan_internals.flags_mask[row];
         }
     }
@@ -720,7 +720,7 @@ ladder_ins_err_t execGE(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row,
 
     if (flag) {
         if (data1 >= data2) {
-            (*ladder_ctx).scan_internals.ladder_network_flags[column] = (*ladder_ctx).scan_internals.ladder_network_flags[column]
+            (*ladder_ctx).scan_internals.network_flags[column] = (*ladder_ctx).scan_internals.network_flags[column]
                     | (*ladder_ctx).scan_internals.flags_mask[row];
         }
     }
@@ -737,7 +737,7 @@ ladder_ins_err_t execLT(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row,
 
     if (flag) {
         if (data1 < data2) {
-            (*ladder_ctx).scan_internals.ladder_network_flags[column] = (*ladder_ctx).scan_internals.ladder_network_flags[column]
+            (*ladder_ctx).scan_internals.network_flags[column] = (*ladder_ctx).scan_internals.network_flags[column]
                     | (*ladder_ctx).scan_internals.flags_mask[row];
         }
     }
@@ -754,7 +754,7 @@ ladder_ins_err_t execLE(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row,
 
     if (flag) {
         if (data1 <= data2) {
-            (*ladder_ctx).scan_internals.ladder_network_flags[column] = (*ladder_ctx).scan_internals.ladder_network_flags[column]
+            (*ladder_ctx).scan_internals.network_flags[column] = (*ladder_ctx).scan_internals.network_flags[column]
                     | (*ladder_ctx).scan_internals.flags_mask[row];
         }
     }
@@ -771,7 +771,7 @@ ladder_ins_err_t execNE(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row,
 
     if (flag) {
         if (data1 != data2) {
-            (*ladder_ctx).scan_internals.ladder_network_flags[column] = (*ladder_ctx).scan_internals.ladder_network_flags[column]
+            (*ladder_ctx).scan_internals.network_flags[column] = (*ladder_ctx).scan_internals.network_flags[column]
                     | (*ladder_ctx).scan_internals.flags_mask[row];
         }
     }
@@ -779,7 +779,6 @@ ladder_ins_err_t execNE(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row,
     return LADDER_INS_ERR_OK;
 }
 
-// get and set memory values
 ladder_ins_err_t ladder_get_previous_value(ladder_ctx_t *ladder_ctx, uint32_t row, uint32_t column, int *value) {
     *value = 0;
 
@@ -812,6 +811,7 @@ ladder_ins_err_t ladder_get_previous_value(ladder_ctx_t *ladder_ctx, uint32_t ro
 
     return LADDER_INS_ERR_OK;
 }
+
 ladder_ins_err_t ladder_get_data_value(ladder_ctx_t *ladder_ctx, uint32_t row, uint32_t column, int *value) { // issue #55 - change to uint16_t ?
     *value = 0;
 
