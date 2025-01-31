@@ -93,19 +93,6 @@ typedef enum LADDER_INS_ERROR {
 } ladder_ins_err_t;
 
 /**
- * @struct ladder_instructions_ioc_s
- * @brief Instruction inputs, outputs and occupied cells
- *
- */
-typedef struct ladder_instructions_ioc_s {
-    uint8_t inputs;  /**< Inputs quantity */
-    uint8_t outputs; /**< Outputs quantity */
-    uint8_t cells;   /**< Cells quantity */
-} ladder_instructions_ioc_t;
-
-extern const ladder_instructions_ioc_t ladder_fn_ioc[];
-
-/**
  * @fn  ladder_ins_err_t (*ladder_fn_t)(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag)
  * @brief Instruction prototype
  *

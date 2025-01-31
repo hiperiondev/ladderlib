@@ -147,6 +147,14 @@ typedef enum LADDER_TYPE {
     LADDER_TYPE_INV, /**< First invalid */
 } ladder_type_t;
 
+typedef enum LADDER_BASETIME {
+    LADDER_BASETIME_1MS,
+    LADDER_BASETIME_10MS,
+    LADDER_BASETIME_100MS,
+    LADDER_BASETIME_1SEC,
+    LADDER_BASETIME_1MIN,
+} ladder_basetime_t;
+
 /**
  * @struct ladder_cell_s
  * @brief Type definition for Networks and global declarations
@@ -155,7 +163,7 @@ typedef enum LADDER_TYPE {
 typedef struct ladder_cell_s {
     ladder_instruction_t code; /**< Code */
                  int16_t data; /**< Data */
-           ladder_type_t type; /**< Type */
+                 uint8_t type; /**< Type */
 } ladder_cell_t;
 
 /**

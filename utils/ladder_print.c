@@ -91,46 +91,121 @@ static const char *dt_graph[] = {
         "KR", //
         };
 
+static const char *basetime_graph[] = {
+        "1ms  ",
+        "10ms ",
+        "100ms",
+        "1s   ",
+        "1m   "
+};
+
+/**
+ * @struct ladder_instructions_ioc_s
+ * @brief Instruction inputs, outputs, occupied cells and timer (for basetime)
+ *
+ */
+typedef struct ladder_instructions_ioc_s {
+    uint8_t inputs;   /**< Inputs quantity */
+    uint8_t outputs;  /**< Outputs quantity */
+    uint8_t cells;    /**< Cells quantity */
+       bool basetime; /**< it's timer, have basetime */
+} ladder_instructions_ioc_t;
+
+static const ladder_instructions_ioc_t ladder_fn_ioc[] = {
+        { 1, 1, 1, false }, // NOP
+        { 1, 1, 1, false }, // CONN
+        { 1, 1, 1, false }, // NEG
+        { 1, 1, 1, false }, // NO
+        { 1, 1, 1, false }, // NC
+        { 1, 1, 1, false }, // RE
+        { 1, 1, 1, false }, // FE
+        { 1, 1, 1, false }, // COIL
+        { 1, 1, 1, false }, // COILL
+        { 1, 1, 1, false }, // COILU
+        { 1, 2, 2, true  }, // TON
+        { 1, 2, 2, true  }, // TOFF
+        { 1, 2, 2, true  }, // TP
+        { 2, 2, 2, false }, // CTU
+        { 2, 2, 2, false }, // CTD
+        { 1, 1, 2, false }, // MOVE
+        { 1, 3, 3, false }, // SUB
+        { 1, 1, 3, false }, // ADD
+        { 1, 1, 3, false }, // MUL
+        { 1, 2, 3, false }, // DIV
+        { 1, 1, 3, false }, // MOD
+        { 1, 1, 2, false }, // SHL
+        { 1, 1, 2, false }, // SHR
+        { 1, 1, 2, false }, // ROL
+        { 1, 1, 2, false }, // ROR
+        { 1, 1, 3, false }, // AND
+        { 1, 1, 3, false }, // OR
+        { 1, 1, 3, false }, // XOR
+        { 1, 1, 2, false }, // NOT
+        { 1, 1, 2, false }, // EQ
+        { 1, 1, 2, false }, // GT
+        { 1, 1, 2, false }, // GE
+        { 1, 1, 2, false }, // LT
+        { 1, 1, 2, false }, // LE
+        { 1, 1, 2, false }, // NE
+        { 1, 1, 1, false }, // INV
+        { 1, 1, 1, false }, // BAR
+        };
+
 static void fn_to_str(ladder_network_t network, char (*cells)[6][32], uint32_t row, uint32_t column) {
     memset(cells, 0, 6 * 32 * sizeof(char));
 
-    if(network.cells[row][column].code == 0)
+    if(network.cells[row][column].code == LADDER_INS_NOP || network.cells[row][column].code >= LADDER_INS_INV )
         return;
 
     if (ladder_fn_ioc[network.cells[row][column].code].cells != 1) {
-        sprintf((*cells)[0], "---+-%s-----+--", fn_symbol[network.cells[row][column].code]);
+        sprintf((*cells)[0], "---+-%s--------+--", fn_symbol[network.cells[row][column].code]);
     } else {
-        sprintf((*cells)[0], "--------%s-----", fn_symbol[network.cells[row][column].code]);
+        sprintf((*cells)[0], "--------%s--------", fn_symbol[network.cells[row][column].code]);
     }
 
     switch (ladder_fn_ioc[network.cells[row][column].code].cells) {
         case 1:
-            sprintf((*cells)[1], "     %s %04d    ", dt_graph[network.cells[row][column].type], network.cells[row][column].data);
+            sprintf((*cells)[1], "     %s %04d       ", dt_graph[network.cells[row][column].type], network.cells[row][column].data);
             break;
         case 2:
             if (row > LADDER_NET_ROWS - 2)
                 break;
-            sprintf((*cells)[1], "   | %s %04d |  ", dt_graph[network.cells[row][column].type], network.cells[row][column].data);
-            sprintf((*cells)[2], "%s| %s %04d |%s", ladder_fn_ioc[network.cells[row][column].code].inputs == 1 ? "   " : "---",
-                    dt_graph[network.cells[row + 1][column].type], network.cells[row + 1][column].data,
-                    ladder_fn_ioc[network.cells[row][column].code].outputs == 1 ? "  " : "--");
 
-            sprintf((*cells)[3], "   +---------+  ");
+            sprintf((*cells)[1], "   | %s %04d    |  ", dt_graph[network.cells[row][column].type], network.cells[row][column].data);
+
+            if (ladder_fn_ioc[network.cells[row][column].code].basetime) {
+                sprintf((*cells)[2], "%s| %04d %s |%s",
+                        ladder_fn_ioc[network.cells[row][column].code].inputs == 1 ? "   " : "---",
+                        network.cells[row + 1][column].data,
+                        basetime_graph[network.cells[row + 1][column].type],
+                        ladder_fn_ioc[network.cells[row][column].code].outputs == 1 ? "  " : "--"
+                                );
+            } else {
+                sprintf((*cells)[2], "%s| %s %04d    |%s", ladder_fn_ioc[network.cells[row][column].code].inputs == 1 ? "   " : "---",
+                        dt_graph[network.cells[row + 1][column].type], network.cells[row + 1][column].data,
+                        ladder_fn_ioc[network.cells[row][column].code].outputs == 1 ? "  " : "--");
+            }
+
+            sprintf((*cells)[3], "   +------------+  ");
 
             break;
         case 3:
             if (row > LADDER_NET_ROWS - 3)
                 break;
-            sprintf((*cells)[1], "   | %s %04d |  ", dt_graph[network.cells[row][column].type], network.cells[row][column].data);
-            //---//
-            sprintf((*cells)[2], "%s| %s %04d |%s",
+
+            sprintf((*cells)[1], "   | %s %04d    |  ", dt_graph[network.cells[row][column].type], network.cells[row][column].data);
+
+            sprintf((*cells)[2], "%s| %s %04d    |%s",
                     (ladder_fn_ioc[network.cells[row][column].code].inputs == 2 || ladder_fn_ioc[network.cells[row][column].code].outputs == 3) ? "---" : "   ",
                     dt_graph[network.cells[row + 1][column].type], network.cells[row + 1][column].data,
                     (ladder_fn_ioc[network.cells[row][column].code].outputs == 2 || ladder_fn_ioc[network.cells[row][column].code].outputs == 3) ? "--" : "  ");
-            sprintf((*cells)[3], "   | %s %04d |  ", dt_graph[network.cells[row + 2][column].type], network.cells[row + 1][column].data);
-            sprintf((*cells)[4], "%s|         |%s", ladder_fn_ioc[network.cells[row][column].code].inputs == 1 ? "   " : "---",
+
+            sprintf((*cells)[3], "   | %s %04d    |  ", dt_graph[network.cells[row + 2][column].type], network.cells[row + 1][column].data);
+
+            sprintf((*cells)[4], "%s|            |%s", ladder_fn_ioc[network.cells[row][column].code].inputs == 1 ? "   " : "---",
                     ladder_fn_ioc[network.cells[row][column].code].outputs == 1 ? "  " : "--");
-            sprintf((*cells)[5], "   +---------+  ");
+
+            sprintf((*cells)[5], "   +------------+  ");
             break;
         default:
             break;
@@ -168,14 +243,14 @@ void ladder_print(ladder_ctx_t ladder_ctx) {
             printf("|");
             for (uint32_t c = 0; c < LADDER_NET_COLUMNS; c++) {
                 if (network_str[r][c][0][0] == '\0')
-                    printf("................");
+                    printf("...................");
                 else
                     printf("%s", network_str[r][c][0]);
             }
             printf("|\n|");
             for (uint32_t c = 0; c < LADDER_NET_COLUMNS; c++) {
                 if (network_str[r][c][0][0] == '\0')
-                    printf("                ");
+                    printf("                   ");
                 else
                     printf("%s", network_str[r][c][1]);
             }
