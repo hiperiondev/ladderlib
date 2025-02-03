@@ -105,45 +105,59 @@
 
 // blink
 static void load_demo(ladder_ctx_t *ladder_ctx) {
-    (*ladder_ctx).ladder.total_networks = 2;
+    (*ladder_ctx).ladder.total_networks = 1;
 
     // NETWORK 0
-    (*ladder_ctx).network[0].cells[0][0].code = LADDER_INS_SUB;
-    (*ladder_ctx).network[0].cells[0][0].data = 10;
-    (*ladder_ctx).network[0].cells[0][0].type = LADDER_TYPE_I;
 
-    (*ladder_ctx).network[0].cells[1][0].code = LADDER_INS_SUB | LADDER_INS_MASK;
-    (*ladder_ctx).network[0].cells[1][0].data = 9;
-    (*ladder_ctx).network[0].cells[1][0].type = LADDER_TYPE_M;
+    // timer 2 output
+    (*ladder_ctx).network[0].cells[0][0].code = LADDER_INS_NC;
+    (*ladder_ctx).network[0].cells[0][0].data = 0;
+    (*ladder_ctx).network[0].cells[0][0].type = LADDER_TYPE_M;
 
-    (*ladder_ctx).network[0].cells[2][0].code = LADDER_INS_SUB | LADDER_INS_MASK;
-    (*ladder_ctx).network[0].cells[2][0].data = 8;
-    (*ladder_ctx).network[0].cells[2][0].type = LADDER_TYPE_M;
-
+    // timer 1
     (*ladder_ctx).network[0].cells[0][1].code = LADDER_INS_TON;
-    (*ladder_ctx).network[0].cells[0][1].data = 1;
+    (*ladder_ctx).network[0].cells[0][1].data = 0;
     (*ladder_ctx).network[0].cells[0][1].type = LADDER_TYPE_T;
+    (*ladder_ctx).network[0].cells[1][1].code = LADDER_INS_TP | LADDER_INS_MASK;
+    (*ladder_ctx).network[0].cells[1][1].data = 10;
+    (*ladder_ctx).network[0].cells[1][1].type = LADDER_BASETIME_SEC;
 
-    (*ladder_ctx).network[0].cells[1][1].code = LADDER_INS_TON | LADDER_INS_MASK;
-    (*ladder_ctx).network[0].cells[1][1].data = 2;
-    (*ladder_ctx).network[0].cells[1][1].type = LADDER_BASETIME_100MS;
-
+    // timer 1 out
     (*ladder_ctx).network[0].cells[0][2].code = LADDER_INS_COIL;
-    (*ladder_ctx).network[0].cells[0][2].data = 2;
+    (*ladder_ctx).network[0].cells[0][2].data = 1;
     (*ladder_ctx).network[0].cells[0][2].type = LADDER_TYPE_M;
 
-    // NETWORK 1
-    (*ladder_ctx).network[1].cells[0][0].code = LADDER_INS_NC;
-    (*ladder_ctx).network[1].cells[0][0].data = 3;
-    (*ladder_ctx).network[1].cells[0][0].type = LADDER_TYPE_M;
+    // ----------------------------- //
 
-    (*ladder_ctx).network[1].cells[0][1].code = LADDER_INS_NO;
-    (*ladder_ctx).network[1].cells[0][1].data = 4;
-    (*ladder_ctx).network[1].cells[0][1].type = LADDER_TYPE_M;
+    // timer output
+    (*ladder_ctx).network[0].cells[2][0].code = LADDER_INS_NO;
+    (*ladder_ctx).network[0].cells[2][0].data = 1;
+    (*ladder_ctx).network[0].cells[2][0].type = LADDER_TYPE_M;
 
-    (*ladder_ctx).network[1].cells[0][2].code = LADDER_INS_NC;
-    (*ladder_ctx).network[1].cells[0][2].data = 1;
-    (*ladder_ctx).network[1].cells[0][2].type = LADDER_TYPE_M;
+    // timer 2
+    (*ladder_ctx).network[0].cells[2][1].code = LADDER_INS_TON;
+    (*ladder_ctx).network[0].cells[2][1].data = 1;
+    (*ladder_ctx).network[0].cells[2][1].type = LADDER_TYPE_T;
+    (*ladder_ctx).network[0].cells[3][1].code = LADDER_INS_TON | LADDER_INS_MASK;
+    (*ladder_ctx).network[0].cells[3][1].data = 10;
+    (*ladder_ctx).network[0].cells[3][1].type = LADDER_BASETIME_SEC;
+
+    // timer 2 output
+    (*ladder_ctx).network[0].cells[2][2].code = LADDER_INS_COIL;
+    (*ladder_ctx).network[0].cells[2][2].data = 0;
+    (*ladder_ctx).network[0].cells[2][2].type = LADDER_TYPE_M;
+
+    // ----------------------------- //
+
+    // timer 1
+    (*ladder_ctx).network[0].cells[4][0].code = LADDER_INS_NO;
+    (*ladder_ctx).network[0].cells[4][0].data = 1;
+    (*ladder_ctx).network[0].cells[4][0].type = LADDER_TYPE_M;
+
+    // timer output
+    (*ladder_ctx).network[0].cells[4][1].code = LADDER_INS_COIL;
+    (*ladder_ctx).network[0].cells[4][1].data = 0;
+    (*ladder_ctx).network[0].cells[4][1].type = LADDER_TYPE_Q;
 }
 
 int main(void) {

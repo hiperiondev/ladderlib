@@ -111,11 +111,11 @@ int dummy_delay(long msec) {
     return res;
 }
 
-int32_t dummy_micros(void) {
+uint32_t dummy_micros(void) {
     struct timespec ts;
     clock_gettime(CLOCK_MONOTONIC, &ts);
 
-    return (int32_t) (ts.tv_nsec * 1000);
+    return (uint32_t) (ts.tv_nsec * 1000);
 }
 
 void dummy_read_inputs_local(ladder_ctx_t *ladder_ctx) {
@@ -162,7 +162,17 @@ void dummy_write_outputs_local(ladder_ctx_t *ladder_ctx) {
             (*ladder_ctx).memory.Q[3], (*ladder_ctx).memory.Q[4], (*ladder_ctx).memory.Q[5], (*ladder_ctx).memory.Q[6], (*ladder_ctx).memory.Q[7]);
 
     printf("-----------------------                                                     \n");
-    printf("\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A");
+    printf("Timer 0 [%d, %d, %d]\n", (*ladder_ctx).memory.Td[0], (*ladder_ctx).memory.Tr[0],(*ladder_ctx).timers[0].acc );
+    printf("Timer 1 [%d, %d, %d]\n", (*ladder_ctx).memory.Td[1], (*ladder_ctx).memory.Tr[1],(*ladder_ctx).timers[1].acc );
+    printf("Timer 2 [%d, %d, %d]\n", (*ladder_ctx).memory.Td[2], (*ladder_ctx).memory.Tr[2],(*ladder_ctx).timers[2].acc );
+    printf("Timer 3 [%d, %d, %d]\n", (*ladder_ctx).memory.Td[3], (*ladder_ctx).memory.Tr[3],(*ladder_ctx).timers[3].acc );
+    printf("Timer 4 [%d, %d, %d]\n", (*ladder_ctx).memory.Td[4], (*ladder_ctx).memory.Tr[4],(*ladder_ctx).timers[4].acc );
+    printf("Timer 5 [%d, %d, %d]\n", (*ladder_ctx).memory.Td[5], (*ladder_ctx).memory.Tr[5],(*ladder_ctx).timers[5].acc );
+    printf("Timer 6 [%d, %d, %d]\n", (*ladder_ctx).memory.Td[6], (*ladder_ctx).memory.Tr[6],(*ladder_ctx).timers[6].acc );
+
+    printf("\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A");
+
+    dummy_delay(50);
 }
 
 void dummy_read_inputs_remote(ladder_ctx_t *ladder_ctx) {

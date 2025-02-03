@@ -148,11 +148,11 @@ typedef enum LADDER_TYPE {
 } ladder_type_t;
 
 typedef enum LADDER_BASETIME {
-    LADDER_BASETIME_1MS,
+    LADDER_BASETIME_MS,
     LADDER_BASETIME_10MS,
     LADDER_BASETIME_100MS,
-    LADDER_BASETIME_1SEC,
-    LADDER_BASETIME_1MIN,
+    LADDER_BASETIME_SEC,
+    LADDER_BASETIME_MIN,
 } ladder_basetime_t;
 
 /**
@@ -285,12 +285,12 @@ typedef void (*_end_task)(void);
 typedef int (*_delay)(long msec);
 
 /**
- * @fn int32_t (*_micros)(void)
+ * @fn uint32_t (*_micros)(void)
  * @brief Microseconds from system start
  *
  * @return
  */
-typedef int32_t (*_micros)(void);
+typedef uint32_t (*_micros)(void);
 
 /**
  * @struct ladder_io_s

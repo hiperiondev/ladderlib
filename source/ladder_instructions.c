@@ -81,6 +81,8 @@ const char *fn_err_str[] = {
 };
 #endif
 
+static uint32_t basetime_factor[] = { 1, 10, 100, 1000, 60000 };
+
 ladder_ins_err_t execNop(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag) {
     return LADDER_INS_ERR_OK;
 }
@@ -214,13 +216,13 @@ ladder_ins_err_t execTON(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row
     if ((*ladder_ctx).memory.Tr[(*ladder_ctx).exec_network.cells[row][column].data]) {
         (*ladder_ctx).timers[(*ladder_ctx).exec_network.cells[row][column].data].acc =
                 (uint16_t) ((((*ladder_ctx).io.micros() / 1000) - (*ladder_ctx).timers[(*ladder_ctx).exec_network.cells[row][column].data].time_stamp)
-                        / (*ladder_ctx).exec_network.cells[row + 1][column].type);
+                        / basetime_factor[(*ladder_ctx).exec_network.cells[row + 1][column].type]);
     }
 
     // timer done --> activate timer done flag and set acc value to his set point
     if ((*ladder_ctx).memory.Tr[(*ladder_ctx).exec_network.cells[row][column].data]
             && ((((*ladder_ctx).io.micros() / 1000) - (*ladder_ctx).timers[(*ladder_ctx).exec_network.cells[row][column].data].time_stamp)
-                    >= ((*ladder_ctx).exec_network.cells[row + 1][column].data * (*ladder_ctx).exec_network.cells[row + 1][column].type))) {
+                    >= ((*ladder_ctx).exec_network.cells[row + 1][column].data * basetime_factor[(*ladder_ctx).exec_network.cells[row + 1][column].type]))) {
         (*ladder_ctx).memory.Tr[(*ladder_ctx).exec_network.cells[row][column].data] = false;
         (*ladder_ctx).memory.Td[(*ladder_ctx).exec_network.cells[row][column].data] = true;
         (*ladder_ctx).timers[(*ladder_ctx).exec_network.cells[row][column].data].acc = (*ladder_ctx).exec_network.cells[row + 1][column].data;
@@ -263,13 +265,13 @@ ladder_ins_err_t execTOFF(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t ro
     if ((*ladder_ctx).memory.Tr[(*ladder_ctx).exec_network.cells[row][column].data]) {
         (*ladder_ctx).timers[(*ladder_ctx).exec_network.cells[row][column].data].acc =
                 (uint16_t) ((((*ladder_ctx).io.micros() / 1000) - (*ladder_ctx).timers[(*ladder_ctx).exec_network.cells[row][column].data].time_stamp)
-                        / (*ladder_ctx).exec_network.cells[row + 1][column].type);
+                        / basetime_factor[(*ladder_ctx).exec_network.cells[row + 1][column].type]);
     }
 
     // timer done --> activate timer done flag and set acc value to his set point
     if ((*ladder_ctx).memory.Tr[(*ladder_ctx).exec_network.cells[row][column].data]
             && ((((*ladder_ctx).io.micros() / 1000) - (*ladder_ctx).timers[(*ladder_ctx).exec_network.cells[row][column].data].time_stamp)
-                    >= ((*ladder_ctx).exec_network.cells[row + 1][column].data * (*ladder_ctx).exec_network.cells[row + 1][column].type))) {
+                    >= ((*ladder_ctx).exec_network.cells[row + 1][column].data * basetime_factor[(*ladder_ctx).exec_network.cells[row + 1][column].type]))) {
         (*ladder_ctx).memory.Tr[(*ladder_ctx).exec_network.cells[row][column].data] = false;
         (*ladder_ctx).memory.Td[(*ladder_ctx).exec_network.cells[row][column].data] = false;
         (*ladder_ctx).timers[(*ladder_ctx).exec_network.cells[row][column].data].acc = (*ladder_ctx).exec_network.cells[row + 1][column].data;
@@ -308,13 +310,13 @@ ladder_ins_err_t execTP(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row,
     if ((*ladder_ctx).memory.Td[(*ladder_ctx).exec_network.cells[row][column].data]) {
         (*ladder_ctx).timers[(*ladder_ctx).exec_network.cells[row][column].data].acc =
                 (uint16_t) ((((*ladder_ctx).io.micros() / 1000) - (*ladder_ctx).timers[(*ladder_ctx).exec_network.cells[row][column].data].time_stamp)
-                        / (*ladder_ctx).exec_network.cells[row + 1][column].type);
+                        / basetime_factor[(*ladder_ctx).exec_network.cells[row + 1][column].type]);
     }
 
     // timer done --> activate timer done flag and set acc value to his setpoint
     if ((*ladder_ctx).memory.Td[(*ladder_ctx).exec_network.cells[row][column].data]
             && ((((*ladder_ctx).io.micros() / 1000) - (*ladder_ctx).timers[(*ladder_ctx).exec_network.cells[row][column].data].time_stamp)
-                    >= ((*ladder_ctx).exec_network.cells[row + 1][column].data * (*ladder_ctx).exec_network.cells[row + 1][column].type))) {
+                    >= ((*ladder_ctx).exec_network.cells[row + 1][column].data * basetime_factor[(*ladder_ctx).exec_network.cells[row + 1][column].type]))) {
         (*ladder_ctx).memory.Td[(*ladder_ctx).exec_network.cells[row][column].data] = false;
         (*ladder_ctx).timers[(*ladder_ctx).exec_network.cells[row][column].data].acc = (*ladder_ctx).exec_network.cells[row + 1][column].data;
     }

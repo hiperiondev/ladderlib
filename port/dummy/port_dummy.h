@@ -33,15 +33,15 @@
 
 #include "ladder.h"
 
-   void dummy_read_inputs_local(ladder_ctx_t *ladder_ctx);
-   void dummy_write_outputs_local(ladder_ctx_t *ladder_ctx);
-   void dummy_read_inputs_remote(ladder_ctx_t *ladder_ctx);
-   void dummy_write_outputs_remote(ladder_ctx_t *ladder_ctx);
-   bool dummy_external_on_scan(ladder_ctx_t *ladder_ctx);
-   bool dummy_external_on_task(ladder_ctx_t *ladder_ctx);
-   void dummy_panic(ladder_ctx_t *ladder_ctx);
+    void dummy_read_inputs_local(ladder_ctx_t *ladder_ctx);
+    void dummy_write_outputs_local(ladder_ctx_t *ladder_ctx);
+    void dummy_read_inputs_remote(ladder_ctx_t *ladder_ctx);
+    void dummy_write_outputs_remote(ladder_ctx_t *ladder_ctx);
+    bool dummy_external_on_scan(ladder_ctx_t *ladder_ctx);
+    bool dummy_external_on_task(ladder_ctx_t *ladder_ctx);
+    void dummy_panic(ladder_ctx_t *ladder_ctx);
 
-    int dummy_delay(long msec);
-int32_t dummy_micros(void);
+     int dummy_delay(long msec);
+uint32_t dummy_micros(void);
 
 #endif /* PORT_DUMMY_H_ */

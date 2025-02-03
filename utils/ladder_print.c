@@ -92,11 +92,11 @@ static const char *dt_graph[] = {
         };
 
 static const char *basetime_graph[] = {
-        "1ms  ",
+        "ms   ",
         "10ms ",
         "100ms",
-        "1s   ",
-        "1m   "
+        "seg  ",
+        "min  "
 };
 
 /**
