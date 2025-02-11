@@ -33,6 +33,7 @@
 #include "ladder_print.h"
 #include "ladder_instructions.h"
 
+// registers quantity
 #define QTY_M  8
 #define QTY_I  8
 #define QTY_Q  8
@@ -43,7 +44,8 @@
 #define QTY_D  8
 #define QTY_R  8
 
-#define TEST_MAX_RESULTS 10
+// quantity of results for test
+#define TEST_MAX_RESULTS 8
 
 /**
  * @typedef network_result_t
