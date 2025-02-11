@@ -156,143 +156,423 @@ static bool network_test(ladder_network_t network, uint32_t rows, uint32_t colum
 // function tests
 
 static bool fn_nop(void) {
-    return true;
+    bool res;
+    ladder_network_t network;
+    const network_result_t result = { 0 };
+
+    init_network(&network, 1, 1);
+    res = network_test(network, 1, 1, 1, result);
+    deinit_network(&network, 1);
+
+    return res;
 }
 
 static bool fn_conn(void) {
-    return true;
+    bool res;
+    ladder_network_t network;
+    const network_result_t result = { 0 };
+
+    init_network(&network, 1, 1);
+    res = network_test(network, 1, 1, 1, result);
+    deinit_network(&network, 1);
+
+    return res;
 }
 
 static bool fn_neg(void) {
-    return true;
+    bool res;
+    ladder_network_t network;
+    const network_result_t result = { 0 };
+
+    init_network(&network, 1, 1);
+    res = network_test(network, 1, 1, 1, result);
+    deinit_network(&network, 1);
+
+    return res;
 }
 
 static bool fn_no(void) {
-    return true;
+    bool res;
+    ladder_network_t network;
+    const network_result_t result = { 0 };
+
+    init_network(&network, 1, 1);
+    res = network_test(network, 1, 1, 1, result);
+    deinit_network(&network, 1);
+
+    return res;
 }
 
 static bool fn_nc(void) {
-    return true;
+    bool res;
+    ladder_network_t network;
+    const network_result_t result = { 0 };
+
+    init_network(&network, 1, 1);
+    res = network_test(network, 1, 1, 1, result);
+    deinit_network(&network, 1);
+
+    return res;
 }
 
 static bool fn_re(void) {
-    return true;
+    bool res;
+    ladder_network_t network;
+    const network_result_t result = { 0 };
+
+    init_network(&network, 1, 1);
+    res = network_test(network, 1, 1, 1, result);
+    deinit_network(&network, 1);
+
+    return res;
 }
 
 static bool fn_fe(void) {
-    return true;
+    bool res;
+    ladder_network_t network;
+    const network_result_t result = { 0 };
+
+    init_network(&network, 1, 1);
+    res = network_test(network, 1, 1, 1, result);
+    deinit_network(&network, 1);
+
+    return res;
 }
 
 static bool fn_coil(void) {
-    return true;
+    bool res;
+    ladder_network_t network;
+    const network_result_t result = { 0 };
+
+    init_network(&network, 1, 1);
+    res = network_test(network, 1, 1, 1, result);
+    deinit_network(&network, 1);
+
+    return res;
 }
 
 static bool fn_coill(void) {
-    return true;
+    bool res;
+    ladder_network_t network;
+    const network_result_t result = { 0 };
+
+    init_network(&network, 1, 1);
+    res = network_test(network, 1, 1, 1, result);
+    deinit_network(&network, 1);
+
+    return res;
 }
 
 static bool fn_coilu(void) {
-    return true;
+    bool res;
+    ladder_network_t network;
+    const network_result_t result = { 0 };
+
+    init_network(&network, 1, 1);
+    res = network_test(network, 1, 1, 1, result);
+    deinit_network(&network, 1);
+
+    return res;
 }
 
 static bool fn_ton(void) {
-    return true;
+    bool res;
+    ladder_network_t network;
+    const network_result_t result = { 0 };
+
+    init_network(&network, 1, 1);
+    res = network_test(network, 1, 1, 1, result);
+    deinit_network(&network, 1);
+
+    return res;
 }
 
 static bool fn_toff(void) {
-    return true;
+    bool res;
+    ladder_network_t network;
+    const network_result_t result = { 0 };
+
+    init_network(&network, 1, 1);
+    res = network_test(network, 1, 1, 1, result);
+    deinit_network(&network, 1);
+
+    return res;
 }
 
 static bool fn_tp(void) {
-    return true;
+    bool res;
+    ladder_network_t network;
+    const network_result_t result = { 0 };
+
+    init_network(&network, 1, 1);
+    res = network_test(network, 1, 1, 1, result);
+    deinit_network(&network, 1);
+
+    return res;
 }
 
 static bool fn_ctu(void) {
-    return true;
+    bool res;
+    ladder_network_t network;
+    const network_result_t result = { 0 };
+
+    init_network(&network, 1, 1);
+    res = network_test(network, 1, 1, 1, result);
+    deinit_network(&network, 1);
+
+    return res;
 }
 
 static bool fn_ctd(void) {
-    return true;
+    bool res;
+    ladder_network_t network;
+    const network_result_t result = { 0 };
+
+    init_network(&network, 1, 1);
+    res = network_test(network, 1, 1, 1, result);
+    deinit_network(&network, 1);
+
+    return res;
 }
 
 static bool fn_move(void) {
-    return true;
+    bool res;
+    ladder_network_t network;
+    const network_result_t result = { 0 };
+
+    init_network(&network, 1, 1);
+    res = network_test(network, 1, 1, 1, result);
+    deinit_network(&network, 1);
+
+    return res;
 }
 
 static bool fn_sub(void) {
-    return true;
+    bool res;
+    ladder_network_t network;
+    const network_result_t result = { 0 };
+
+    init_network(&network, 1, 1);
+    res = network_test(network, 1, 1, 1, result);
+    deinit_network(&network, 1);
+
+    return res;
 }
 
 static bool fn_add(void) {
-    return true;
+    bool res;
+    ladder_network_t network;
+    const network_result_t result = { 0 };
+
+    init_network(&network, 1, 1);
+    res = network_test(network, 1, 1, 1, result);
+    deinit_network(&network, 1);
+
+    return res;
 }
 
 static bool fn_mul(void) {
-    return true;
+    bool res;
+    ladder_network_t network;
+    const network_result_t result = { 0 };
+
+    init_network(&network, 1, 1);
+    res = network_test(network, 1, 1, 1, result);
+    deinit_network(&network, 1);
+
+    return res;
 }
 
 static bool fn_div(void) {
-    return true;
+    bool res;
+    ladder_network_t network;
+    const network_result_t result = { 0 };
+
+    init_network(&network, 1, 1);
+    res = network_test(network, 1, 1, 1, result);
+    deinit_network(&network, 1);
+
+    return res;
 }
 
 static bool fn_mod(void) {
-    return true;
+    bool res;
+    ladder_network_t network;
+    const network_result_t result = { 0 };
+
+    init_network(&network, 1, 1);
+    res = network_test(network, 1, 1, 1, result);
+    deinit_network(&network, 1);
+
+    return res;
 }
 
 static bool fn_shl(void) {
-    return true;
+    bool res;
+    ladder_network_t network;
+    const network_result_t result = { 0 };
+
+    init_network(&network, 1, 1);
+    res = network_test(network, 1, 1, 1, result);
+    deinit_network(&network, 1);
+
+    return res;
 }
 
 static bool fn_shr(void) {
-    return true;
+    bool res;
+    ladder_network_t network;
+    const network_result_t result = { 0 };
+
+    init_network(&network, 1, 1);
+    res = network_test(network, 1, 1, 1, result);
+    deinit_network(&network, 1);
+
+    return res;
 }
 
 static bool fn_rol(void) {
-    return true;
+    bool res;
+    ladder_network_t network;
+    const network_result_t result = { 0 };
+
+    init_network(&network, 1, 1);
+    res = network_test(network, 1, 1, 1, result);
+    deinit_network(&network, 1);
+
+    return res;
 }
 
 static bool fn_ror(void) {
-    return true;
+    bool res;
+    ladder_network_t network;
+    const network_result_t result = { 0 };
+
+    init_network(&network, 1, 1);
+    res = network_test(network, 1, 1, 1, result);
+    deinit_network(&network, 1);
+
+    return res;
 }
 
 static bool fn_and(void) {
-    return true;
+    bool res;
+    ladder_network_t network;
+    const network_result_t result = { 0 };
+
+    init_network(&network, 1, 1);
+    res = network_test(network, 1, 1, 1, result);
+    deinit_network(&network, 1);
+
+    return res;
 }
 
 static bool fn_or(void) {
-    return true;
+    bool res;
+    ladder_network_t network;
+    const network_result_t result = { 0 };
+
+    init_network(&network, 1, 1);
+    res = network_test(network, 1, 1, 1, result);
+    deinit_network(&network, 1);
+
+    return res;
 }
 
 static bool fn_xor(void) {
-    return true;
+    bool res;
+    ladder_network_t network;
+    const network_result_t result = { 0 };
+
+    init_network(&network, 1, 1);
+    res = network_test(network, 1, 1, 1, result);
+    deinit_network(&network, 1);
+
+    return res;
 }
 
 static bool fn_not(void) {
-    return true;
+    bool res;
+    ladder_network_t network;
+    const network_result_t result = { 0 };
+
+    init_network(&network, 1, 1);
+    res = network_test(network, 1, 1, 1, result);
+    deinit_network(&network, 1);
+
+    return res;
 }
 
 static bool fn_eq(void) {
-    return true;
+    bool res;
+    ladder_network_t network;
+    const network_result_t result = { 0 };
+
+    init_network(&network, 1, 1);
+    res = network_test(network, 1, 1, 1, result);
+    deinit_network(&network, 1);
+
+    return res;
 }
 
 static bool fn_gt(void) {
-    return true;
+    bool res;
+    ladder_network_t network;
+    const network_result_t result = { 0 };
+
+    init_network(&network, 1, 1);
+    res = network_test(network, 1, 1, 1, result);
+    deinit_network(&network, 1);
+
+    return res;
 }
 
 static bool fn_ge(void) {
-    return true;
+    bool res;
+    ladder_network_t network;
+    const network_result_t result = { 0 };
+
+    init_network(&network, 1, 1);
+    res = network_test(network, 1, 1, 1, result);
+    deinit_network(&network, 1);
+
+    return res;
 }
 
 static bool fn_lt(void) {
-    return true;
+    bool res;
+    ladder_network_t network;
+    const network_result_t result = { 0 };
+
+    init_network(&network, 1, 1);
+    res = network_test(network, 1, 1, 1, result);
+    deinit_network(&network, 1);
+
+    return res;
 }
 
 static bool fn_le(void) {
-    return true;
+    bool res;
+    ladder_network_t network;
+    const network_result_t result = { 0 };
+
+    init_network(&network, 1, 1);
+    res = network_test(network, 1, 1, 1, result);
+    deinit_network(&network, 1);
+
+    return res;
 }
 
 static bool fn_ne(void) {
-    return true;
+    bool res;
+    ladder_network_t network;
+    const network_result_t result = { 0 };
+
+    init_network(&network, 1, 1);
+    res = network_test(network, 1, 1, 1, result);
+    deinit_network(&network, 1);
+
+    return res;
 }
 
 static bool function_tests(void) {
@@ -514,12 +794,12 @@ int main(void) {
     // clear screen
     printf("\e[1;1H\e[2J");
 
-    printf("Start function test...\n");
+    printf("Start function tests ...\n");
     if(!function_tests()){
         printf("ERROR!!\n");
         exit(1);
     }
-    printf("Function test OK\n");
+    printf("Function tests: OK\n\n");
 
     // initialize context
     if (!ladder_ctx_init(&ladder_ctx, NET_COLUMNS, NET_ROWS, TOTAL_NETWORKS, QTY_M, QTY_I, QTY_Q, QTY_IW, QTY_QW, QTY_C, QTY_T, QTY_D, QTY_R)) {
