@@ -155,6 +155,7 @@ static bool network_test(ladder_network_t network, uint32_t rows, uint32_t colum
 
 // function tests
 
+// TODO: Implement
 static bool fn_nop(void) {
     bool res;
     ladder_network_t network;
@@ -167,6 +168,7 @@ static bool fn_nop(void) {
     return res;
 }
 
+// TODO: Implement
 static bool fn_conn(void) {
     bool res;
     ladder_network_t network;
@@ -179,6 +181,7 @@ static bool fn_conn(void) {
     return res;
 }
 
+// TODO: Implement
 static bool fn_neg(void) {
     bool res;
     ladder_network_t network;
@@ -191,6 +194,7 @@ static bool fn_neg(void) {
     return res;
 }
 
+// TODO: Implement
 static bool fn_no(void) {
     bool res;
     ladder_network_t network;
@@ -203,6 +207,7 @@ static bool fn_no(void) {
     return res;
 }
 
+// TODO: Implement
 static bool fn_nc(void) {
     bool res;
     ladder_network_t network;
@@ -215,6 +220,7 @@ static bool fn_nc(void) {
     return res;
 }
 
+// TODO: Implement
 static bool fn_re(void) {
     bool res;
     ladder_network_t network;
@@ -227,6 +233,7 @@ static bool fn_re(void) {
     return res;
 }
 
+// TODO: Implement
 static bool fn_fe(void) {
     bool res;
     ladder_network_t network;
@@ -239,6 +246,7 @@ static bool fn_fe(void) {
     return res;
 }
 
+// TODO: Implement
 static bool fn_coil(void) {
     bool res;
     ladder_network_t network;
@@ -251,6 +259,7 @@ static bool fn_coil(void) {
     return res;
 }
 
+// TODO: Implement
 static bool fn_coill(void) {
     bool res;
     ladder_network_t network;
@@ -263,6 +272,7 @@ static bool fn_coill(void) {
     return res;
 }
 
+// TODO: Implement
 static bool fn_coilu(void) {
     bool res;
     ladder_network_t network;
@@ -275,6 +285,7 @@ static bool fn_coilu(void) {
     return res;
 }
 
+// TODO: Implement
 static bool fn_ton(void) {
     bool res;
     ladder_network_t network;
@@ -287,6 +298,7 @@ static bool fn_ton(void) {
     return res;
 }
 
+// TODO: Implement
 static bool fn_toff(void) {
     bool res;
     ladder_network_t network;
@@ -299,6 +311,7 @@ static bool fn_toff(void) {
     return res;
 }
 
+// TODO: Implement
 static bool fn_tp(void) {
     bool res;
     ladder_network_t network;
@@ -311,6 +324,7 @@ static bool fn_tp(void) {
     return res;
 }
 
+// TODO: Implement
 static bool fn_ctu(void) {
     bool res;
     ladder_network_t network;
@@ -323,6 +337,7 @@ static bool fn_ctu(void) {
     return res;
 }
 
+// TODO: Implement
 static bool fn_ctd(void) {
     bool res;
     ladder_network_t network;
@@ -335,6 +350,7 @@ static bool fn_ctd(void) {
     return res;
 }
 
+// TODO: Implement
 static bool fn_move(void) {
     bool res;
     ladder_network_t network;
@@ -347,6 +363,7 @@ static bool fn_move(void) {
     return res;
 }
 
+// TODO: Implement
 static bool fn_sub(void) {
     bool res;
     ladder_network_t network;
@@ -359,6 +376,7 @@ static bool fn_sub(void) {
     return res;
 }
 
+// TODO: Implement
 static bool fn_add(void) {
     bool res;
     ladder_network_t network;
@@ -371,6 +389,7 @@ static bool fn_add(void) {
     return res;
 }
 
+// TODO: Implement
 static bool fn_mul(void) {
     bool res;
     ladder_network_t network;
@@ -383,6 +402,7 @@ static bool fn_mul(void) {
     return res;
 }
 
+// TODO: Implement
 static bool fn_div(void) {
     bool res;
     ladder_network_t network;
@@ -395,6 +415,7 @@ static bool fn_div(void) {
     return res;
 }
 
+// TODO: Implement
 static bool fn_mod(void) {
     bool res;
     ladder_network_t network;
@@ -407,6 +428,7 @@ static bool fn_mod(void) {
     return res;
 }
 
+// TODO: Implement
 static bool fn_shl(void) {
     bool res;
     ladder_network_t network;
@@ -419,6 +441,7 @@ static bool fn_shl(void) {
     return res;
 }
 
+// TODO: Implement
 static bool fn_shr(void) {
     bool res;
     ladder_network_t network;
@@ -431,6 +454,7 @@ static bool fn_shr(void) {
     return res;
 }
 
+// TODO: Implement
 static bool fn_rol(void) {
     bool res;
     ladder_network_t network;
@@ -443,6 +467,7 @@ static bool fn_rol(void) {
     return res;
 }
 
+// TODO: Implement
 static bool fn_ror(void) {
     bool res;
     ladder_network_t network;
@@ -455,6 +480,7 @@ static bool fn_ror(void) {
     return res;
 }
 
+// TODO: Implement
 static bool fn_and(void) {
     bool res;
     ladder_network_t network;
@@ -467,6 +493,7 @@ static bool fn_and(void) {
     return res;
 }
 
+// TODO: Implement
 static bool fn_or(void) {
     bool res;
     ladder_network_t network;
@@ -479,6 +506,7 @@ static bool fn_or(void) {
     return res;
 }
 
+// TODO: Implement
 static bool fn_xor(void) {
     bool res;
     ladder_network_t network;
@@ -491,6 +519,7 @@ static bool fn_xor(void) {
     return res;
 }
 
+// TODO: Implement
 static bool fn_not(void) {
     bool res;
     ladder_network_t network;
@@ -503,6 +532,7 @@ static bool fn_not(void) {
     return res;
 }
 
+// TODO: Implement
 static bool fn_eq(void) {
     bool res;
     ladder_network_t network;
@@ -515,6 +545,7 @@ static bool fn_eq(void) {
     return res;
 }
 
+// TODO: Implement
 static bool fn_gt(void) {
     bool res;
     ladder_network_t network;
@@ -527,6 +558,7 @@ static bool fn_gt(void) {
     return res;
 }
 
+// TODO: Implement
 static bool fn_ge(void) {
     bool res;
     ladder_network_t network;
@@ -539,6 +571,7 @@ static bool fn_ge(void) {
     return res;
 }
 
+// TODO: Implement
 static bool fn_lt(void) {
     bool res;
     ladder_network_t network;
@@ -551,6 +584,7 @@ static bool fn_lt(void) {
     return res;
 }
 
+// TODO: Implement
 static bool fn_le(void) {
     bool res;
     ladder_network_t network;
@@ -563,6 +597,7 @@ static bool fn_le(void) {
     return res;
 }
 
+// TODO: Implement
 static bool fn_ne(void) {
     bool res;
     ladder_network_t network;
