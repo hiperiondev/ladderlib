@@ -43,6 +43,8 @@
 #define QTY_D  8
 #define QTY_R  8
 
+#define TEST_MAX_RESULTS 10
+
 /**
  * @typedef network_result_t
  * @brief Expected results on test
@@ -50,17 +52,17 @@
  *
  */
 typedef struct {
-    uint32_t M[2][10];
-    uint32_t I[2][10];
-    uint32_t Q[2][10];
-    uint32_t Cr[2][10];
-    uint32_t Cd[2][10];
-    uint32_t Tr[2][10];
-    uint32_t Td[2][10];
-    uint32_t IW[2][10];
-    uint32_t QW[2][10];
-    uint32_t C[2][10];
-    uint32_t D[2][10];
+    uint32_t M[2][TEST_MAX_RESULTS];
+    uint32_t I[2][TEST_MAX_RESULTS];
+    uint32_t Q[2][TEST_MAX_RESULTS];
+    uint32_t Cr[2][TEST_MAX_RESULTS];
+    uint32_t Cd[2][TEST_MAX_RESULTS];
+    uint32_t Tr[2][TEST_MAX_RESULTS];
+    uint32_t Td[2][TEST_MAX_RESULTS];
+    uint32_t IW[2][TEST_MAX_RESULTS];
+    uint32_t QW[2][TEST_MAX_RESULTS];
+    uint32_t C[2][TEST_MAX_RESULTS];
+    uint32_t D[2][TEST_MAX_RESULTS];
 } network_result_t;
 
 uint32_t cycles_counter;
@@ -145,7 +147,7 @@ static void load_network(ladder_network_t network, uint32_t network_id, ladder_c
 static bool test_results(ladder_ctx_t ladder_ctx, network_result_t result) {
     bool res = true;
 
-    for (uint8_t i = 0; i < 9; i++) {
+    for (uint8_t i = 0; i < TEST_MAX_RESULTS; i++) {
         res &= ladder_ctx.memory.M[result.M[0][i]] == result.M[1][i];
         res &= ladder_ctx.memory.I[result.I[0][i]] == result.I[1][i];
         res &= ladder_ctx.memory.Q[result.Q[0][i]] == result.Q[1][i];
@@ -205,6 +207,8 @@ static bool network_test(ladder_network_t network, uint32_t rows, uint32_t colum
 
     return res;
 }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // function tests
 
@@ -704,7 +708,8 @@ static bool function_tests(void) {
 
     return res;
 }
-/////////////////
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 static void load_demo(ladder_ctx_t *ladder_ctx) {
     printf("DEMO: blink (2 network, 7 rows, 6 columns) \n\n");
