@@ -34,7 +34,7 @@
 
 #define LADDERLIB_VERSION_MAYOR 1 // indicate a really big change that can cause a incompatibilities with previous versions
 #define LADDERLIB_VERSION_MINOR 0 // indicate some change on API or opcode or very important correction in functionality
-#define LADDERLIB_VERSION_PATCH 1 // indicate some minor change or correction
+#define LADDERLIB_VERSION_PATCH 2 // indicate some minor change or correction
 
 /**
  * @enum LADDER_INSTRUCTIONS
