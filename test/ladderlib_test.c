@@ -63,13 +63,27 @@ typedef struct {
 } network_result_t;
 
 uint32_t cycles_counter;
-uint32_t cycles_end;;
+uint32_t cycles_end;
 
 bool test_on_task_after(ladder_ctx_t *ladder_ctx) {
     if (cycles_counter++ >= cycles_end)
         (*ladder_ctx).ladder.state = LADDER_ST_EXIT_TSK;
 
     return true;
+}
+
+static void init_network(ladder_network_t *network, uint32_t rows, uint32_t columns) {
+    (*network).bars = calloc(columns, sizeof(uint32_t));
+    (*network).cells = malloc(rows * sizeof(ladder_cell_t*));
+    for (uint32_t cl = 0; cl < rows; cl++)
+        (*network).cells[cl] = calloc(columns, sizeof(ladder_cell_t));
+}
+
+static void deinit_network(ladder_network_t *network, uint32_t rows) {
+    free((*network).bars);
+    for (uint32_t cl = 0; cl < rows; cl++)
+        free((*network).cells[cl]);
+    free((*network).cells);
 }
 
 static void load_network(ladder_network_t network, uint32_t network_id, ladder_ctx_t *ladder_ctx) {
@@ -138,6 +152,191 @@ static bool network_test(ladder_network_t network, uint32_t rows, uint32_t colum
 
     return res;
 }
+
+// function tests
+
+static bool fn_nop(void) {
+    return true;
+}
+
+static bool fn_conn(void) {
+    return true;
+}
+
+static bool fn_neg(void) {
+    return true;
+}
+
+static bool fn_no(void) {
+    return true;
+}
+
+static bool fn_nc(void) {
+    return true;
+}
+
+static bool fn_re(void) {
+    return true;
+}
+
+static bool fn_fe(void) {
+    return true;
+}
+
+static bool fn_coil(void) {
+    return true;
+}
+
+static bool fn_coill(void) {
+    return true;
+}
+
+static bool fn_coilu(void) {
+    return true;
+}
+
+static bool fn_ton(void) {
+    return true;
+}
+
+static bool fn_toff(void) {
+    return true;
+}
+
+static bool fn_tp(void) {
+    return true;
+}
+
+static bool fn_ctu(void) {
+    return true;
+}
+
+static bool fn_ctd(void) {
+    return true;
+}
+
+static bool fn_move(void) {
+    return true;
+}
+
+static bool fn_sub(void) {
+    return true;
+}
+
+static bool fn_add(void) {
+    return true;
+}
+
+static bool fn_mul(void) {
+    return true;
+}
+
+static bool fn_div(void) {
+    return true;
+}
+
+static bool fn_mod(void) {
+    return true;
+}
+
+static bool fn_shl(void) {
+    return true;
+}
+
+static bool fn_shr(void) {
+    return true;
+}
+
+static bool fn_rol(void) {
+    return true;
+}
+
+static bool fn_ror(void) {
+    return true;
+}
+
+static bool fn_and(void) {
+    return true;
+}
+
+static bool fn_or(void) {
+    return true;
+}
+
+static bool fn_xor(void) {
+    return true;
+}
+
+static bool fn_not(void) {
+    return true;
+}
+
+static bool fn_eq(void) {
+    return true;
+}
+
+static bool fn_gt(void) {
+    return true;
+}
+
+static bool fn_ge(void) {
+    return true;
+}
+
+static bool fn_lt(void) {
+    return true;
+}
+
+static bool fn_le(void) {
+    return true;
+}
+
+static bool fn_ne(void) {
+    return true;
+}
+
+static bool function_tests(void) {
+    bool res = true;
+
+    res &= fn_nop();
+    res &= fn_conn();
+    res &= fn_neg();
+    res &= fn_no();
+    res &= fn_nc();
+    res &= fn_re();
+    res &= fn_fe();
+    res &= fn_coil();
+    res &= fn_coill();
+    res &= fn_coilu();
+    res &= fn_ton();
+    res &= fn_toff();
+    res &= fn_tp();
+    res &= fn_ctu();
+    res &= fn_ctd();
+    res &= fn_move();
+    res &= fn_sub();
+    res &= fn_add();
+    res &= fn_mul();
+    res &= fn_div();
+    res &= fn_mod();
+    res &= fn_shl();
+    res &= fn_shr();
+    res &= fn_rol();
+    res &= fn_ror();
+    res &= fn_and();
+    res &= fn_or();
+    res &= fn_xor();
+    res &= fn_not();
+    res &= fn_eq();
+    res &= fn_gt();
+    res &= fn_ge();
+    res &= fn_lt();
+    res &= fn_le();
+    res &= fn_ne();
+
+    return res;
+}
+/////////////////
 
 static void load_demo(ladder_ctx_t *ladder_ctx) {
     printf("DEMO: blink (2 network, 7 rows, 6 columns) \n\n");
@@ -314,6 +513,13 @@ int main(void) {
 
     // clear screen
     printf("\e[1;1H\e[2J");
+
+    printf("Start function test...\n");
+    if(!function_tests()){
+        printf("ERROR!!\n");
+        exit(1);
+    }
+    printf("Function test OK\n");
 
     // initialize context
     if (!ladder_ctx_init(&ladder_ctx, NET_COLUMNS, NET_ROWS, TOTAL_NETWORKS, QTY_M, QTY_I, QTY_Q, QTY_IW, QTY_QW, QTY_C, QTY_T, QTY_D, QTY_R)) {
