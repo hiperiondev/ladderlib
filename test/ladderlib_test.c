@@ -43,7 +43,12 @@
 #define QTY_D  8
 #define QTY_R  8
 
-// 0: id, 1:value
+/**
+ * @typedef network_result_t
+ * @brief Expected results on test
+ * 0: register id, 1: expected value
+ *
+ */
 typedef struct {
     uint32_t M[2][10];
     uint32_t I[2][10];
@@ -61,13 +66,31 @@ typedef struct {
 uint32_t cycles_counter;
 uint32_t cycles_end;
 
+/**
+ * @fn bool test_on_task_after(ladder_ctx_t*)
+ * @brief Manage on_task_after function for tests
+ *
+ * @param ladder_ctx Context
+ * @return Result
+ */
 bool test_on_task_after(ladder_ctx_t *ladder_ctx) {
+    if(cycles_end == 0)
+        return true;
+
     if (cycles_counter++ >= cycles_end)
         (*ladder_ctx).ladder.state = LADDER_ST_EXIT_TSK;
 
     return true;
 }
 
+/**
+ * @fn static void init_network(ladder_network_t *network, uint32_t rows, uint32_t columns)
+ * @brief Initialize network container
+ *
+ * @param network Network
+ * @param rows Rows quantity
+ * @param columns Columns quantity
+ */
 static void init_network(ladder_network_t *network, uint32_t rows, uint32_t columns) {
     (*network).bars = calloc(columns, sizeof(uint32_t));
     (*network).cells = malloc(rows * sizeof(ladder_cell_t*));
@@ -75,6 +98,13 @@ static void init_network(ladder_network_t *network, uint32_t rows, uint32_t colu
         (*network).cells[cl] = calloc(columns, sizeof(ladder_cell_t));
 }
 
+/**
+ * @fn static void deinit_network(ladder_network_t *network, uint32_t rows)
+ * @brief Free network container
+ *
+ * @param network Network
+ * @param rows Rows quantity
+ */
 static void deinit_network(ladder_network_t *network, uint32_t rows) {
     free((*network).bars);
     for (uint32_t cl = 0; cl < rows; cl++)
@@ -82,6 +112,14 @@ static void deinit_network(ladder_network_t *network, uint32_t rows) {
     free((*network).cells);
 }
 
+/**
+ * @fn static void load_network(ladder_network_t network, uint32_t network_id, ladder_ctx_t *ladder_ctx)
+ * @brief Load a network to context
+ *
+ * @param network Network
+ * @param network_id Network number
+ * @param ladder_ctx Context
+ */
 static void load_network(ladder_network_t network, uint32_t network_id, ladder_ctx_t *ladder_ctx) {
     for (uint32_t column = 0; column < (*ladder_ctx).ladder.quantity.net_columns; column++) {
         for (uint32_t row = 0; row < (*ladder_ctx).ladder.quantity.net_rows; row++) {
@@ -96,6 +134,14 @@ static void load_network(ladder_network_t network, uint32_t network_id, ladder_c
     }
 }
 
+/**
+ * @fn static bool test_results(ladder_ctx_t ladder_ctx, network_result_t result)
+ * @brief Check expected results
+ *
+ * @param ladder_ctx Context
+ * @param result Expected results
+ * @return Result
+ */
 static bool test_results(ladder_ctx_t ladder_ctx, network_result_t result) {
     bool res = true;
 
@@ -116,6 +162,17 @@ static bool test_results(ladder_ctx_t ladder_ctx, network_result_t result) {
     return res;
 }
 
+/**
+ * @fn static bool network_test(ladder_network_t network, uint32_t rows, uint32_t columns, uint32_t cycles, network_result_t result)
+ * @brief Run an execution test for a network
+ *
+ * @param network Network to load test
+ * @param rows Rows quantity
+ * @param columns Columns quantity
+ * @param cycles Cycles to run. 0 to wait for exit (usually Quit on dummy)
+ * @param result Expected results
+ * @return Test result
+ */
 static bool network_test(ladder_network_t network, uint32_t rows, uint32_t columns, uint32_t cycles, network_result_t result) {
     ladder_ctx_t ladder_ctx;
     bool res;
