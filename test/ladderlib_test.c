@@ -33,19 +33,15 @@
 #include "ladder_print.h"
 #include "ladder_instructions.h"
 
-#define NET_COLUMNS    6
-#define NET_ROWS       8
-#define TOTAL_NETWORKS 2
-
-#define QTY_M  100
-#define QTY_I  200
-#define QTY_Q  200
-#define QTY_IW 50
-#define QTY_QW 50
-#define QTY_C  200
-#define QTY_T  300
-#define QTY_D  10000
-#define QTY_R  2000
+#define QTY_M  8
+#define QTY_I  8
+#define QTY_Q  8
+#define QTY_IW 8
+#define QTY_QW 8
+#define QTY_C  8
+#define QTY_T  8
+#define QTY_D  8
+#define QTY_R  8
 
 // 0: id, 1:value
 typedef struct {
@@ -837,7 +833,7 @@ int main(void) {
     printf("Function tests: OK\n\n");
 
     // initialize context
-    if (!ladder_ctx_init(&ladder_ctx, NET_COLUMNS, NET_ROWS, TOTAL_NETWORKS, QTY_M, QTY_I, QTY_Q, QTY_IW, QTY_QW, QTY_C, QTY_T, QTY_D, QTY_R)) {
+    if (!ladder_ctx_init(&ladder_ctx, 6, 7, 2, QTY_M, QTY_I, QTY_Q, QTY_IW, QTY_QW, QTY_C, QTY_T, QTY_D, QTY_R)) {
         printf("ERROR Initializing\n");
         return 1;
     }
