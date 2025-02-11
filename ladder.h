@@ -390,7 +390,7 @@ typedef struct ladder_scan_internals_s {
 typedef struct ladder_ctx_s {
                  ladder_t ladder;         /**< Internals */
               ladder_hw_t hw;             /**< Hardware functions */
-          ladder_manage_t on;             /**< Manage function */
+          ladder_manage_t on;             /**< Manage functions */
           ladder_memory_t memory;         /**< Memory */
   ladder_prev_scan_vals_t prev_scan_vals; /**< Previous scan values */
        ladder_registers_t registers;      /**< Registers */
@@ -401,7 +401,8 @@ typedef struct ladder_ctx_s {
 } ladder_ctx_t;
 
 /**
- * @fn bool ladder_ctx_init(ladder_ctx_t*, uint8_t, uint8_t, uint32_t, uint32_t, uint32_t, uint32_t, uint32_t, uint32_t, uint32_t, uint32_t, uint32_t, uint32_t)
+ * @fn bool ladder_ctx_init(ladder_ctx_t *ladder_ctx, uint8_t net_columns_qty, uint8_t net_rows_qty, uint32_t networks_qty, uint32_t qty_m, uint32_t qty_i,
+ uint32_t qty_q, uint32_t qty_iw, uint32_t qty_qw, uint32_t qty_c, uint32_t qty_t, uint32_t qty_d, uint32_t qty_r);
  * @brief Initialize context.
  *
  *
@@ -442,7 +443,7 @@ void ladder_task(void *ladderctx);
 
 /**
  * @fn void ladder_clear_program(ladder_ctx_t *ladder_ctx)
- * @brief Deletes all networks
+ * @brief Delete all networks
  *
  * @param ladder_ctx Ladder context
  */

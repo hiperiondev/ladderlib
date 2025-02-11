@@ -42,6 +42,8 @@
 #ifndef CCRONEXPR_H
 #define CCRONEXPR_H
 
+#define CRON_DISABLE_YEARS
+
 #include <time.h>
 #include <stdint.h>
 
@@ -54,11 +56,11 @@
  *
  */
 typedef enum CRONEXPR_ERR {
-    CRONEXPR_ERR_OK,                       // ok
-    CRONEXPR_ERR_NULLEXP,                  // invalid NULL expression
-    CRONEXPR_ERR_NULLTARG,                 // invalid NULL target
-    CRONEXPR_ERR_INVNUMFIELDS,             // invalid number of fields, expression must consist of 5-7 fields
-    CRONEXPR_ERR_REBOOT,                   // reboot not implemented
+    CRONEXPR_ERR_OK,           // ok
+    CRONEXPR_ERR_NULLEXP,      // invalid NULL expression
+    CRONEXPR_ERR_NULLTARG,     // invalid NULL target
+    CRONEXPR_ERR_INVNUMFIELDS, // invalid number of fields, expression must consist of 5-7 fields
+    CRONEXPR_ERR_REBOOT,       // reboot not implemented
 } cron_expr_err_t;
 
 /**
