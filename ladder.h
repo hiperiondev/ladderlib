@@ -326,7 +326,6 @@ typedef struct ladder_hw_s {
 /**
  * @struct ladder_memory_s
  * @brief Memory registers
- * Byte is used for Bits for increased performance of Scan time
  */
 typedef struct ladder_memory_s {
     uint8_t *M;  /**< Regular flags */
@@ -422,7 +421,7 @@ bool ladder_ctx_init(ladder_ctx_t *ladder_ctx, uint8_t net_columns_qty, uint8_t 
  * @brief Delete context
  *
  * @param ladder_ctx Ladder context
- * @return Status
+ * @return Error
  */
 bool ladder_ctx_deinit(ladder_ctx_t *ladder_ctx);
 
@@ -436,7 +435,7 @@ void ladder_task(void *ladderctx);
 
 /**
  * @fn void ladder_clear_program(ladder_ctx_t *ladder_ctx)
- * @brief Deletes all networks (all values to 0)
+ * @brief Deletes all networks
  *
  * @param ladder_ctx Ladder context
  */
