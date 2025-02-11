@@ -112,8 +112,8 @@ void ladder_scan(ladder_ctx_t *ladder_ctx) {
                     }
                 }
 
-                if((*ladder_ctx).hw.manage.on_instruction != NULL)
-                    (*ladder_ctx).hw.manage.on_instruction(ladder_ctx);
+                if((*ladder_ctx).on.instruction != NULL)
+                    (*ladder_ctx).on.instruction(ladder_ctx);
             }
 
             // update dynamic flags vs bars (not for last column)
@@ -127,7 +127,7 @@ void ladder_scan(ladder_ctx_t *ladder_ctx) {
             }
         }
 
-        if ((*ladder_ctx).hw.manage.on_scan_end != NULL)
-            (*ladder_ctx).hw.manage.on_scan_end(ladder_ctx);
+        if ((*ladder_ctx).on.scan_end != NULL)
+            (*ladder_ctx).on.scan_end(ladder_ctx);
     }
 }

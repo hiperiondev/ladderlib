@@ -94,14 +94,14 @@ bool ladder_ctx_init(ladder_ctx_t *ladder_ctx, uint8_t net_columns_qty, uint8_t 
     (*ladder_ctx).hw.io.write_outputs_local = NULL;
     (*ladder_ctx).hw.io.read_inputs_remote = NULL;
     (*ladder_ctx).hw.io.write_outputs_remote = NULL;
-    (*ladder_ctx).hw.manage.on_scan_end = NULL;
-    (*ladder_ctx).hw.manage.on_instruction = NULL;
-    (*ladder_ctx).hw.manage.on_task_before = NULL;
-    (*ladder_ctx).hw.manage.on_task_after = NULL;
+    (*ladder_ctx).on.scan_end = NULL;
+    (*ladder_ctx).on.instruction = NULL;
+    (*ladder_ctx).on.task_before = NULL;
+    (*ladder_ctx).on.task_after = NULL;
     (*ladder_ctx).hw.time.millis = NULL;
     (*ladder_ctx).hw.time.delay = NULL;
-    (*ladder_ctx).hw.manage.on_panic = NULL;
-    (*ladder_ctx).hw.manage.on_end_task = NULL;
+    (*ladder_ctx).on.panic = NULL;
+    (*ladder_ctx).on.end_task = NULL;
 
     (*ladder_ctx).network = calloc(networks_qty, sizeof(ladder_network_t));
 

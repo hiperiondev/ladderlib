@@ -54,17 +54,17 @@
  *
  */
 typedef struct {
-    uint32_t M[2][TEST_MAX_RESULTS];
-    uint32_t I[2][TEST_MAX_RESULTS];
-    uint32_t Q[2][TEST_MAX_RESULTS];
+    uint32_t  M[2][TEST_MAX_RESULTS];
+    uint32_t  I[2][TEST_MAX_RESULTS];
+    uint32_t  Q[2][TEST_MAX_RESULTS];
     uint32_t Cr[2][TEST_MAX_RESULTS];
     uint32_t Cd[2][TEST_MAX_RESULTS];
     uint32_t Tr[2][TEST_MAX_RESULTS];
     uint32_t Td[2][TEST_MAX_RESULTS];
     uint32_t IW[2][TEST_MAX_RESULTS];
     uint32_t QW[2][TEST_MAX_RESULTS];
-    uint32_t C[2][TEST_MAX_RESULTS];
-    uint32_t D[2][TEST_MAX_RESULTS];
+    uint32_t  C[2][TEST_MAX_RESULTS];
+    uint32_t  D[2][TEST_MAX_RESULTS];
 } network_result_t;
 
 uint32_t cycles_counter;
@@ -191,7 +191,7 @@ static bool network_test(ladder_network_t network, uint32_t rows, uint32_t colum
 
     ladder_ctx.hw.io.read_inputs_local = dummy_read_inputs_local;
     ladder_ctx.hw.io.write_outputs_local = dummy_write_outputs_local;
-    ladder_ctx.hw.manage.on_task_after = test_on_task_after;
+    ladder_ctx.on.task_after = test_on_task_after;
     ladder_ctx.hw.time.millis = dummy_millis;
     ladder_ctx.hw.time.delay = dummy_delay;
 
@@ -912,12 +912,12 @@ int main(void) {
     ladder_ctx.hw.io.write_outputs_local = dummy_write_outputs_local;
     ladder_ctx.hw.io.read_inputs_remote = dummy_read_inputs_remote;
     ladder_ctx.hw.io.write_outputs_remote = dummy_write_outputs_remote;
-    ladder_ctx.hw.manage.on_scan_end = dummy_on_scan_end;
-    ladder_ctx.hw.manage.on_instruction = dummy_on_instruction;
-    ladder_ctx.hw.manage.on_task_before = dummy_on_task_before;
-    ladder_ctx.hw.manage.on_task_after = dummy_on_task_after;
-    ladder_ctx.hw.manage.on_panic = dummy_on_panic;
-    ladder_ctx.hw.manage.on_end_task = dummy_on_end_task;
+    ladder_ctx.on.scan_end = dummy_on_scan_end;
+    ladder_ctx.on.instruction = dummy_on_instruction;
+    ladder_ctx.on.task_before = dummy_on_task_before;
+    ladder_ctx.on.task_after = dummy_on_task_after;
+    ladder_ctx.on.panic = dummy_on_panic;
+    ladder_ctx.on.end_task = dummy_on_end_task;
     ladder_ctx.hw.time.millis = dummy_millis;
     ladder_ctx.hw.time.delay = dummy_delay;
 

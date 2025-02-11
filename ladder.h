@@ -4,6 +4,7 @@
  *
  * This is based on other projects:
  *    PLsi (https://github.com/ElPercha/PLsi)
+ *    ccronexpr (https://github.com/staticlibs/ccronexpr)
  *
  *    please contact their authors for more information.
  *
@@ -31,7 +32,7 @@
 #include <stdint.h>
 #include <stddef.h>
 
-#define LADDERLIB_VERSION_MAYOR 1 // indicate a really big change that can cause a lot of incompatibilities with previous versions
+#define LADDERLIB_VERSION_MAYOR 1 // indicate a really big change that can cause a incompatibilities with previous versions
 #define LADDERLIB_VERSION_MINOR 0 // indicate some change on API or opcode or very important correction in functionality
 #define LADDERLIB_VERSION_PATCH 1 // indicate some minor change or correction
 
@@ -309,19 +310,24 @@ typedef struct ladder_hw_s {
     } io;
 
     struct {
-           _on_scan_end on_scan_end;    /**< Manage for every scan cycle */
-        _on_instruction on_instruction; /**< Manage for every instruction call */
-        _on_task_before on_task_before; /**< Manage for every task cycle before scan */
-         _on_task_after on_task_after;  /**< Manage for every task cycle after scan */
-              _on_panic on_panic;       /**< Manage panic status */
-           _on_end_task on_end_task;    /**< Manage for end task */
-    } manage;
-
-    struct {
         _millis millis; /**< Milliseconds from system start */
          _delay delay;  /**< Delay in milliseconds */
     } time;
 } ladder_hw_t;
+
+/**
+ * @typedef ladder_manage_t
+ * @brief Internal manage functions
+ *
+ */
+typedef struct ladder_manage_s {
+       _on_scan_end scan_end;    /**< Manage for every scan cycle */
+    _on_instruction instruction; /**< Manage for every instruction call */
+    _on_task_before task_before; /**< Manage for every task cycle before scan */
+     _on_task_after task_after;  /**< Manage for every task cycle after scan */
+          _on_panic panic;       /**< Manage panic status */
+       _on_end_task end_task;    /**< Manage for end task */
+} ladder_manage_t;
 
 /**
  * @struct ladder_memory_s
@@ -384,6 +390,7 @@ typedef struct ladder_scan_internals_s {
 typedef struct ladder_ctx_s {
                  ladder_t ladder;         /**< Internals */
               ladder_hw_t hw;             /**< Hardware functions */
+          ladder_manage_t on;             /**< Manage function */
           ladder_memory_t memory;         /**< Memory */
   ladder_prev_scan_vals_t prev_scan_vals; /**< Previous scan values */
        ladder_registers_t registers;      /**< Registers */

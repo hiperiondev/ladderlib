@@ -45,8 +45,8 @@ void ladder_task(void *ladderctx) {
     while ((*ladder_ctx).ladder.state != LADDER_ST_EXIT_TSK) {
 
         if ((*ladder_ctx).ladder.state != LADDER_ST_RUNNING) {
-            if ((*ladder_ctx).hw.manage.on_panic != NULL)
-                (*ladder_ctx).hw.manage.on_panic(ladder_ctx);
+            if ((*ladder_ctx).on.panic != NULL)
+                (*ladder_ctx).on.panic(ladder_ctx);
 
             goto exit;
         }
@@ -57,8 +57,8 @@ void ladder_task(void *ladderctx) {
         }
 
         // external function before scan
-        if ((*ladder_ctx).hw.manage.on_task_before != NULL)
-            (*ladder_ctx).hw.manage.on_task_before(ladder_ctx);
+        if ((*ladder_ctx).on.task_before != NULL)
+            (*ladder_ctx).on.task_before(ladder_ctx);
 
         // ladder program scan
         ladder_scan_time(ladder_ctx);
@@ -79,11 +79,11 @@ void ladder_task(void *ladderctx) {
             (*ladder_ctx).hw.io.write_outputs_remote(ladder_ctx);
 
         // external function after scan
-        if ((*ladder_ctx).hw.manage.on_task_after != NULL)
-            (*ladder_ctx).hw.manage.on_task_after(ladder_ctx);
+        if ((*ladder_ctx).on.task_after != NULL)
+            (*ladder_ctx).on.task_after(ladder_ctx);
     }
 
     exit:
-    if ((*ladder_ctx).hw.manage.on_end_task != NULL)
-        (*ladder_ctx).hw.manage.on_end_task();
+    if ((*ladder_ctx).on.end_task != NULL)
+        (*ladder_ctx).on.end_task();
 }
