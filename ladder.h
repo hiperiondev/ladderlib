@@ -78,6 +78,7 @@ typedef enum LADDER_INSTRUCTIONS {
     LADDER_INS_LE,           /**< Instruction LE */
     LADDER_INS_NE,           /**< Instruction NE */
     LADDER_INS_BAR,          /**< Instruction BAR */
+    LADDER_INS_FOREINGN,     /**< Instruction FOREINGN */
     //...//
     LADDER_INS_INV,          /**< First invalid */
     LADDER_INS_MULTI = 0xff, /**< cell is a part of multi cell instruction */

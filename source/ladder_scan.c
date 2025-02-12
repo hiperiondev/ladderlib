@@ -34,43 +34,44 @@
 #include "ladder_instructions.h"
 #include "ladder_internals.h"
 
-static ladder_fn_t const ladder_function[] = {
-        execNop,   //
-        execConn,  //
-        execNeg,   //
-        execNO,    //
-        execNC,    //
-        execRE,    //
-        execFE,    //
-        execCoil,  //
-        execCoilL, //
-        execCoilU, //
-        execTON,   //
-        execTOFF,  //
-        execTP,    //
-        execCTU,   //
-        execCTD,   //
-        execMOVE,  //
-        execSUB,   //
-        execADD,   //
-        execMUL,   //
-        execDIV,   //
-        execMOD,   //
-        execSHL,   //
-        execSHR,   //
-        execROL,   //
-        execROR,   //
-        execAND,   //
-        execOR,    //
-        execXOR,   //
-        execNOT,   //
-        execEQ,    //
-        execGT,    //
-        execGE,    //
-        execLT,    //
-        execLE,    //
-        execNE,    //
-        execBAR,   //
+static ladder_fn_t const ladder_function[] = { //
+        execNop,      // 00
+        execConn,     // 01
+        execNeg,      // 02
+        execNO,       // 03
+        execNC,       // 04
+        execRE,       // 05
+        execFE,       // 06
+        execCoil,     // 07
+        execCoilL,    // 08
+        execCoilU,    // 09
+        execTON,      // 10
+        execTOFF,     // 11
+        execTP,       // 12
+        execCTU,      // 13
+        execCTD,      // 14
+        execMOVE,     // 15
+        execSUB,      // 16
+        execADD,      // 17
+        execMUL,      // 18
+        execDIV,      // 19
+        execMOD,      // 20
+        execSHL,      // 21
+        execSHR,      // 22
+        execROL,      // 23
+        execROR,      // 24
+        execAND,      // 25
+        execOR,       // 26
+        execXOR,      // 27
+        execNOT,      // 28
+        execEQ,       // 29
+        execGT,       // 30
+        execGE,       // 31
+        execLT,       // 32
+        execLE,       // 33
+        execNE,       // 34
+        execBAR,      // 35
+        execFOREINGN, // 36
         };
 
 void ladder_scan(ladder_ctx_t *ladder_ctx) {

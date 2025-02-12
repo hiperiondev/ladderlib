@@ -70,6 +70,7 @@ static const char *fn_symbol[] = {
         "LE-", // 2
         "NE-", // 2
         "-|-", //
+        "FGN", // ?
         "???", // 1
         };
 
@@ -149,6 +150,7 @@ static const ladder_instructions_ioc_t ladder_fn_ioc[] = {
         { 1, 1, 2, false }, // LE
         { 1, 1, 2, false }, // NE
         { 1, 1, 1, false }, // BAR
+        { 0, 0, 0, false }, // FOREINGN // TODO: get from definition
         { 1, 1, 1, false }, // INV
         };
 
@@ -165,6 +167,9 @@ static void fn_to_str(ladder_ctx_t ladder_ctx, uint32_t net, char (*cells)[6][32
     }
 
     switch (ladder_fn_ioc[ladder_ctx.network[net].cells[row][column].code].cells) {
+        case 0:
+            sprintf((*cells)[1], "                   ");
+            break;
         case 1:
             if (ladder_ctx.network[net].cells[row][column].code == LADDER_INS_CONN)
                 sprintf((*cells)[1], "                   ");
@@ -227,7 +232,7 @@ void ladder_print(ladder_ctx_t ladder_ctx) {
 
     for (uint32_t n = 0; n < ladder_ctx.ladder.quantity.networks; n++) {
         memset(network_str, 0, ladder_ctx.ladder.quantity.net_rows * ladder_ctx.ladder.quantity.net_columns * 2 * 32 * sizeof(char));
-        printf("Network %d:\n\n", n);
+        printf("[Network %d]\n\n", n);
 
         for (uint32_t r = 0; r < ladder_ctx.ladder.quantity.net_rows; r++) {
             for (uint32_t c = 0; c < ladder_ctx.ladder.quantity.net_columns; c++) {
@@ -244,14 +249,14 @@ void ladder_print(ladder_ctx_t ladder_ctx) {
         }
 
         for (uint32_t r = 0; r < ladder_ctx.ladder.quantity.net_rows; r++) {
-            printf("|");
+            printf("    |");
             for (uint32_t c = 0; c < ladder_ctx.ladder.quantity.net_columns; c++) {
                 if (network_str[r][c][0][0] == '\0')
                     printf("                   ");
                 else
                     printf("%s", network_str[r][c][0]);
             }
-            printf("|\n|");
+            printf("|\n    |");
             for (uint32_t c = 0; c < ladder_ctx.ladder.quantity.net_columns; c++) {
                 if (network_str[r][c][0][0] == '\0')
                     printf("                   ");
@@ -263,6 +268,4 @@ void ladder_print(ladder_ctx_t ladder_ctx) {
 
         printf("\n\n");
     }
-
-    printf("\n\n");
 }

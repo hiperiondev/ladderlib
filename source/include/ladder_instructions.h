@@ -491,4 +491,16 @@ ladder_ins_err_t execNE(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row,
  */
 ladder_ins_err_t execBAR(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag);
 
+/**
+ * @fn ladder_ins_err_t execFOREINGN(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag)
+ * @brief Execute external functions
+ *
+ * @param ladder_ctx Ladder context
+ * @param column Column
+ * @param row Row
+ * @param flag Flag
+ * @return Status
+ */
+ladder_ins_err_t execFOREINGN(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag);
+
 #endif /* LADDER_LOGIC_INSTRUCTIONS_H */

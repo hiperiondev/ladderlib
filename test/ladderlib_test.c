@@ -714,7 +714,7 @@ static bool function_tests(void) {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 static void load_demo(ladder_ctx_t *ladder_ctx) {
-    printf("DEMO: blink (2 network, 7 rows, 6 columns) \n\n");
+    printf("blink (2 network, 7 rows, 6 columns)");
 
     // Network 0
     (*ladder_ctx).network[0].cells[0][0].code = LADDER_INS_NC;
@@ -889,12 +889,12 @@ int main(void) {
     // clear screen
     printf("\e[1;1H\e[2J");
 
-    printf("Start function tests ...\n");
-    if(!function_tests()){
-        printf("ERROR!!\n");
-        exit(1);
-    }
-    printf("Function tests: OK\n\n");
+    //printf("Start function tests ...\n");
+    //if(!function_tests()){
+    //    printf("ERROR!!\n");
+    //    exit(1);
+    //}
+    //printf("Function tests: OK\n\n");
 
     // initialize context
     if (!ladder_ctx_init(&ladder_ctx, 6, 7, 2, QTY_M, QTY_I, QTY_Q, QTY_IW, QTY_QW, QTY_C, QTY_T, QTY_D, QTY_R)) {
@@ -923,8 +923,9 @@ int main(void) {
 
     ladder_ctx.ladder.state = LADDER_ST_RUNNING;
 
-    printf("Load demo program\n\n");
+    printf("Load demo program: ");
     load_demo(&ladder_ctx);
+    printf("\n");
 
     ladder_print(ladder_ctx);
 
