@@ -70,14 +70,16 @@ static ladder_fn_t const ladder_function[] = { //
         execLT,       // 32
         execLE,       // 33
         execNE,       // 34
-        execBAR,      // 35
-        execFOREINGN, // 36
+        execFOREINGN, // 35
         };
 
 void ladder_scan(ladder_ctx_t *ladder_ctx) {
     ladder_ins_err_t ins_err;
 
     for (uint32_t network = 0; network < (*ladder_ctx).ladder.quantity.networks; network++) {
+        if (!(*ladder_ctx).network[network].enable)
+            continue;
+
         (*ladder_ctx).exec_network = &((*ladder_ctx).network[network]);
 
         // resets dynamic flags before to start each network

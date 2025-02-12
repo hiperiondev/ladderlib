@@ -717,6 +717,8 @@ static void load_demo(ladder_ctx_t *ladder_ctx) {
     printf("blink (2 network, 7 rows, 6 columns)");
 
     // Network 0
+    (*ladder_ctx).network[0].enable = true;
+
     (*ladder_ctx).network[0].cells[0][0].code = LADDER_INS_NC;
     (*ladder_ctx).network[0].cells[0][0].data = 3;
     (*ladder_ctx).network[0].cells[0][0].type = LADDER_TYPE_M;
@@ -799,6 +801,8 @@ static void load_demo(ladder_ctx_t *ladder_ctx) {
     //------------------------------------------------------------//
 
     // Network 1
+    (*ladder_ctx).network[1].enable = true;
+
     (*ladder_ctx).network[1].cells[0][0].code = LADDER_INS_NO;
     (*ladder_ctx).network[1].cells[0][0].data = 3;
     (*ladder_ctx).network[1].cells[0][0].type = LADDER_TYPE_M;

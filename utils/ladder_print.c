@@ -149,7 +149,6 @@ static const ladder_instructions_ioc_t ladder_fn_ioc[] = {
         { 1, 1, 2, false }, // LT
         { 1, 1, 2, false }, // LE
         { 1, 1, 2, false }, // NE
-        { 1, 1, 1, false }, // BAR
         { 0, 0, 0, false }, // FOREINGN // TODO: get from definition
         { 1, 1, 1, false }, // INV
         };
@@ -232,7 +231,7 @@ void ladder_print(ladder_ctx_t ladder_ctx) {
 
     for (uint32_t n = 0; n < ladder_ctx.ladder.quantity.networks; n++) {
         memset(network_str, 0, ladder_ctx.ladder.quantity.net_rows * ladder_ctx.ladder.quantity.net_columns * 2 * 32 * sizeof(char));
-        printf("[Network %d]\n\n", n);
+        printf("[Network %d (%s)]\n\n", n, ladder_ctx.network[n].enable ? "enabled" : "disabled");
 
         for (uint32_t r = 0; r < ladder_ctx.ladder.quantity.net_rows; r++) {
             for (uint32_t c = 0; c < ladder_ctx.ladder.quantity.net_columns; c++) {

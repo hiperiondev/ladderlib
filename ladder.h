@@ -32,9 +32,27 @@
 #include <stdint.h>
 #include <stddef.h>
 
-#define LADDERLIB_VERSION_MAYOR 1 // indicate a really big change that can cause a incompatibilities with previous versions
-#define LADDERLIB_VERSION_MINOR 0 // indicate some change on API or opcode or very important correction in functionality
-#define LADDERLIB_VERSION_PATCH 2 // indicate some minor change or correction
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * @def LADDERLIB_VERSION_MAYOR
+ * @brief Indicate a really big change that can cause a incompatibilities with previous versions.
+ */
+#define LADDERLIB_VERSION_MAYOR 1
+
+/**
+ * @def LADDERLIB_VERSION_MINOR
+ * @brief Indicate some change on API or opcode or very important correction in functionality
+ */
+#define LADDERLIB_VERSION_MINOR 0
+
+/**
+ * @def LADDERLIB_VERSION_PATCH
+ * @brief Indicate some minor change or correction
+ */
+#define LADDERLIB_VERSION_PATCH 2
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
  * @enum LADDER_INSTRUCTIONS
@@ -77,7 +95,6 @@ typedef enum LADDER_INSTRUCTIONS {
     LADDER_INS_LT,           /**< Instruction LT */
     LADDER_INS_LE,           /**< Instruction LE */
     LADDER_INS_NE,           /**< Instruction NE */
-    LADDER_INS_BAR,          /**< Instruction BAR */
     LADDER_INS_FOREINGN,     /**< Instruction FOREINGN */
     //...//
     LADDER_INS_INV,          /**< First invalid */
@@ -153,6 +170,7 @@ typedef struct ladder_cell_s {
  *
  */
 typedef struct ladder_network_s {
+             bool enable;  /**< Enabled for execution */
     ladder_cell_t **cells; /**< Cells */
          uint32_t *bars;   /**< Bars */
 } ladder_network_t;
