@@ -36,15 +36,17 @@
 #include "ladder_instructions.h"
 #include "fn_crontab.h"
 
-ladder_ins_err_t cron_init(ladder_ctx_t *ladder_ctx, void *data) {
-    return LADDER_INS_ERR_OK;
+ladder_instructions_ioc_t cron_description = { 1, 1, 1, false };
+
+bool cron_init(ladder_foreign_function_t *function, uint32_t id, void *data, uint32_t qty) {
+    return true;
 }
 
 ladder_ins_err_t cron_exec(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag) {
     return LADDER_INS_ERR_OK;
 }
 
-ladder_ins_err_t cron_deinit(ladder_ctx_t *ladder_ctx) {
-    return LADDER_INS_ERR_OK;
+bool cron_deinit(ladder_foreign_function_t *function) {
+    return true;
 }
 

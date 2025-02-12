@@ -87,6 +87,9 @@ bool ladder_ctx_init(ladder_ctx_t *ladder_ctx, uint8_t net_columns_qty, uint8_t 
     if (net_rows_qty > 32)
         return false;
 
+    (*ladder_ctx).foreign.qty = 0;
+    (*ladder_ctx).foreign.fn = NULL;
+
     (*ladder_ctx).scan_internals.actual_scan_time = 0;
     (*ladder_ctx).scan_internals.start_time = 0;
 
@@ -189,5 +192,26 @@ bool ladder_ctx_deinit(ladder_ctx_t *ladder_ctx) {
 
     free((*ladder_ctx).timers);
 
+    for (uint32_t f = 0; f < (*ladder_ctx).foreign.qty; f++) {
+        (*ladder_ctx).foreign.fn[f].deinit(&((*ladder_ctx).foreign.fn[f]));
+    }
+
     return true;
 }
+
+bool ladder_add_foreign(ladder_ctx_t *ladder_ctx, _foreign_fn_init *fn_init, void *init_data, uint32_t qty) {
+    if (fn_init == NULL)
+        return false;
+
+    if ((*ladder_ctx).foreign.qty == 0)
+        (*ladder_ctx).foreign.fn = malloc(sizeof(ladder_foreign_function_t));
+    else
+        (*ladder_ctx).foreign.fn = realloc((*ladder_ctx).foreign.fn, ((*ladder_ctx).foreign.qty + 1) * sizeof(ladder_foreign_function_t));
+
+    memset(&((*ladder_ctx).foreign.fn[(*ladder_ctx).foreign.qty]), 0, sizeof(ladder_foreign_function_t));
+
+    ++(*ladder_ctx).foreign.qty;
+
+    return fn_init(&((*ladder_ctx).foreign.fn[(*ladder_ctx).foreign.qty - 1]), (*ladder_ctx).foreign.qty - 1, init_data, qty);
+}
+

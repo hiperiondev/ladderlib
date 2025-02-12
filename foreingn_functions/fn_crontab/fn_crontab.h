@@ -60,7 +60,7 @@ typedef struct ladder_crontab_s {
 } ladder_crontab_t;
 
 ladder_ins_err_t cron_exec(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag);
-ladder_ins_err_t cron_init(ladder_ctx_t *ladder_ctx, void *data);
-ladder_ins_err_t cron_deinit(ladder_ctx_t *ladder_ctx);
+            bool cron_init(ladder_foreign_function_t *function, uint32_t id, void *data, uint32_t qty);
+            bool cron_deinit(ladder_foreign_function_t *function);
 
 #endif /* FN_CRONTAB_H_ */
