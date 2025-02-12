@@ -70,7 +70,7 @@ static ladder_fn_t const ladder_function[] = { //
         execLT,       // 32
         execLE,       // 33
         execNE,       // 34
-        execFOREINGN, // 35
+        execFOREIGN,  // 35
         };
 
 void ladder_scan(ladder_ctx_t *ladder_ctx) {

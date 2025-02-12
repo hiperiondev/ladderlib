@@ -34,20 +34,6 @@
 #include "ladder.h"
 
 /**
- * @enum LADDER_INS_ERROR
- * @brief Instruction status
- *
- */
-typedef enum LADDER_INS_ERROR {
-    LADDER_INS_ERR_OK,        /**< OK */
-    LADDER_INS_ERR_GETPREVVAL,/**< Error get previous value */
-    LADDER_INS_ERR_GETDATAVAL,/**< Error get data value */
-    LADDER_INS_ERR_SETDATAVAL,/**< Error set data value */
-    //...//
-    LADDER_INS_ERR_FAIL,      /**< Generic fail */
-} ladder_ins_err_t;
-
-/**
  * @fn  ladder_ins_err_t (*ladder_fn_t)(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag)
  * @brief Instruction prototype
  *
@@ -480,7 +466,7 @@ ladder_ins_err_t execLE(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row,
 ladder_ins_err_t execNE(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag);
 
 /**
- * @fn ladder_ins_err_t execFOREINGN(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag)
+ * @fn ladder_ins_err_t execFOREIGN(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag)
  * @brief Execute external functions
  *
  * @param ladder_ctx Ladder context
@@ -489,6 +475,6 @@ ladder_ins_err_t execNE(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row,
  * @param flag Flag
  * @return Status
  */
-ladder_ins_err_t execFOREINGN(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag);
+ladder_ins_err_t execFOREIGN(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag);
 
 #endif /* LADDER_LOGIC_INSTRUCTIONS_H */

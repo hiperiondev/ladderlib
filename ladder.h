@@ -95,7 +95,7 @@ typedef enum LADDER_INSTRUCTIONS {
     LADDER_INS_LT,           /**< Instruction LT */
     LADDER_INS_LE,           /**< Instruction LE */
     LADDER_INS_NE,           /**< Instruction NE */
-    LADDER_INS_FOREINGN,     /**< Instruction FOREINGN */
+    LADDER_INS_FOREIGN,      /**< Instruction FOREIGN */
     //...//
     LADDER_INS_INV,          /**< First invalid */
     LADDER_INS_MULTI = 0xff, /**< cell is a part of multi cell instruction */
@@ -114,6 +114,20 @@ typedef enum LADDER_STATE {
     LADDER_ST_NULLFN,   /**< pointer to NULL function */
     LADDER_ST_INV,      /**< Invalid */
 } ladder_state_t;
+
+/**
+ * @enum LADDER_INS_ERROR
+ * @brief Instruction status
+ *
+ */
+typedef enum LADDER_INS_ERROR {
+    LADDER_INS_ERR_OK,        /**< OK */
+    LADDER_INS_ERR_GETPREVVAL,/**< Error get previous value */
+    LADDER_INS_ERR_GETDATAVAL,/**< Error get data value */
+    LADDER_INS_ERR_SETDATAVAL,/**< Error set data value */
+    //...//
+    LADDER_INS_ERR_FAIL,      /**< Generic fail */
+} ladder_ins_err_t;
 
 /**
  * @enum LADDER_TYPE
@@ -137,6 +151,7 @@ typedef enum LADDER_TYPE {
     LADDER_TYPE_K,    /**< Type K */
     LADDER_TYPE_R,    /**< Type R */
     LADDER_TYPE_KR,   /**< Type KR */
+    LADDER_TYPE_STR,  /**< Type string */
     LADDER_TYPE_INV,  /**< First invalid */
 } ladder_type_t;
 
@@ -152,6 +167,19 @@ typedef enum LADDER_BASETIME {
     LADDER_BASETIME_SEC,  /**< LADDER_BASETIME_SEC */
     LADDER_BASETIME_MIN,  /**< LADDER_BASETIME_MIN */
 } ladder_basetime_t;
+
+
+/**
+ * @struct ladder_instructions_ioc_s
+ * @brief Instruction description: inputs, outputs, occupied cells and timer (for basetime)
+ *
+ */
+typedef struct ladder_instructions_ioc_s {
+    uint8_t inputs;   /**< Inputs quantity */
+    uint8_t outputs;  /**< Outputs quantity */
+    uint8_t cells;    /**< Cells quantity */
+       bool basetime; /**< it's timer, have basetime */
+} ladder_instructions_ioc_t;
 
 /**
  * @struct ladder_cell_s
@@ -402,6 +430,52 @@ typedef struct ladder_scan_internals_s {
 } ladder_scan_internals_t;
 
 /**
+ * @fn ladder_ins_err_t (_foreign_fn)(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag)
+ * @brief Prototype for foreign functions
+ *
+  @param ladder_ctx Ladder context
+ * @param column Column
+ * @param row Row
+ * @param flag Previous flag
+ * @return Status
+ */
+typedef ladder_ins_err_t (_foreign_fn)(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag);
+
+/**
+ * @fn ladder_ins_err_t (_foreign_fn_init)(ladder_ctx_t *ladder_ctx, void *data);
+ * @brief Prototype for foreign function initializer
+ *
+ * @param ladder_ctx Ladder context
+ * @param data Internal initialize values
+ * @return Status
+ */
+typedef ladder_ins_err_t (_foreign_fn_init)(ladder_ctx_t *ladder_ctx, void *data);
+
+/**
+ * @fn adder_ins_err_t (_foreign_fn_deinit)(ladder_ctx_t *ladder_ctx);
+ * @brief Prototype for foreign functions deinitializer
+ *
+ * @param ladder_ctx Ladder context
+ * @return Status
+ */
+typedef ladder_ins_err_t (_foreign_fn_deinit)(ladder_ctx_t *ladder_ctx);
+
+/**
+ * @struct ladder_foreign_s
+ * @brief Foreign functions
+ *
+ */
+typedef struct ladder_foreign_s {
+    uint32_t qty;                               /**< Foreign functions quantity */
+    struct {
+        ladder_instructions_ioc_t *description; /**< Foreign function description */
+                      _foreign_fn *exec;        /**< Foreign functions pointers */
+               _foreign_fn_deinit *deinit;      /**< Foreign functions deinitializer pointers */
+                             void *data;        /**< Internal data for foreign functions */
+    } fn;
+} ladder_foreign_t;
+
+/**
  * @struct ladder_ctx_s
  * @brief Ladder context
  *
@@ -417,6 +491,7 @@ typedef struct ladder_ctx_s {
   ladder_scan_internals_t scan_internals; /**< Scan internals */
          ladder_network_t *network;       /**< Networks */
          ladder_network_t *exec_network;  /**< Network in execution */
+         ladder_foreign_t foreign;        /**< Foreign functions */
 } ladder_ctx_t;
 
 /**

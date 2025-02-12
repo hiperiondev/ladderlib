@@ -25,6 +25,26 @@
  *
  */
 
+#include <stdbool.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <string.h>
 
+#include "ccronexpr.h"
+#include "ladder.h"
+#include "ladder_internals.h"
+#include "ladder_instructions.h"
+#include "fn_crontab.h"
 
+ladder_ins_err_t cron_init(ladder_ctx_t *ladder_ctx, void *data) {
+    return LADDER_INS_ERR_OK;
+}
+
+ladder_ins_err_t cron_exec(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag) {
+    return LADDER_INS_ERR_OK;
+}
+
+ladder_ins_err_t cron_deinit(ladder_ctx_t *ladder_ctx) {
+    return LADDER_INS_ERR_OK;
+}
 

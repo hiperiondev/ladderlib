@@ -101,18 +101,6 @@ static const char *basetime_graph[] = {
         "min  "
 };
 
-/**
- * @struct ladder_instructions_ioc_s
- * @brief Instruction inputs, outputs, occupied cells and timer (for basetime)
- *
- */
-typedef struct ladder_instructions_ioc_s {
-    uint8_t inputs;   /**< Inputs quantity */
-    uint8_t outputs;  /**< Outputs quantity */
-    uint8_t cells;    /**< Cells quantity */
-       bool basetime; /**< it's timer, have basetime */
-} ladder_instructions_ioc_t;
-
 static const ladder_instructions_ioc_t ladder_fn_ioc[] = {
         { 1, 1, 1, false }, // NOP
         { 1, 1, 1, false }, // CONN
@@ -149,7 +137,7 @@ static const ladder_instructions_ioc_t ladder_fn_ioc[] = {
         { 1, 1, 2, false }, // LT
         { 1, 1, 2, false }, // LE
         { 1, 1, 2, false }, // NE
-        { 0, 0, 0, false }, // FOREINGN // TODO: get from definition
+        { 0, 0, 0, false }, // FOREIGN // TODO: get from definition
         { 1, 1, 1, false }, // INV
         };
 

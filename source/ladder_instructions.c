@@ -697,7 +697,7 @@ ladder_ins_err_t execNE(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row,
 }
 
 //TODO: IMPLEMENT
-ladder_ins_err_t execFOREINGN(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag) {
+ladder_ins_err_t execFOREIGN(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag) {
     //TODO: IMPLEMENT
     if (flag) {
         LADDER_ACTUALIZE_FLAGS(column, row);
@@ -781,6 +781,7 @@ ladder_ins_err_t ladder_get_data_value(ladder_ctx_t *ladder_ctx, uint32_t row, u
             break;
         case LADDER_TYPE_K:
             (*value) = (int) ((*(*ladder_ctx).exec_network).cells[row][column].data);
+
             break;
             //    case LADDER_TYPE_R:
             //      (*value) = R[(*(*ladder_ctx).exec_network).cells[row][column].data];

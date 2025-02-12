@@ -28,8 +28,39 @@
 #ifndef _FN_CRONTAB_H_
 #define _FN_CRONTAB_H_
 
+#include <stdbool.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <string.h>
 
+#include "ccronexpr.h"
+#include "ladder.h"
+#include "ladder_internals.h"
+#include "ladder_instructions.h"
 
+/**
+ * @struct ladder_crontab_value_s
+ * @brief Crontab value
+ *
+ */
+typedef struct ladder_crontab_value_s {
+    bool parsed;
+    cron_expr cron;
+} ladder_crontab_value_t;
 
+/**
+ * @struct ladder_crontab_s
+ * @brief Main crontab context
+ *
+ */
+typedef struct ladder_crontab_s {
+                  uint32_t id;     /**< Foreign function id */
+                  uint32_t qty;    /**< Cron values quantity */
+    ladder_crontab_value_t *value; /**< Cron values */
+} ladder_crontab_t;
+
+ladder_ins_err_t cron_exec(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag);
+ladder_ins_err_t cron_init(ladder_ctx_t *ladder_ctx, void *data);
+ladder_ins_err_t cron_deinit(ladder_ctx_t *ladder_ctx);
 
 #endif /* FN_CRONTAB_H_ */
