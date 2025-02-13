@@ -33,10 +33,6 @@
 #include "ladder_internals.h"
 #include "ladder_instructions.h"
 
-#define LADDER_ACTUALIZE_FLAGS(column, row)                                                                       \
-		(*ladder_ctx).scan_internals.network_flags[(column)] =                                                    \
-            (*ladder_ctx).scan_internals.network_flags[(column)] | LADDER_FLAG_MASK(row)
-
 static uint32_t basetime_factor[] = { 1, 10, 100, 1000, 60000 };
 static uint8_t error;
 
@@ -696,14 +692,13 @@ ladder_ins_err_t execNE(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row,
     return LADDER_INS_ERR_OK;
 }
 
-//TODO: IMPLEMENT
 ladder_ins_err_t execFOREIGN(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag) {
-    //TODO: IMPLEMENT
-    if (flag) {
-        LADDER_ACTUALIZE_FLAGS(column, row);
-    }
+    int data1;
 
-    return LADDER_INS_ERR_OK;
+    if (ladder_get_data_value(ladder_ctx, row, column, &data1) != LADDER_INS_ERR_OK)
+        return LADDER_INS_ERR_GETDATAVAL;
+
+    return (*ladder_ctx).foreign.fn[data1].exec(ladder_ctx, row, column, flag);
 }
 
 ladder_ins_err_t ladder_get_previous_value(ladder_ctx_t *ladder_ctx, uint32_t row, uint32_t column, int *value) {
@@ -743,6 +738,8 @@ ladder_ins_err_t ladder_get_data_value(ladder_ctx_t *ladder_ctx, uint32_t row, u
     *value = 0;
 
     switch ((*(*ladder_ctx).exec_network).cells[row][column].type) {
+        case LADDER_TYPE_NONE:
+            (*value) = (int) (*(*ladder_ctx).exec_network).cells[row][column].data;
         case LADDER_TYPE_M:
             (*value) = (int) ((*ladder_ctx).memory.M[(*(*ladder_ctx).exec_network).cells[row][column].data]);
             break;

@@ -34,16 +34,13 @@
 #include "ladder.h"
 
 /**
- * @fn  ladder_ins_err_t (*ladder_fn_t)(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag)
- * @brief Instruction prototype
+ * @def LADDER_ACTUALIZE_FLAGS
+ * @brief Actualize flags in/after execution
  *
- * @param ladder_ctx Ladder context
- * @param column Column
- * @param row Row
- * @param flag Flag
- * @return Status
  */
-typedef ladder_ins_err_t (*ladder_fn_t)(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag);
+#define LADDER_ACTUALIZE_FLAGS(column, row)                                                                       \
+        (*ladder_ctx).scan_internals.network_flags[(column)] =                                                    \
+            (*ladder_ctx).scan_internals.network_flags[(column)] | LADDER_FLAG_MASK(row)
 
 /**
  * @fn ladder_ins_err_t execNop(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag)

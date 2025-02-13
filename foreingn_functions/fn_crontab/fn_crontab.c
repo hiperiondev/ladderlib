@@ -29,6 +29,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include "ccronexpr.h"
 #include "ladder.h"
@@ -36,17 +37,36 @@
 #include "ladder_instructions.h"
 #include "fn_crontab.h"
 
-ladder_instructions_ioc_t cron_description = { 1, 1, 1, false };
+ladder_instructions_ioc_t cron_description = { 1, 1, 2, false };
 
-bool cron_init(ladder_foreign_function_t *function, uint32_t id, void *data, uint32_t qty) {
+bool cron_init(ladder_foreign_function_t *function, void *data, uint32_t qty) {
+    if (qty == 0)
+        qty = 1;
+
+    if (((*function).name = strdup("CRN")) == NULL)
+        return false;
+
+    memcpy(&((*function).description), &cron_description, sizeof(ladder_instructions_ioc_t));
+
+    (*function).deinit = cron_deinit;
+    (*function).exec = cron_exec;
+    (*function).data = calloc(qty, sizeof(ladder_crontab_value_t));
+
     return true;
 }
 
 ladder_ins_err_t cron_exec(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag) {
+    if (flag) {
+        LADDER_ACTUALIZE_FLAGS(column, row);
+    }
+
     return LADDER_INS_ERR_OK;
 }
 
 bool cron_deinit(ladder_foreign_function_t *function) {
+    free((*function).name);
+    free((*function).data);
+
     return true;
 }
 

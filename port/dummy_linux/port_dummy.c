@@ -39,50 +39,51 @@
 #include "port_dummy.h"
 
 static const char *_ladder_status_str[] = {
-        "STOPPED",   //
-        "RUNNING",   //
-        "ERROR",     //
-        "EXIT_TASK", //
-        "INVALID",   //
+        "STOPPED",  //
+        "RUNNING",  //
+        "ERROR",    //
+        "EXIT_TSK", //
+        "NULLFN",   //
+        "INVALID",  //
         };
 
 static const char *_fn_str[] = {
-        "NOP",   //
-        "CONN",  //
-        "NEG",   //
-        "NO",    //
-        "NC",    //
-        "RE",    //
-        "FE",    //
-        "COIL",  //
-        "COILL", //
-        "COILU", //
-        "TON",   //
-        "TOFF",  //
-        "TP",    //
-        "CTU",   //
-        "CTD",   //
-        "MOVE",  //
-        "SUB",   //
-        "ADD",   //
-        "MUL",   //
-        "DIV",   //
-        "MOD",   //
-        "SHL",   //
-        "SHR",   //
-        "ROL",   //
-        "ROR",   //
-        "AND",   //
-        "OR",    //
-        "XOR",   //
-        "NOT",   //
-        "EQ",    //
-        "GT",    //
-        "GE",    //
-        "LT",    //
-        "LE",    //
-        "NE",    //
-        "BAR",   //
+        "NOP",     //
+        "CONN",    //
+        "NEG",     //
+        "NO",      //
+        "NC",      //
+        "RE",      //
+        "FE",      //
+        "COIL",    //
+        "COILL",   //
+        "COILU",   //
+        "TON",     //
+        "TOFF",    //
+        "TP",      //
+        "CTU",     //
+        "CTD",     //
+        "MOVE",    //
+        "SUB",     //
+        "ADD",     //
+        "MUL",     //
+        "DIV",     //
+        "MOD",     //
+        "SHL",     //
+        "SHR",     //
+        "ROL",     //
+        "ROR",     //
+        "AND",     //
+        "OR",      //
+        "XOR",     //
+        "NOT",     //
+        "EQ",      //
+        "GT",      //
+        "GE",      //
+        "LT",      //
+        "LE",      //
+        "NE",      //
+        "FOREIGN", //
         };
 
 static const char *_fn_err_str[] = {
@@ -232,11 +233,11 @@ bool dummy_on_task_after(ladder_ctx_t *ladder_ctx) {
 
 void dummy_on_panic(ladder_ctx_t *ladder_ctx) {
     printf("--------- dummy PANIC ---------\n");
-    printf("        STATE: %s (%d)\n", _ladder_status_str[(*ladder_ctx).ladder.state], (*ladder_ctx).ladder.state);
-    printf("  INSTRUCTION: %s (%d)\n", _fn_str[(*ladder_ctx).ladder.last.instr], (*ladder_ctx).ladder.last.instr);
-    printf("      NETWORK: %d\n", (*ladder_ctx).ladder.last.network);
-    printf("         CELL: %d, %d\n", (*ladder_ctx).ladder.last.cell_row, (*ladder_ctx).ladder.last.cell_column);
-    printf("        ERROR: %s (%d)\n", _fn_err_str[(*ladder_ctx).ladder.last.err], (*ladder_ctx).ladder.last.err);
+    printf("        STATE: %s (%d)                     \n", _ladder_status_str[(*ladder_ctx).ladder.state], (*ladder_ctx).ladder.state);
+    printf("  INSTRUCTION: %s (%d)                     \n", _fn_str[(*ladder_ctx).ladder.last.instr], (*ladder_ctx).ladder.last.instr);
+    printf("      NETWORK: %d                          \n", (*ladder_ctx).ladder.last.network);
+    printf("         CELL: %d, %d                      \n", (*ladder_ctx).ladder.last.cell_row, (*ladder_ctx).ladder.last.cell_column);
+    printf("        ERROR: %s (%d)                     \n", _fn_err_str[(*ladder_ctx).ladder.last.err], (*ladder_ctx).ladder.last.err);
     printf("-------------------------------\n\n");
 }
 

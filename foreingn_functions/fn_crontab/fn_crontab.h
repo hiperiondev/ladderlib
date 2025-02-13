@@ -54,13 +54,40 @@ typedef struct ladder_crontab_value_s {
  *
  */
 typedef struct ladder_crontab_s {
-                  uint32_t id;     /**< Foreign function id */
                   uint32_t qty;    /**< Cron values quantity */
     ladder_crontab_value_t *value; /**< Cron values */
 } ladder_crontab_t;
 
+/**
+ * @fn ladder_ins_err_t cron_exec(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag)
+ * @brief Function implementation
+ *
+ * @param ladder_ctx Ladder context
+ * @param column Column
+ * @param row Row
+ * @param flag Flag
+ * @return Status
+ */
 ladder_ins_err_t cron_exec(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag);
-            bool cron_init(ladder_foreign_function_t *function, uint32_t id, void *data, uint32_t qty);
-            bool cron_deinit(ladder_foreign_function_t *function);
+
+/**
+ * @fn bool cron_init(ladder_foreign_function_t *function, uint32_t id, void *data, uint32_t qty)
+ * @brief Initialize function
+ *
+ * @param function Function container
+ * @param data Initialization data
+ * @param qty Quantity of internal data
+ * @return Status
+ */
+bool cron_init(ladder_foreign_function_t *function, void *data, uint32_t qty);
+
+/**
+ * @fn bool cron_deinit(ladder_foreign_function_t *function)
+ * @brief Deinitialize function
+ *
+ * @param function Function container
+ * @return Status
+ */
+bool cron_deinit(ladder_foreign_function_t *function);
 
 #endif /* FN_CRONTAB_H_ */

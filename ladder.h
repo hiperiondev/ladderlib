@@ -429,19 +429,19 @@ typedef struct ladder_scan_internals_s {
          uint64_t start_time;       /**< Start time for calculate scan time */
 } ladder_scan_internals_t;
 
-typedef struct ladder_foreign_function_s ladder_foreign_function_t;
-
 /**
- * @fn ladder_ins_err_t (_foreign_fn)(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag)
- * @brief Prototype for foreign functions
+ * @fn  ladder_ins_err_t (*ladder_fn_t)(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag)
+ * @brief Instruction prototype
  *
-  @param ladder_ctx Ladder context
+ * @param ladder_ctx Ladder context
  * @param column Column
  * @param row Row
- * @param flag Previous flag
+ * @param flag Flag
  * @return Status
  */
-typedef ladder_ins_err_t (_foreign_fn)(ladder_foreign_function_t *function, uint32_t column, uint32_t row, bool flag);
+typedef ladder_ins_err_t (*ladder_fn_t)(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag);
+
+typedef struct ladder_foreign_function_s ladder_foreign_function_t;
 
 /**
  * @fn bool (_foreign_fn_init)(ladder_ctx_t *ladder_ctx, void *data, uint32_t qty);
@@ -452,7 +452,7 @@ typedef ladder_ins_err_t (_foreign_fn)(ladder_foreign_function_t *function, uint
  * @param qty Quantity
  * @return Status
  */
-typedef bool (_foreign_fn_init)(ladder_foreign_function_t *function, uint32_t id, void *data, uint32_t qty);
+typedef bool (*_foreign_fn_init)(ladder_foreign_function_t *function, void *data, uint32_t qty);
 
 /**
  * @fn bool (_foreign_fn_deinit)(ladder_foreign_function_t *function);
@@ -461,7 +461,7 @@ typedef bool (_foreign_fn_init)(ladder_foreign_function_t *function, uint32_t id
  * @param ladder_ctx Function
  * @return Status
  */
-typedef bool (_foreign_fn_deinit)(ladder_foreign_function_t *function);
+typedef bool (*_foreign_fn_deinit)(ladder_foreign_function_t *function);
 
 /**
  * @struct ladder_foreign_function_s
@@ -472,8 +472,8 @@ typedef struct ladder_foreign_function_s {
                      uint32_t id;          /**< Foreign function id */
                          char *name;       /**< Foreign function name */
     ladder_instructions_ioc_t description; /**< Foreign function description */
-                  _foreign_fn *exec;       /**< Foreign functions pointers */
-           _foreign_fn_deinit *deinit;     /**< Foreign functions deinitializer pointers */
+                  ladder_fn_t exec;        /**< Foreign functions pointers */
+           _foreign_fn_deinit deinit;      /**< Foreign functions deinitializer pointers */
                          void *data;       /**< Internal data for foreign functions */
 } ladder_foreign_function_t;
 
@@ -556,7 +556,7 @@ void ladder_task(void *ladderctx);
 void ladder_clear_program(ladder_ctx_t *ladder_ctx);
 
 /**
- * @fn bool ladder_add_foreign(ladder_ctx_t *ladder_ctx, _foreign_fn_init *fn_init, void *init_data, uint32_t qty)
+ * @fn bool ladder_add_foreign(ladder_ctx_t *ladder_ctx, _foreign_fn_init fn_init, void *init_data, uint32_t qty)
  * @brief Add a foreign function
  *
  * @param ladder_ctx Ladder context
@@ -565,6 +565,6 @@ void ladder_clear_program(ladder_ctx_t *ladder_ctx);
  * @param qty Quantity
  * @return
  */
-bool ladder_add_foreign(ladder_ctx_t *ladder_ctx, _foreign_fn_init *fn_init, void *init_data, uint32_t qty);
+bool ladder_add_foreign(ladder_ctx_t *ladder_ctx, _foreign_fn_init fn_init, void *init_data, uint32_t qty);
 
 #endif /* LADDER_H */

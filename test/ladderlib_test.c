@@ -32,6 +32,7 @@
 #include "port_dummy.h"
 #include "ladder_print.h"
 #include "ladder_instructions.h"
+#include "fn_crontab.h"
 
 // registers quantity
 #define QTY_M  8
@@ -669,6 +670,19 @@ static bool fn_ne(void) {
     return res;
 }
 
+// TODO: Implement
+static bool fn_foreign(void) {
+    bool res;
+    ladder_network_t network;
+    const network_result_t result = { 0 };
+
+    init_network(&network, 1, 1);
+    res = network_test(network, 1, 1, 1, result);
+    deinit_network(&network, 1);
+
+    return res;
+}
+
 static bool function_tests(void) {
     bool res = true;
 
@@ -707,6 +721,7 @@ static bool function_tests(void) {
     res &= fn_lt();
     res &= fn_le();
     res &= fn_ne();
+    res &= fn_foreign();
 
     return res;
 }
@@ -755,7 +770,16 @@ static void load_demo(ladder_ctx_t *ladder_ctx) {
     (*ladder_ctx).network[0].cells[3][1].type = LADDER_BASETIME_SEC;
 
     (*ladder_ctx).network[0].cells[2][2].code = LADDER_INS_CONN;
-    (*ladder_ctx).network[0].cells[2][3].code = LADDER_INS_CONN;
+
+    //(*ladder_ctx).network[0].cells[2][3].code = LADDER_INS_CONN;
+
+    (*ladder_ctx).network[0].cells[2][3].code = LADDER_INS_FOREIGN;
+    (*ladder_ctx).network[0].cells[2][3].data = 0;
+    (*ladder_ctx).network[0].cells[2][3].type = LADDER_TYPE_NONE;
+    (*ladder_ctx).network[0].cells[3][3].code = LADDER_INS_MULTI;
+    (*ladder_ctx).network[0].cells[3][3].data = 0;
+    (*ladder_ctx).network[0].cells[3][3].type = LADDER_TYPE_NONE;
+
     (*ladder_ctx).network[0].cells[2][4].code = LADDER_INS_CONN;
 
     (*ladder_ctx).network[0].cells[2][5].code = LADDER_INS_COIL;
@@ -926,6 +950,12 @@ int main(void) {
     ladder_ctx.hw.time.delay = dummy_delay;
 
     ladder_ctx.ladder.state = LADDER_ST_RUNNING;
+
+    // add foreign
+    if(!ladder_add_foreign(&ladder_ctx, cron_init, NULL, 5)) {
+        printf("ERROR Load foreign\n");
+        exit(1);
+    }
 
     printf("Load demo program: ");
     load_demo(&ladder_ctx);

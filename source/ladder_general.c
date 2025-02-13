@@ -195,12 +195,21 @@ bool ladder_ctx_deinit(ladder_ctx_t *ladder_ctx) {
     for (uint32_t f = 0; f < (*ladder_ctx).foreign.qty; f++) {
         (*ladder_ctx).foreign.fn[f].deinit(&((*ladder_ctx).foreign.fn[f]));
     }
+    free((*ladder_ctx).foreign.fn);
 
     return true;
 }
 
-bool ladder_add_foreign(ladder_ctx_t *ladder_ctx, _foreign_fn_init *fn_init, void *init_data, uint32_t qty) {
+bool ladder_add_foreign(ladder_ctx_t *ladder_ctx, _foreign_fn_init fn_init, void *init_data, uint32_t qty) {
     if (fn_init == NULL)
+        return false;
+
+    ladder_foreign_function_t fn_new;
+
+    memset(&fn_new, 0, sizeof(ladder_foreign_function_t));
+    fn_new.id = (*ladder_ctx).foreign.qty;
+
+    if (!fn_init(&fn_new, init_data, qty))
         return false;
 
     if ((*ladder_ctx).foreign.qty == 0)
@@ -208,10 +217,9 @@ bool ladder_add_foreign(ladder_ctx_t *ladder_ctx, _foreign_fn_init *fn_init, voi
     else
         (*ladder_ctx).foreign.fn = realloc((*ladder_ctx).foreign.fn, ((*ladder_ctx).foreign.qty + 1) * sizeof(ladder_foreign_function_t));
 
-    memset(&((*ladder_ctx).foreign.fn[(*ladder_ctx).foreign.qty]), 0, sizeof(ladder_foreign_function_t));
-
+    memcpy(&((*ladder_ctx).foreign.fn[(*ladder_ctx).foreign.qty]), &fn_new, sizeof(ladder_foreign_function_t));
     ++(*ladder_ctx).foreign.qty;
 
-    return fn_init(&((*ladder_ctx).foreign.fn[(*ladder_ctx).foreign.qty - 1]), (*ladder_ctx).foreign.qty - 1, init_data, qty);
+    return true;
 }
 
