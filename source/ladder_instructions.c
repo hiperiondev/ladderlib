@@ -693,12 +693,19 @@ ladder_ins_err_t execNE(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row,
 }
 
 ladder_ins_err_t execFOREIGN(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag) {
-    int data1;
+    int data;
+    ladder_ins_err_t res = LADDER_INS_ERR_OK;
 
-    if (ladder_get_data_value(ladder_ctx, row, column, &data1) != LADDER_INS_ERR_OK)
+    if (ladder_get_data_value(ladder_ctx, row, column, &data) != LADDER_INS_ERR_OK)
         return LADDER_INS_ERR_GETDATAVAL;
 
-    return (*ladder_ctx).foreign.fn[data1].exec(ladder_ctx, row, column, flag);
+    res = (*ladder_ctx).foreign.fn[data].exec(ladder_ctx, row, column, flag);
+
+    //if (flag) {
+    //    LADDER_ACTUALIZE_FLAGS(column, row);
+    //}
+
+    return res;
 }
 
 ladder_ins_err_t ladder_get_previous_value(ladder_ctx_t *ladder_ctx, uint32_t row, uint32_t column, int *value) {
@@ -740,6 +747,9 @@ ladder_ins_err_t ladder_get_data_value(ladder_ctx_t *ladder_ctx, uint32_t row, u
     switch ((*(*ladder_ctx).exec_network).cells[row][column].type) {
         case LADDER_TYPE_NONE:
             (*value) = (int) (*(*ladder_ctx).exec_network).cells[row][column].data;
+            break;
+        case LADDER_TYPE_STR:
+            break;
         case LADDER_TYPE_M:
             (*value) = (int) ((*ladder_ctx).memory.M[(*(*ladder_ctx).exec_network).cells[row][column].data]);
             break;
