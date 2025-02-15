@@ -69,7 +69,7 @@ void ladder_scan(ladder_ctx_t *ladder_ctx);
 void ladder_save_previous_values(ladder_ctx_t *ladder_ctx);
 
 /**
- * @fn void ladder_set_data_value(ladder_ctx_t *ladder_ctx, uint32_t row, uint32_t column, int value, uint8_t *error)
+ * @fn void ladder_set_data_value(ladder_ctx_t *ladder_ctx, uint32_t row, uint32_t column, void *value, uint8_t *error)
  * @brief Set values
  *
  * @param ladder_ctx Ladder context
@@ -79,6 +79,6 @@ void ladder_save_previous_values(ladder_ctx_t *ladder_ctx);
  * @param error Error status
  * @return Status
  */
-void ladder_set_data_value(ladder_ctx_t *ladder_ctx, uint32_t row, uint32_t column, int value, uint8_t *error);
+void ladder_set_data_value(ladder_ctx_t *ladder_ctx, uint32_t row, uint32_t column, void *value, uint8_t *error);
 
 #endif /* LADDER_INTERNALS_H */
