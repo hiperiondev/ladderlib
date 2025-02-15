@@ -622,6 +622,9 @@ void ladder_set_data_value(ladder_ctx_t *ladder_ctx, uint32_t row, uint32_t colu
         case LADDER_TYPE_D:
             (*ladder_ctx).registers.D[(*(*ladder_ctx).exec_network).cells[row][column].data.i32] = *((int32_t*) value);
             break;
+        case LADDER_TYPE_REAL:
+            (*(*ladder_ctx).exec_network).cells[row][column].data.real = *((float*) value);
+            break;
 
         default:
             *error = LADDER_INS_ERR_SETDATAVAL;
