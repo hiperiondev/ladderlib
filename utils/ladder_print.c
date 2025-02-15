@@ -150,10 +150,10 @@ static void fn_to_str(ladder_ctx_t ladder_ctx, uint32_t net, char (*cells)[6][32
     ladder_instructions_ioc_t actual_ioc;
 
     if (ladder_ctx.network[net].cells[row][column].code == LADDER_INS_FOREIGN) {
-        memcpy(&actual_ioc, &(ladder_ctx.foreign.fn[ladder_ctx.network[net].cells[row][column].data.i16]).description, sizeof(ladder_instructions_ioc_t));
+        memcpy(&actual_ioc, &(ladder_ctx.foreign.fn[ladder_ctx.network[net].cells[row][column].data.i32]).description, sizeof(ladder_instructions_ioc_t));
         sprintf((*cells)[0], "---+-%s--------+--",
-                strlen(ladder_ctx.foreign.fn[ladder_ctx.network[net].cells[row][column].data.i16].name) == 0 ?
-                        "???" : ladder_ctx.foreign.fn[ladder_ctx.network[net].cells[row][column].data.i16].name);
+                strlen(ladder_ctx.foreign.fn[ladder_ctx.network[net].cells[row][column].data.i32].name) == 0 ?
+                        "???" : ladder_ctx.foreign.fn[ladder_ctx.network[net].cells[row][column].data.i32].name);
     } else {
         memcpy(&actual_ioc, &(ladder_fn_ioc[ladder_ctx.network[net].cells[row][column].code]), sizeof(ladder_instructions_ioc_t));
         if (actual_ioc.cells != 1) {
@@ -175,7 +175,7 @@ static void fn_to_str(ladder_ctx_t ladder_ctx, uint32_t net, char (*cells)[6][32
 
             else
                 sprintf((*cells)[1], "     %s %04d       ", dt_graph[ladder_ctx.network[net].cells[row][column].type],
-                        ladder_ctx.network[net].cells[row][column].data.i16);
+                        ladder_ctx.network[net].cells[row][column].data.i32);
             break;
         case 2:
             if (row > ladder_ctx.ladder.quantity.net_rows - 1)
@@ -185,10 +185,10 @@ static void fn_to_str(ladder_ctx_t ladder_ctx, uint32_t net, char (*cells)[6][32
                 sprintf((*cells)[1], "   | %.10s |  ", ladder_ctx.network[net].cells[row][column].data.cstr);
             else
                 sprintf((*cells)[1], "   | %s %04d    |  ", dt_graph[ladder_ctx.network[net].cells[row][column].type],
-                        ladder_ctx.network[net].cells[row][column].data.i16);
+                        ladder_ctx.network[net].cells[row][column].data.i32);
 
             if (actual_ioc.basetime) {
-                sprintf((*cells)[2], "%s| %04d %s |%s", actual_ioc.inputs == 1 ? "   " : "---", ladder_ctx.network[net].cells[row + 1][column].data.i16,
+                sprintf((*cells)[2], "%s| %04d %s |%s", actual_ioc.inputs == 1 ? "   " : "---", ladder_ctx.network[net].cells[row + 1][column].data.i32,
                         basetime_graph[ladder_ctx.network[net].cells[row + 1][column].type], actual_ioc.outputs == 1 ? "  " : "--");
             } else {
                 if (ladder_ctx.network[net].cells[row + 1][column].type == LADDER_TYPE_CSTR)
@@ -196,7 +196,7 @@ static void fn_to_str(ladder_ctx_t ladder_ctx, uint32_t net, char (*cells)[6][32
                             actual_ioc.outputs == 1 ? "  " : "--");
                 else
                     sprintf((*cells)[2], "%s| %s %04d    |%s", actual_ioc.inputs == 1 ? "   " : "---",
-                            dt_graph[ladder_ctx.network[net].cells[row + 1][column].type], ladder_ctx.network[net].cells[row + 1][column].data.i16,
+                            dt_graph[ladder_ctx.network[net].cells[row + 1][column].type], ladder_ctx.network[net].cells[row + 1][column].data.i32,
                             actual_ioc.outputs == 1 ? "  " : "--");
             }
 
@@ -211,21 +211,21 @@ static void fn_to_str(ladder_ctx_t ladder_ctx, uint32_t net, char (*cells)[6][32
                 sprintf((*cells)[1], "   | %.10s |  ", ladder_ctx.network[net].cells[row][column].data.cstr);
             } else
                 sprintf((*cells)[1], "   | %s %04d    |  ", dt_graph[ladder_ctx.network[net].cells[row][column].type],
-                        ladder_ctx.network[net].cells[row][column].data.i16);
+                        ladder_ctx.network[net].cells[row][column].data.i32);
 
             if (ladder_ctx.network[net].cells[row + 1][column].type == LADDER_TYPE_CSTR) {
                 sprintf((*cells)[2], "%s| %s    |%s", (actual_ioc.inputs == 2 || actual_ioc.outputs == 3) ? "---" : "   ",
                         ladder_ctx.network[net].cells[row + 1][column].data.cstr, (actual_ioc.outputs == 2 || actual_ioc.outputs == 3) ? "--" : "  ");
             } else
                 sprintf((*cells)[2], "%s| %s %04d    |%s", (actual_ioc.inputs == 2 || actual_ioc.outputs == 3) ? "---" : "   ",
-                        dt_graph[ladder_ctx.network[net].cells[row + 1][column].type], ladder_ctx.network[net].cells[row + 1][column].data.i16,
+                        dt_graph[ladder_ctx.network[net].cells[row + 1][column].type], ladder_ctx.network[net].cells[row + 1][column].data.i32,
                         (actual_ioc.outputs == 2 || actual_ioc.outputs == 3) ? "--" : "  ");
 
             if (ladder_ctx.network[net].cells[row + 2][column].type == LADDER_TYPE_CSTR) {
                 sprintf((*cells)[3], "   | %.10s |  ", ladder_ctx.network[net].cells[row + 2][column].data.cstr);
             } else
                 sprintf((*cells)[3], "   | %s %04d    |  ", dt_graph[ladder_ctx.network[net].cells[row + 2][column].type],
-                        ladder_ctx.network[net].cells[row + 1][column].data.i16);
+                        ladder_ctx.network[net].cells[row + 1][column].data.i32);
 
             sprintf((*cells)[4], "%s|            |%s", actual_ioc.inputs == 1 ? "   " : "---", actual_ioc.outputs == 1 ? "  " : "--");
 

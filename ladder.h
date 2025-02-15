@@ -147,9 +147,6 @@ typedef enum LADDER_TYPE {
     LADDER_TYPE_C,    /**< Type C */
     LADDER_TYPE_T,    /**< Type T */
     LADDER_TYPE_D,    /**< Type D */
-    LADDER_TYPE_K,    /**< Type K */
-    LADDER_TYPE_R,    /**< Type R */
-    LADDER_TYPE_KR,   /**< Type KR */
     LADDER_TYPE_CSTR, /**< Type constant string */
     LADDER_TYPE_INV,  /**< First invalid */
 } ladder_type_t;
@@ -188,7 +185,7 @@ typedef struct ladder_instructions_ioc_s {
 typedef struct ladder_cell_s {
     ladder_instruction_t code; /**< Code */
     union {
-           int16_t i16;        /**< integer */
+           int32_t i32;        /**< integer */
         const char *cstr;      /**< Constant string */
     } data;                    /**< Data */
       ladder_type_t type;      /**< Data type */
@@ -413,10 +410,10 @@ typedef struct ladder_prev_scan_vals_s {
  *
  */
 typedef struct ladder_registers_s {
-    uint16_t *IW; /**< Analog Inputs (word) */
-    uint16_t *QW; /**< Analog Outputs (word) */
-    uint16_t *C;  /**< Counter registers (16 bits) */
-     int16_t *D;  /**< Regular registers (signed 16 bits) */
+     int32_t *IW; /**< Analog Inputs */
+     int32_t *QW; /**< Analog Outputs */
+    uint32_t *C;  /**< Counter registers */
+     int32_t *D;  /**< Regular registers */
        float *R;  /**< Floating point registers */
 } ladder_registers_t;
 

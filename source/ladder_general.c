@@ -74,7 +74,7 @@ void ladder_clear_program(ladder_ctx_t *ladder_ctx) {
             (*ladder_ctx).network[nt].bars[c] = 0;
             for (uint32_t r = 0; r < (*ladder_ctx).ladder.quantity.net_rows - 1; r++) {
                 (*ladder_ctx).network[nt].cells[r][c].code = 0;
-                (*ladder_ctx).network[nt].cells[r][c].data.i16 = 0;
+                (*ladder_ctx).network[nt].cells[r][c].data.i32 = 0;
                 (*ladder_ctx).network[nt].cells[r][c].type = 0;
             }
         }
@@ -131,10 +131,10 @@ bool ladder_ctx_init(ladder_ctx_t *ladder_ctx, uint8_t net_columns_qty, uint8_t 
     (*ladder_ctx).prev_scan_vals.Trh = calloc(qty_t, sizeof(bool));
     (*ladder_ctx).prev_scan_vals.Tdh = calloc(qty_t, sizeof(bool));
 
-    (*ladder_ctx).registers.IW = calloc(qty_iw, sizeof(uint16_t));
-    (*ladder_ctx).registers.QW = calloc(qty_qw, sizeof(uint16_t));
-    (*ladder_ctx).registers.C = calloc(qty_c, sizeof(uint16_t));
-    (*ladder_ctx).registers.D = calloc(qty_d, sizeof(int16_t));
+    (*ladder_ctx).registers.IW = calloc(qty_iw, sizeof(int32_t));
+    (*ladder_ctx).registers.QW = calloc(qty_qw, sizeof(int32_t));
+    (*ladder_ctx).registers.C = calloc(qty_c, sizeof(uint32_t));
+    (*ladder_ctx).registers.D = calloc(qty_d, sizeof(int32_t));
     (*ladder_ctx).registers.R = calloc(qty_r, sizeof(float));
 
     (*ladder_ctx).timers = calloc(qty_t, sizeof(ladder_timer_t));

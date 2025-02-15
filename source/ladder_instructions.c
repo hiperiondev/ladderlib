@@ -36,6 +36,24 @@
 static uint32_t basetime_factor[] = { 1, 10, 100, 1000, 60000 };
 static uint8_t error;
 
+static const uint8_t type_size[] = {
+        sizeof(uint32_t), /**< Type None */
+        sizeof(uint8_t),  /**< Type M */
+        sizeof(uint8_t),  /**< Type Q */
+        sizeof(uint8_t),  /**< Type I */
+        sizeof(uint8_t),  /**< Type Cd */
+        sizeof(uint8_t),  /**< Type Cr */
+        sizeof(uint8_t),  /**< Type Td */
+        sizeof(uint8_t),  /**< Type Tr */
+        sizeof(int32_t),  /**< Type IW */
+        sizeof(int32_t),  /**< Type QW */
+        sizeof(uint32_t), /**< Type C */
+        sizeof(uint32_t), /**< Type T */
+        sizeof(int32_t),  /**< Type D */
+        sizeof(char*),    /**< Type constant string */
+        sizeof(uint32_t), /**< First invalid */
+};
+
 ladder_ins_err_t execNop(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag) {
     return LADDER_INS_ERR_OK;
 }
@@ -144,40 +162,40 @@ ladder_ins_err_t execCoilU(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t r
 ladder_ins_err_t execTON(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag) {
     // timer is not active --> reset
     if (!flag) {
-        (*ladder_ctx).timers[(*(*ladder_ctx).exec_network).cells[row][column].data.i16].acc = 0;
-        (*ladder_ctx).memory.Tr[(*(*ladder_ctx).exec_network).cells[row][column].data.i16] = false;
-        (*ladder_ctx).memory.Td[(*(*ladder_ctx).exec_network).cells[row][column].data.i16] = false;
+        (*ladder_ctx).timers[(*(*ladder_ctx).exec_network).cells[row][column].data.i32].acc = 0;
+        (*ladder_ctx).memory.Tr[(*(*ladder_ctx).exec_network).cells[row][column].data.i32] = false;
+        (*ladder_ctx).memory.Td[(*(*ladder_ctx).exec_network).cells[row][column].data.i32] = false;
     }
 
     // timer is activated in this scan, set timer running flag and snapshot the timestamp
-    if (flag && !(*ladder_ctx).memory.Td[(*(*ladder_ctx).exec_network).cells[row][column].data.i16]
-            && !(*ladder_ctx).memory.Tr[(*(*ladder_ctx).exec_network).cells[row][column].data.i16]) {
-        (*ladder_ctx).memory.Tr[(*(*ladder_ctx).exec_network).cells[row][column].data.i16] = true;
-        (*ladder_ctx).timers[(*(*ladder_ctx).exec_network).cells[row][column].data.i16].time_stamp = (*ladder_ctx).hw.time.millis();
+    if (flag && !(*ladder_ctx).memory.Td[(*(*ladder_ctx).exec_network).cells[row][column].data.i32]
+            && !(*ladder_ctx).memory.Tr[(*(*ladder_ctx).exec_network).cells[row][column].data.i32]) {
+        (*ladder_ctx).memory.Tr[(*(*ladder_ctx).exec_network).cells[row][column].data.i32] = true;
+        (*ladder_ctx).timers[(*(*ladder_ctx).exec_network).cells[row][column].data.i32].time_stamp = (*ladder_ctx).hw.time.millis();
     }
 
     // timer is running, update acc value
-    if ((*ladder_ctx).memory.Tr[(*(*ladder_ctx).exec_network).cells[row][column].data.i16]) {
-        (*ladder_ctx).timers[(*(*ladder_ctx).exec_network).cells[row][column].data.i16].acc =
-                (uint16_t) (((*ladder_ctx).hw.time.millis() - (*ladder_ctx).timers[(*(*ladder_ctx).exec_network).cells[row][column].data.i16].time_stamp)
+    if ((*ladder_ctx).memory.Tr[(*(*ladder_ctx).exec_network).cells[row][column].data.i32]) {
+        (*ladder_ctx).timers[(*(*ladder_ctx).exec_network).cells[row][column].data.i32].acc =
+                (uint16_t) (((*ladder_ctx).hw.time.millis() - (*ladder_ctx).timers[(*(*ladder_ctx).exec_network).cells[row][column].data.i32].time_stamp)
                         / basetime_factor[(*(*ladder_ctx).exec_network).cells[row + 1][column].type]);
     }
 
     // timer done --> activate timer done flag and set acc value to his set point
-    if ((*ladder_ctx).memory.Tr[(*(*ladder_ctx).exec_network).cells[row][column].data.i16]
-            && (((*ladder_ctx).hw.time.millis() - (*ladder_ctx).timers[(*(*ladder_ctx).exec_network).cells[row][column].data.i16].time_stamp)
-                    >= ((*(*ladder_ctx).exec_network).cells[row + 1][column].data.i16 * basetime_factor[(*(*ladder_ctx).exec_network).cells[row + 1][column].type]))) {
-        (*ladder_ctx).memory.Tr[(*(*ladder_ctx).exec_network).cells[row][column].data.i16] = false;
-        (*ladder_ctx).memory.Td[(*(*ladder_ctx).exec_network).cells[row][column].data.i16] = true;
-        (*ladder_ctx).timers[(*(*ladder_ctx).exec_network).cells[row][column].data.i16].acc = (*(*ladder_ctx).exec_network).cells[row + 1][column].data.i16;
+    if ((*ladder_ctx).memory.Tr[(*(*ladder_ctx).exec_network).cells[row][column].data.i32]
+            && (((*ladder_ctx).hw.time.millis() - (*ladder_ctx).timers[(*(*ladder_ctx).exec_network).cells[row][column].data.i32].time_stamp)
+                    >= ((*(*ladder_ctx).exec_network).cells[row + 1][column].data.i32 * basetime_factor[(*(*ladder_ctx).exec_network).cells[row + 1][column].type]))) {
+        (*ladder_ctx).memory.Tr[(*(*ladder_ctx).exec_network).cells[row][column].data.i32] = false;
+        (*ladder_ctx).memory.Td[(*(*ladder_ctx).exec_network).cells[row][column].data.i32] = true;
+        (*ladder_ctx).timers[(*(*ladder_ctx).exec_network).cells[row][column].data.i32].acc = (*(*ladder_ctx).exec_network).cells[row + 1][column].data.i32;
     }
 
     // copy timer flags to dynamic flags on network
-    if ((*ladder_ctx).memory.Td[(*(*ladder_ctx).exec_network).cells[row][column].data.i16]) {
+    if ((*ladder_ctx).memory.Td[(*(*ladder_ctx).exec_network).cells[row][column].data.i32]) {
         LADDER_ACTUALIZE_FLAGS(column, row);
     }
 
-    if ((*ladder_ctx).memory.Tr[(*(*ladder_ctx).exec_network).cells[row][column].data.i16]) {
+    if ((*ladder_ctx).memory.Tr[(*(*ladder_ctx).exec_network).cells[row][column].data.i32]) {
         LADDER_ACTUALIZE_FLAGS(column, row + 1);
     }
 
@@ -186,45 +204,45 @@ ladder_ins_err_t execTON(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row
 
 ladder_ins_err_t execTOFF(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag) {
     // timer is activated
-    if (flag && !(*ladder_ctx).memory.Td[(*(*ladder_ctx).exec_network).cells[row][column].data.i16]
-            && !(*ladder_ctx).memory.Tr[(*(*ladder_ctx).exec_network).cells[row][column].data.i16]) {
-        (*ladder_ctx).memory.Td[(*(*ladder_ctx).exec_network).cells[row][column].data.i16] = true;
+    if (flag && !(*ladder_ctx).memory.Td[(*(*ladder_ctx).exec_network).cells[row][column].data.i32]
+            && !(*ladder_ctx).memory.Tr[(*(*ladder_ctx).exec_network).cells[row][column].data.i32]) {
+        (*ladder_ctx).memory.Td[(*(*ladder_ctx).exec_network).cells[row][column].data.i32] = true;
     }
 
     // timer reactivated while running --> reset
-    if (flag && (*ladder_ctx).memory.Tr[(*(*ladder_ctx).exec_network).cells[row][column].data.i16]) {
-        (*ladder_ctx).memory.Tr[(*(*ladder_ctx).exec_network).cells[row][column].data.i16] = false;
+    if (flag && (*ladder_ctx).memory.Tr[(*(*ladder_ctx).exec_network).cells[row][column].data.i32]) {
+        (*ladder_ctx).memory.Tr[(*(*ladder_ctx).exec_network).cells[row][column].data.i32] = false;
     }
 
     // timer is activated in this scan, set timer running flag and snapshot the timestamp
-    if (!flag && (*ladder_ctx).memory.Td[(*(*ladder_ctx).exec_network).cells[row][column].data.i16]
-            && !(*ladder_ctx).memory.Tr[(*(*ladder_ctx).exec_network).cells[row][column].data.i16]) {
-        (*ladder_ctx).memory.Tr[(*(*ladder_ctx).exec_network).cells[row][column].data.i16] = true;
-        (*ladder_ctx).timers[(*(*ladder_ctx).exec_network).cells[row][column].data.i16].time_stamp = (*ladder_ctx).hw.time.millis();
+    if (!flag && (*ladder_ctx).memory.Td[(*(*ladder_ctx).exec_network).cells[row][column].data.i32]
+            && !(*ladder_ctx).memory.Tr[(*(*ladder_ctx).exec_network).cells[row][column].data.i32]) {
+        (*ladder_ctx).memory.Tr[(*(*ladder_ctx).exec_network).cells[row][column].data.i32] = true;
+        (*ladder_ctx).timers[(*(*ladder_ctx).exec_network).cells[row][column].data.i32].time_stamp = (*ladder_ctx).hw.time.millis();
     }
 
     // timer is running, update acc value
-    if ((*ladder_ctx).memory.Tr[(*(*ladder_ctx).exec_network).cells[row][column].data.i16]) {
-        (*ladder_ctx).timers[(*(*ladder_ctx).exec_network).cells[row][column].data.i16].acc =
-                (uint16_t) (((*ladder_ctx).hw.time.millis() - (*ladder_ctx).timers[(*(*ladder_ctx).exec_network).cells[row][column].data.i16].time_stamp)
+    if ((*ladder_ctx).memory.Tr[(*(*ladder_ctx).exec_network).cells[row][column].data.i32]) {
+        (*ladder_ctx).timers[(*(*ladder_ctx).exec_network).cells[row][column].data.i32].acc =
+                (uint16_t) (((*ladder_ctx).hw.time.millis() - (*ladder_ctx).timers[(*(*ladder_ctx).exec_network).cells[row][column].data.i32].time_stamp)
                         / basetime_factor[(*(*ladder_ctx).exec_network).cells[row + 1][column].type]);
     }
 
     // timer done --> activate timer done flag and set acc value to his set point
-    if ((*ladder_ctx).memory.Tr[(*(*ladder_ctx).exec_network).cells[row][column].data.i16]
-            && (((*ladder_ctx).hw.time.millis() - (*ladder_ctx).timers[(*(*ladder_ctx).exec_network).cells[row][column].data.i16].time_stamp)
-                    >= ((*(*ladder_ctx).exec_network).cells[row + 1][column].data.i16 * basetime_factor[(*(*ladder_ctx).exec_network).cells[row + 1][column].type]))) {
-        (*ladder_ctx).memory.Tr[(*(*ladder_ctx).exec_network).cells[row][column].data.i16] = false;
-        (*ladder_ctx).memory.Td[(*(*ladder_ctx).exec_network).cells[row][column].data.i16] = false;
-        (*ladder_ctx).timers[(*(*ladder_ctx).exec_network).cells[row][column].data.i16].acc = (*(*ladder_ctx).exec_network).cells[row + 1][column].data.i16;
+    if ((*ladder_ctx).memory.Tr[(*(*ladder_ctx).exec_network).cells[row][column].data.i32]
+            && (((*ladder_ctx).hw.time.millis() - (*ladder_ctx).timers[(*(*ladder_ctx).exec_network).cells[row][column].data.i32].time_stamp)
+                    >= ((*(*ladder_ctx).exec_network).cells[row + 1][column].data.i32 * basetime_factor[(*(*ladder_ctx).exec_network).cells[row + 1][column].type]))) {
+        (*ladder_ctx).memory.Tr[(*(*ladder_ctx).exec_network).cells[row][column].data.i32] = false;
+        (*ladder_ctx).memory.Td[(*(*ladder_ctx).exec_network).cells[row][column].data.i32] = false;
+        (*ladder_ctx).timers[(*(*ladder_ctx).exec_network).cells[row][column].data.i32].acc = (*(*ladder_ctx).exec_network).cells[row + 1][column].data.i32;
     }
 
     // copy timer flags to dynamic flags on network
-    if ((*ladder_ctx).memory.Td[(*(*ladder_ctx).exec_network).cells[row][column].data.i16]) {
+    if ((*ladder_ctx).memory.Td[(*(*ladder_ctx).exec_network).cells[row][column].data.i32]) {
         LADDER_ACTUALIZE_FLAGS(column, row);
     }
 
-    if ((*ladder_ctx).memory.Tr[(*(*ladder_ctx).exec_network).cells[row][column].data.i16]) {
+    if ((*ladder_ctx).memory.Tr[(*(*ladder_ctx).exec_network).cells[row][column].data.i32]) {
         LADDER_ACTUALIZE_FLAGS(column, row + 1);
     }
 
@@ -233,40 +251,40 @@ ladder_ins_err_t execTOFF(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t ro
 
 ladder_ins_err_t execTP(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag) {
     // timer is activated in this scan, set timer running flag and snapshot the timestamp
-    if (flag && !(*ladder_ctx).memory.Td[(*(*ladder_ctx).exec_network).cells[row][column].data.i16]
-            && !(*ladder_ctx).memory.Tr[(*(*ladder_ctx).exec_network).cells[row][column].data.i16]) {
-        (*ladder_ctx).memory.Td[(*(*ladder_ctx).exec_network).cells[row][column].data.i16] = true;
-        (*ladder_ctx).memory.Tr[(*(*ladder_ctx).exec_network).cells[row][column].data.i16] = true;
-        (*ladder_ctx).timers[(*(*ladder_ctx).exec_network).cells[row][column].data.i16].time_stamp = (*ladder_ctx).hw.time.millis();
+    if (flag && !(*ladder_ctx).memory.Td[(*(*ladder_ctx).exec_network).cells[row][column].data.i32]
+            && !(*ladder_ctx).memory.Tr[(*(*ladder_ctx).exec_network).cells[row][column].data.i32]) {
+        (*ladder_ctx).memory.Td[(*(*ladder_ctx).exec_network).cells[row][column].data.i32] = true;
+        (*ladder_ctx).memory.Tr[(*(*ladder_ctx).exec_network).cells[row][column].data.i32] = true;
+        (*ladder_ctx).timers[(*(*ladder_ctx).exec_network).cells[row][column].data.i32].time_stamp = (*ladder_ctx).hw.time.millis();
     }
 
     // reset timer running when input goes false to avoid continuously running the timer if input stays true
-    if (!flag && !(*ladder_ctx).memory.Td[(*(*ladder_ctx).exec_network).cells[row][column].data.i16]
-            && (*ladder_ctx).memory.Tr[(*(*ladder_ctx).exec_network).cells[row][column].data.i16]) {
-        (*ladder_ctx).memory.Tr[(*(*ladder_ctx).exec_network).cells[row][column].data.i16] = false;
+    if (!flag && !(*ladder_ctx).memory.Td[(*(*ladder_ctx).exec_network).cells[row][column].data.i32]
+            && (*ladder_ctx).memory.Tr[(*(*ladder_ctx).exec_network).cells[row][column].data.i32]) {
+        (*ladder_ctx).memory.Tr[(*(*ladder_ctx).exec_network).cells[row][column].data.i32] = false;
     }
 
     // timer is running, update acc value
-    if ((*ladder_ctx).memory.Td[(*(*ladder_ctx).exec_network).cells[row][column].data.i16]) {
-        (*ladder_ctx).timers[(*(*ladder_ctx).exec_network).cells[row][column].data.i16].acc =
-                (uint16_t) (((*ladder_ctx).hw.time.millis() - (*ladder_ctx).timers[(*(*ladder_ctx).exec_network).cells[row][column].data.i16].time_stamp)
+    if ((*ladder_ctx).memory.Td[(*(*ladder_ctx).exec_network).cells[row][column].data.i32]) {
+        (*ladder_ctx).timers[(*(*ladder_ctx).exec_network).cells[row][column].data.i32].acc =
+                (uint16_t) (((*ladder_ctx).hw.time.millis() - (*ladder_ctx).timers[(*(*ladder_ctx).exec_network).cells[row][column].data.i32].time_stamp)
                         / basetime_factor[(*(*ladder_ctx).exec_network).cells[row + 1][column].type]);
     }
 
     // timer done --> activate timer done flag and set acc value to his setpoint
-    if ((*ladder_ctx).memory.Td[(*(*ladder_ctx).exec_network).cells[row][column].data.i16]
-            && (((*ladder_ctx).hw.time.millis() - (*ladder_ctx).timers[(*(*ladder_ctx).exec_network).cells[row][column].data.i16].time_stamp)
-                    >= ((*(*ladder_ctx).exec_network).cells[row + 1][column].data.i16 * basetime_factor[(*(*ladder_ctx).exec_network).cells[row + 1][column].type]))) {
-        (*ladder_ctx).memory.Td[(*(*ladder_ctx).exec_network).cells[row][column].data.i16] = false;
-        (*ladder_ctx).timers[(*(*ladder_ctx).exec_network).cells[row][column].data.i16].acc = (*(*ladder_ctx).exec_network).cells[row + 1][column].data.i16;
+    if ((*ladder_ctx).memory.Td[(*(*ladder_ctx).exec_network).cells[row][column].data.i32]
+            && (((*ladder_ctx).hw.time.millis() - (*ladder_ctx).timers[(*(*ladder_ctx).exec_network).cells[row][column].data.i32].time_stamp)
+                    >= ((*(*ladder_ctx).exec_network).cells[row + 1][column].data.i32 * basetime_factor[(*(*ladder_ctx).exec_network).cells[row + 1][column].type]))) {
+        (*ladder_ctx).memory.Td[(*(*ladder_ctx).exec_network).cells[row][column].data.i32] = false;
+        (*ladder_ctx).timers[(*(*ladder_ctx).exec_network).cells[row][column].data.i32].acc = (*(*ladder_ctx).exec_network).cells[row + 1][column].data.i32;
     }
 
     // copy timer flags to dynamic flags on network
-    if ((*ladder_ctx).memory.Td[(*(*ladder_ctx).exec_network).cells[row][column].data.i16]) {
+    if ((*ladder_ctx).memory.Td[(*(*ladder_ctx).exec_network).cells[row][column].data.i32]) {
         LADDER_ACTUALIZE_FLAGS(column, row);
     }
 
-    if ((*ladder_ctx).memory.Tr[(*(*ladder_ctx).exec_network).cells[row][column].data.i16]) {
+    if ((*ladder_ctx).memory.Tr[(*(*ladder_ctx).exec_network).cells[row][column].data.i32]) {
         LADDER_ACTUALIZE_FLAGS(column, row + 1);
     }
 
@@ -277,41 +295,41 @@ ladder_ins_err_t execCTU(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row
     // reset counter
     if (column == 0) {
         if ((*ladder_ctx).ladder.state == LADDER_ST_RUNNING) {
-            (*ladder_ctx).registers.C[(*(*ladder_ctx).exec_network).cells[row][column].data.i16] = 0;
-            (*ladder_ctx).memory.Cd[(*(*ladder_ctx).exec_network).cells[row][column].data.i16] = false;
-            (*ladder_ctx).memory.Cr[(*(*ladder_ctx).exec_network).cells[row][column].data.i16] = false;
+            (*ladder_ctx).registers.C[(*(*ladder_ctx).exec_network).cells[row][column].data.i32] = 0;
+            (*ladder_ctx).memory.Cd[(*(*ladder_ctx).exec_network).cells[row][column].data.i32] = false;
+            (*ladder_ctx).memory.Cr[(*(*ladder_ctx).exec_network).cells[row][column].data.i32] = false;
         }
     } else {
         if ((*ladder_ctx).scan_internals.network_flags[column - 1] & LADDER_FLAG_MASK(row + 1)) {
-            (*ladder_ctx).registers.C[(*(*ladder_ctx).exec_network).cells[row][column].data.i16] = 0;
-            (*ladder_ctx).memory.Cd[(*(*ladder_ctx).exec_network).cells[row][column].data.i16] = false;
-            (*ladder_ctx).memory.Cr[(*(*ladder_ctx).exec_network).cells[row][column].data.i16] = false;
+            (*ladder_ctx).registers.C[(*(*ladder_ctx).exec_network).cells[row][column].data.i32] = 0;
+            (*ladder_ctx).memory.Cd[(*(*ladder_ctx).exec_network).cells[row][column].data.i32] = false;
+            (*ladder_ctx).memory.Cr[(*(*ladder_ctx).exec_network).cells[row][column].data.i32] = false;
         }
     }
 
     // counter is activated in this scan, change count
-    if (flag && !(*ladder_ctx).memory.Cr[(*(*ladder_ctx).exec_network).cells[row][column].data.i16]
-            && !(*ladder_ctx).memory.Cd[(*(*ladder_ctx).exec_network).cells[row][column].data.i16]) {
-        (*ladder_ctx).memory.Cr[(*(*ladder_ctx).exec_network).cells[row][column].data.i16] = true;
-        (*ladder_ctx).registers.C[(*(*ladder_ctx).exec_network).cells[row][column].data.i16]++;
+    if (flag && !(*ladder_ctx).memory.Cr[(*(*ladder_ctx).exec_network).cells[row][column].data.i32]
+            && !(*ladder_ctx).memory.Cd[(*(*ladder_ctx).exec_network).cells[row][column].data.i32]) {
+        (*ladder_ctx).memory.Cr[(*(*ladder_ctx).exec_network).cells[row][column].data.i32] = true;
+        (*ladder_ctx).registers.C[(*(*ladder_ctx).exec_network).cells[row][column].data.i32]++;
     }
 
     // reset counter edge detection
     if (!flag) {
-        (*ladder_ctx).memory.Cr[(*(*ladder_ctx).exec_network).cells[row][column].data.i16] = false;
+        (*ladder_ctx).memory.Cr[(*(*ladder_ctx).exec_network).cells[row][column].data.i32] = false;
     }
 
     // counter done
-    if ((*ladder_ctx).registers.C[(*(*ladder_ctx).exec_network).cells[row][column].data.i16] >= (*(*ladder_ctx).exec_network).cells[row + 1][column].data.i16) {
-        (*ladder_ctx).memory.Cd[(*(*ladder_ctx).exec_network).cells[row][column].data.i16] = true;
+    if ((*ladder_ctx).registers.C[(*(*ladder_ctx).exec_network).cells[row][column].data.i32] >= (*(*ladder_ctx).exec_network).cells[row + 1][column].data.i32) {
+        (*ladder_ctx).memory.Cd[(*(*ladder_ctx).exec_network).cells[row][column].data.i32] = true;
     }
 
     // copy counter flags to dynamic flags on network
-    if ((*ladder_ctx).memory.Cd[(*(*ladder_ctx).exec_network).cells[row][column].data.i16]){
+    if ((*ladder_ctx).memory.Cd[(*(*ladder_ctx).exec_network).cells[row][column].data.i32]){
         LADDER_ACTUALIZE_FLAGS(column, row);
     }
 
-    if ((*ladder_ctx).memory.Cr[(*(*ladder_ctx).exec_network).cells[row][column].data.i16]){
+    if ((*ladder_ctx).memory.Cr[(*(*ladder_ctx).exec_network).cells[row][column].data.i32]){
         LADDER_ACTUALIZE_FLAGS(column, row + 1);
     }
 
@@ -322,41 +340,41 @@ ladder_ins_err_t execCTD(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row
     // reset counter
     if (column == 0) {
         if ((*ladder_ctx).ladder.state == LADDER_ST_RUNNING) {
-            (*ladder_ctx).registers.C[(*(*ladder_ctx).exec_network).cells[row][column].data.i16] = (*(*ladder_ctx).exec_network).cells[row + 1][column].data.i16;
-            (*ladder_ctx).memory.Cd[(*(*ladder_ctx).exec_network).cells[row][column].data.i16] = false;
-            (*ladder_ctx).memory.Cr[(*(*ladder_ctx).exec_network).cells[row][column].data.i16] = false;
+            (*ladder_ctx).registers.C[(*(*ladder_ctx).exec_network).cells[row][column].data.i32] = (*(*ladder_ctx).exec_network).cells[row + 1][column].data.i32;
+            (*ladder_ctx).memory.Cd[(*(*ladder_ctx).exec_network).cells[row][column].data.i32] = false;
+            (*ladder_ctx).memory.Cr[(*(*ladder_ctx).exec_network).cells[row][column].data.i32] = false;
         }
     } else {
         if ((*ladder_ctx).scan_internals.network_flags[column - 1] & LADDER_FLAG_MASK(row + 1)) {
-            (*ladder_ctx).registers.C[(*(*ladder_ctx).exec_network).cells[row][column].data.i16] = (*(*ladder_ctx).exec_network).cells[row + 1][column].data.i16;
-            (*ladder_ctx).memory.Cd[(*(*ladder_ctx).exec_network).cells[row][column].data.i16] = false;
-            (*ladder_ctx).memory.Cr[(*(*ladder_ctx).exec_network).cells[row][column].data.i16] = false;
+            (*ladder_ctx).registers.C[(*(*ladder_ctx).exec_network).cells[row][column].data.i32] = (*(*ladder_ctx).exec_network).cells[row + 1][column].data.i32;
+            (*ladder_ctx).memory.Cd[(*(*ladder_ctx).exec_network).cells[row][column].data.i32] = false;
+            (*ladder_ctx).memory.Cr[(*(*ladder_ctx).exec_network).cells[row][column].data.i32] = false;
         }
     }
 
     // counter is activated in this scan, change count
-    if (flag && !(*ladder_ctx).memory.Cr[(*(*ladder_ctx).exec_network).cells[row][column].data.i16]
-            && !(*ladder_ctx).memory.Cd[(*(*ladder_ctx).exec_network).cells[row][column].data.i16]) {
-        (*ladder_ctx).memory.Cr[(*(*ladder_ctx).exec_network).cells[row][column].data.i16] = true;
-        (*ladder_ctx).registers.C[(*(*ladder_ctx).exec_network).cells[row][column].data.i16]--;
+    if (flag && !(*ladder_ctx).memory.Cr[(*(*ladder_ctx).exec_network).cells[row][column].data.i32]
+            && !(*ladder_ctx).memory.Cd[(*(*ladder_ctx).exec_network).cells[row][column].data.i32]) {
+        (*ladder_ctx).memory.Cr[(*(*ladder_ctx).exec_network).cells[row][column].data.i32] = true;
+        (*ladder_ctx).registers.C[(*(*ladder_ctx).exec_network).cells[row][column].data.i32]--;
     }
 
     // reset counter edge detection
     if (!flag) {
-        (*ladder_ctx).memory.Cr[(*(*ladder_ctx).exec_network).cells[row][column].data.i16] = false;
+        (*ladder_ctx).memory.Cr[(*(*ladder_ctx).exec_network).cells[row][column].data.i32] = false;
     }
 
     // counter done
-    if ((*ladder_ctx).registers.C[(*(*ladder_ctx).exec_network).cells[row][column].data.i16] == 0) {
-        (*ladder_ctx).memory.Cd[(*(*ladder_ctx).exec_network).cells[row][column].data.i16] = true;
+    if ((*ladder_ctx).registers.C[(*(*ladder_ctx).exec_network).cells[row][column].data.i32] == 0) {
+        (*ladder_ctx).memory.Cd[(*(*ladder_ctx).exec_network).cells[row][column].data.i32] = true;
     }
 
     // copy counter flags to dynamic flags on network
-    if ((*ladder_ctx).memory.Cd[(*(*ladder_ctx).exec_network).cells[row][column].data.i16]) {
+    if ((*ladder_ctx).memory.Cd[(*(*ladder_ctx).exec_network).cells[row][column].data.i32]) {
         LADDER_ACTUALIZE_FLAGS(column, row);
     }
 
-    if ((*ladder_ctx).memory.Cr[(*(*ladder_ctx).exec_network).cells[row][column].data.i16]) {
+    if ((*ladder_ctx).memory.Cr[(*(*ladder_ctx).exec_network).cells[row][column].data.i32]) {
         LADDER_ACTUALIZE_FLAGS(column, row + 1);
     }
 
@@ -704,30 +722,30 @@ ladder_ins_err_t execFOREIGN(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t
     return res;
 }
 
-ladder_ins_err_t ladder_get_previous_value(ladder_ctx_t *ladder_ctx, uint32_t row, uint32_t column, int *value) {
+ladder_ins_err_t ladder_get_previous_value(ladder_ctx_t *ladder_ctx, uint32_t row, uint32_t column, int32_t *value) {
     *value = 0;
 
     switch ((*(*ladder_ctx).exec_network).cells[row][column].type) {
         case LADDER_TYPE_M:
-            (*value) = (int) ((*ladder_ctx).prev_scan_vals.Mh[(*(*ladder_ctx).exec_network).cells[row][column].data.i16]);
+            (*value) = (int) ((*ladder_ctx).prev_scan_vals.Mh[(*(*ladder_ctx).exec_network).cells[row][column].data.i32]);
             break;
         case LADDER_TYPE_Q:
-            (*value) = (int) ((*ladder_ctx).prev_scan_vals.Qh[(*(*ladder_ctx).exec_network).cells[row][column].data.i16]);
+            (*value) = (int) ((*ladder_ctx).prev_scan_vals.Qh[(*(*ladder_ctx).exec_network).cells[row][column].data.i32]);
             break;
         case LADDER_TYPE_I:
-            (*value) = (int) ((*ladder_ctx).prev_scan_vals.Ih[(*(*ladder_ctx).exec_network).cells[row][column].data.i16]);
+            (*value) = (int) ((*ladder_ctx).prev_scan_vals.Ih[(*(*ladder_ctx).exec_network).cells[row][column].data.i32]);
             break;
         case LADDER_TYPE_Cd:
-            (*value) = (int) ((*ladder_ctx).prev_scan_vals.Cdh[(*(*ladder_ctx).exec_network).cells[row][column].data.i16]);
+            (*value) = (int) ((*ladder_ctx).prev_scan_vals.Cdh[(*(*ladder_ctx).exec_network).cells[row][column].data.i32]);
             break;
         case LADDER_TYPE_Cr:
-            (*value) = (int) ((*ladder_ctx).prev_scan_vals.Crh[(*(*ladder_ctx).exec_network).cells[row][column].data.i16]);
+            (*value) = (int) ((*ladder_ctx).prev_scan_vals.Crh[(*(*ladder_ctx).exec_network).cells[row][column].data.i32]);
             break;
         case LADDER_TYPE_Td:
-            (*value) = (int) ((*ladder_ctx).prev_scan_vals.Tdh[(*(*ladder_ctx).exec_network).cells[row][column].data.i16]);
+            (*value) = (int) ((*ladder_ctx).prev_scan_vals.Tdh[(*(*ladder_ctx).exec_network).cells[row][column].data.i32]);
             break;
         case LADDER_TYPE_Tr:
-            (*value) = (int) ((*ladder_ctx).prev_scan_vals.Trh[(*(*ladder_ctx).exec_network).cells[row][column].data.i16]);
+            (*value) = (int) ((*ladder_ctx).prev_scan_vals.Trh[(*(*ladder_ctx).exec_network).cells[row][column].data.i32]);
             break;
 
         default:
@@ -738,51 +756,48 @@ ladder_ins_err_t ladder_get_previous_value(ladder_ctx_t *ladder_ctx, uint32_t ro
     return LADDER_INS_ERR_OK;
 }
 
-ladder_ins_err_t ladder_get_data_value(ladder_ctx_t *ladder_ctx, uint32_t row, uint32_t column, int *value) { // issue #55 - change to uint16_t ?
+ladder_ins_err_t ladder_get_data_value(ladder_ctx_t *ladder_ctx, uint32_t row, uint32_t column, int32_t *value) { // issue #55 - change to uint16_t ?
     *value = 0;
 
     switch ((*(*ladder_ctx).exec_network).cells[row][column].type) {
         case LADDER_TYPE_NONE:
-            (*value) = (int) (*(*ladder_ctx).exec_network).cells[row][column].data.i16;
+            (*value) = (int) (*(*ladder_ctx).exec_network).cells[row][column].data.i32;
             break;
         case LADDER_TYPE_M:
-            (*value) = (int) ((*ladder_ctx).memory.M[(*(*ladder_ctx).exec_network).cells[row][column].data.i16]);
+            (*value) = (int) ((*ladder_ctx).memory.M[(*(*ladder_ctx).exec_network).cells[row][column].data.i32]);
             break;
         case LADDER_TYPE_Q:
-            (*value) = (int) ((*ladder_ctx).memory.Q[(*(*ladder_ctx).exec_network).cells[row][column].data.i16]);
+            (*value) = (int) ((*ladder_ctx).memory.Q[(*(*ladder_ctx).exec_network).cells[row][column].data.i32]);
             break;
         case LADDER_TYPE_I:
-            (*value) = (int) ((*ladder_ctx).memory.I[(*(*ladder_ctx).exec_network).cells[row][column].data.i16]);
+            (*value) = (int) ((*ladder_ctx).memory.I[(*(*ladder_ctx).exec_network).cells[row][column].data.i32]);
             break;
         case LADDER_TYPE_Cd:
-            (*value) = (int) ((*ladder_ctx).memory.Cd[(*(*ladder_ctx).exec_network).cells[row][column].data.i16]);
+            (*value) = (int) ((*ladder_ctx).memory.Cd[(*(*ladder_ctx).exec_network).cells[row][column].data.i32]);
             break;
         case LADDER_TYPE_Cr:
-            (*value) = (int) ((*ladder_ctx).memory.Cr[(*(*ladder_ctx).exec_network).cells[row][column].data.i16]);
+            (*value) = (int) ((*ladder_ctx).memory.Cr[(*(*ladder_ctx).exec_network).cells[row][column].data.i32]);
             break;
         case LADDER_TYPE_Td:
-            (*value) = (int) ((*ladder_ctx).memory.Td[(*(*ladder_ctx).exec_network).cells[row][column].data.i16]);
+            (*value) = (int) ((*ladder_ctx).memory.Td[(*(*ladder_ctx).exec_network).cells[row][column].data.i32]);
             break;
         case LADDER_TYPE_Tr:
-            (*value) = (int) ((*ladder_ctx).memory.Tr[(*(*ladder_ctx).exec_network).cells[row][column].data.i16]);
+            (*value) = (int) ((*ladder_ctx).memory.Tr[(*(*ladder_ctx).exec_network).cells[row][column].data.i32]);
             break;
         case LADDER_TYPE_IW:
-            (*value) = (int) ((*ladder_ctx).registers.IW[(*(*ladder_ctx).exec_network).cells[row][column].data.i16]);
+            (*value) = (int) ((*ladder_ctx).registers.IW[(*(*ladder_ctx).exec_network).cells[row][column].data.i32]);
             break;
         case LADDER_TYPE_QW:
-            (*value) = (int) ((*ladder_ctx).registers.QW[(*(*ladder_ctx).exec_network).cells[row][column].data.i16]);
+            (*value) = (int) ((*ladder_ctx).registers.QW[(*(*ladder_ctx).exec_network).cells[row][column].data.i32]);
             break;
         case LADDER_TYPE_C:
-            (*value) = (int) ((*ladder_ctx).registers.C[(*(*ladder_ctx).exec_network).cells[row][column].data.i16]);
+            (*value) = (int) ((*ladder_ctx).registers.C[(*(*ladder_ctx).exec_network).cells[row][column].data.i32]);
             break;
         case LADDER_TYPE_D:
-            (*value) = (int) ((*ladder_ctx).registers.D[(*(*ladder_ctx).exec_network).cells[row][column].data.i16]);
+            (*value) = (int) ((*ladder_ctx).registers.D[(*(*ladder_ctx).exec_network).cells[row][column].data.i32]);
             break;
         case LADDER_TYPE_T:
-            (*value) = (int) ((*ladder_ctx).timers[(*(*ladder_ctx).exec_network).cells[row][column].data.i16].acc);
-            break;
-        case LADDER_TYPE_K:
-            (*value) = (int) ((*(*ladder_ctx).exec_network).cells[row][column].data.i16);
+            (*value) = (int) ((*ladder_ctx).timers[(*(*ladder_ctx).exec_network).cells[row][column].data.i32].acc);
             break;
 
         default:
@@ -793,45 +808,42 @@ ladder_ins_err_t ladder_get_data_value(ladder_ctx_t *ladder_ctx, uint32_t row, u
     return LADDER_INS_ERR_OK;
 }
 
-void ladder_set_data_value(ladder_ctx_t *ladder_ctx, uint32_t row, uint32_t column, int value, uint8_t *error) { // Issue #55 - Change to uint16_t ?
+void ladder_set_data_value(ladder_ctx_t *ladder_ctx, uint32_t row, uint32_t column, int32_t value, uint8_t *error) { // Issue #55 - Change to uint16_t ?
     *error = LADDER_INS_ERR_OK;
 
     switch ((*(*ladder_ctx).exec_network).cells[row][column].type) {
         case LADDER_TYPE_M:
-            (*ladder_ctx).memory.M[(*(*ladder_ctx).exec_network).cells[row][column].data.i16] = (uint8_t) (value);
+            (*ladder_ctx).memory.M[(*(*ladder_ctx).exec_network).cells[row][column].data.i32] = (uint8_t) (value);
             break;
         case LADDER_TYPE_Q:
-            (*ladder_ctx).memory.Q[(*(*ladder_ctx).exec_network).cells[row][column].data.i16] = (uint8_t) (value);
+            (*ladder_ctx).memory.Q[(*(*ladder_ctx).exec_network).cells[row][column].data.i32] = (uint8_t) (value);
             break;
         case LADDER_TYPE_I:
-            (*ladder_ctx).memory.I[(*(*ladder_ctx).exec_network).cells[row][column].data.i16] = (uint8_t) (value);
+            (*ladder_ctx).memory.I[(*(*ladder_ctx).exec_network).cells[row][column].data.i32] = (uint8_t) (value);
             break;
         case LADDER_TYPE_Cd:
-            (*ladder_ctx).memory.Cd[(*(*ladder_ctx).exec_network).cells[row][column].data.i16] = (uint8_t) (value);
+            (*ladder_ctx).memory.Cd[(*(*ladder_ctx).exec_network).cells[row][column].data.i32] = (uint8_t) (value);
             break;
         case LADDER_TYPE_Cr:
-            (*ladder_ctx).memory.Cr[(*(*ladder_ctx).exec_network).cells[row][column].data.i16] = (uint8_t) (value);
+            (*ladder_ctx).memory.Cr[(*(*ladder_ctx).exec_network).cells[row][column].data.i32] = (uint8_t) (value);
             break;
         case LADDER_TYPE_Td:
-            (*ladder_ctx).memory.Td[(*(*ladder_ctx).exec_network).cells[row][column].data.i16] = (uint8_t) (value);
+            (*ladder_ctx).memory.Td[(*(*ladder_ctx).exec_network).cells[row][column].data.i32] = (uint8_t) (value);
             break;
         case LADDER_TYPE_Tr:
-            (*ladder_ctx).memory.Tr[(*(*ladder_ctx).exec_network).cells[row][column].data.i16] = (uint8_t) (value);
+            (*ladder_ctx).memory.Tr[(*(*ladder_ctx).exec_network).cells[row][column].data.i32] = (uint8_t) (value);
             break;
         case LADDER_TYPE_IW:
-            (*ladder_ctx).registers.IW[(*(*ladder_ctx).exec_network).cells[row][column].data.i16] = (uint16_t) (value);
+            (*ladder_ctx).registers.IW[(*(*ladder_ctx).exec_network).cells[row][column].data.i32] = (uint16_t) (value);
             break;
         case LADDER_TYPE_QW:
-            (*ladder_ctx).registers.QW[(*(*ladder_ctx).exec_network).cells[row][column].data.i16] = (uint16_t) (value);
+            (*ladder_ctx).registers.QW[(*(*ladder_ctx).exec_network).cells[row][column].data.i32] = (uint16_t) (value);
             break;
         case LADDER_TYPE_C:
-            (*ladder_ctx).registers.C[(*(*ladder_ctx).exec_network).cells[row][column].data.i16] = (uint16_t) (value);
+            (*ladder_ctx).registers.C[(*(*ladder_ctx).exec_network).cells[row][column].data.i32] = (uint16_t) (value);
             break;
         case LADDER_TYPE_D:
-            (*ladder_ctx).registers.D[(*(*ladder_ctx).exec_network).cells[row][column].data.i16] = (uint16_t) (value);
-            break;
-        case LADDER_TYPE_T:
-            (*ladder_ctx).timers[(*(*ladder_ctx).exec_network).cells[row][column].data.i16].acc = (uint16_t) (value);
+            (*ladder_ctx).registers.D[(*(*ladder_ctx).exec_network).cells[row][column].data.i32] = (uint16_t) (value);
             break;
 
         default:

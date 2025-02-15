@@ -42,44 +42,44 @@ static void load_demo(ladder_ctx_t *ladder_ctx) {
     (*ladder_ctx).network[0].enable = true;
 
     (*ladder_ctx).network[0].cells[0][0].code = LADDER_INS_NC;
-    (*ladder_ctx).network[0].cells[0][0].data.i16 = 3;
+    (*ladder_ctx).network[0].cells[0][0].data.i32 = 3;
     (*ladder_ctx).network[0].cells[0][0].type = LADDER_TYPE_M;
 
     (*ladder_ctx).network[0].cells[0][1].code = LADDER_INS_NC;
-    (*ladder_ctx).network[0].cells[0][1].data.i16 = 2;
+    (*ladder_ctx).network[0].cells[0][1].data.i32 = 2;
     (*ladder_ctx).network[0].cells[0][1].type = LADDER_TYPE_M;
 
     (*ladder_ctx).network[0].cells[0][2].code = LADDER_INS_TON;
-    (*ladder_ctx).network[0].cells[0][2].data.i16 = 0;
+    (*ladder_ctx).network[0].cells[0][2].data.i32 = 0;
     (*ladder_ctx).network[0].cells[0][2].type = LADDER_TYPE_T;
     (*ladder_ctx).network[0].cells[1][2].code = LADDER_INS_MULTI;
-    (*ladder_ctx).network[0].cells[1][2].data.i16 = 5;
+    (*ladder_ctx).network[0].cells[1][2].data.i32 = 5;
     (*ladder_ctx).network[0].cells[1][2].type = LADDER_BASETIME_SEC;
 
     (*ladder_ctx).network[0].cells[0][3].code = LADDER_INS_CONN;
     (*ladder_ctx).network[0].cells[0][4].code = LADDER_INS_CONN;
 
     (*ladder_ctx).network[0].cells[0][5].code = LADDER_INS_COIL;
-    (*ladder_ctx).network[0].cells[0][5].data.i16 = 1;
+    (*ladder_ctx).network[0].cells[0][5].data.i32 = 1;
     (*ladder_ctx).network[0].cells[0][5].type = LADDER_TYPE_M;
 
     // ----------------------------- //
 
     (*ladder_ctx).network[0].cells[2][0].code = LADDER_INS_NO;
-    (*ladder_ctx).network[0].cells[2][0].data.i16 = 1;
+    (*ladder_ctx).network[0].cells[2][0].data.i32 = 1;
     (*ladder_ctx).network[0].cells[2][0].type = LADDER_TYPE_M;
 
     (*ladder_ctx).network[0].cells[2][1].code = LADDER_INS_TON;
-    (*ladder_ctx).network[0].cells[2][1].data.i16 = 1;
+    (*ladder_ctx).network[0].cells[2][1].data.i32 = 1;
     (*ladder_ctx).network[0].cells[2][1].type = LADDER_TYPE_T;
     (*ladder_ctx).network[0].cells[3][1].code = LADDER_INS_MULTI;
-    (*ladder_ctx).network[0].cells[3][1].data.i16 = 5;
+    (*ladder_ctx).network[0].cells[3][1].data.i32 = 5;
     (*ladder_ctx).network[0].cells[3][1].type = LADDER_BASETIME_SEC;
 
     (*ladder_ctx).network[0].cells[2][2].code = LADDER_INS_CONN;
 
     (*ladder_ctx).network[0].cells[2][3].code = LADDER_INS_FOREIGN;
-    (*ladder_ctx).network[0].cells[2][3].data.i16 = 0;
+    (*ladder_ctx).network[0].cells[2][3].data.i32 = 0;
     (*ladder_ctx).network[0].cells[2][3].type = LADDER_TYPE_NONE;
     (*ladder_ctx).network[0].cells[3][3].code = LADDER_INS_MULTI;
     (*ladder_ctx).network[0].cells[3][3].data.cstr = "0 0 0 31 6 *";
@@ -88,13 +88,13 @@ static void load_demo(ladder_ctx_t *ladder_ctx) {
     (*ladder_ctx).network[0].cells[2][4].code = LADDER_INS_CONN;
 
     (*ladder_ctx).network[0].cells[2][5].code = LADDER_INS_COIL;
-    (*ladder_ctx).network[0].cells[2][5].data.i16 = 2;
+    (*ladder_ctx).network[0].cells[2][5].data.i32 = 2;
     (*ladder_ctx).network[0].cells[2][5].type = LADDER_TYPE_M;
 
     // ----------------------------- //
 
     (*ladder_ctx).network[0].cells[4][0].code = LADDER_INS_NO;
-    (*ladder_ctx).network[0].cells[4][0].data.i16 = 1;
+    (*ladder_ctx).network[0].cells[4][0].data.i32 = 1;
     (*ladder_ctx).network[0].cells[4][0].type = LADDER_TYPE_M;
 
     (*ladder_ctx).network[0].cells[4][1].code = LADDER_INS_CONN;
@@ -103,20 +103,20 @@ static void load_demo(ladder_ctx_t *ladder_ctx) {
     (*ladder_ctx).network[0].cells[4][4].code = LADDER_INS_CONN;
 
     (*ladder_ctx).network[0].cells[4][5].code = LADDER_INS_COIL;
-    (*ladder_ctx).network[0].cells[4][5].data.i16 = 0;
+    (*ladder_ctx).network[0].cells[4][5].data.i32 = 0;
     (*ladder_ctx).network[0].cells[4][5].type = LADDER_TYPE_Q;
 
     // ----------------------------- //
 
     (*ladder_ctx).network[0].cells[5][0].code = LADDER_INS_NO;
-    (*ladder_ctx).network[0].cells[5][0].data.i16 = 0;
+    (*ladder_ctx).network[0].cells[5][0].data.i32 = 0;
     (*ladder_ctx).network[0].cells[5][0].type = LADDER_TYPE_Q;
 
     (*ladder_ctx).network[0].cells[5][1].code = LADDER_INS_CTU;
-    (*ladder_ctx).network[0].cells[5][1].data.i16 = 0;
+    (*ladder_ctx).network[0].cells[5][1].data.i32 = 0;
     (*ladder_ctx).network[0].cells[5][1].type = LADDER_TYPE_C;
     (*ladder_ctx).network[0].cells[6][1].code = LADDER_INS_MULTI;
-    (*ladder_ctx).network[0].cells[6][1].data.i16 = 5;
+    (*ladder_ctx).network[0].cells[6][1].data.i32 = 5;
     (*ladder_ctx).network[0].cells[6][1].type = LADDER_TYPE_NONE;
 
     (*ladder_ctx).network[0].cells[5][2].code = LADDER_INS_CONN;
@@ -124,7 +124,7 @@ static void load_demo(ladder_ctx_t *ladder_ctx) {
     (*ladder_ctx).network[0].cells[5][4].code = LADDER_INS_CONN;
 
     (*ladder_ctx).network[0].cells[5][5].code = LADDER_INS_COIL;
-    (*ladder_ctx).network[0].cells[5][5].data.i16 = 3;
+    (*ladder_ctx).network[0].cells[5][5].data.i32 = 3;
     (*ladder_ctx).network[0].cells[5][5].type = LADDER_TYPE_M;
 
     //------------------------------------------------------------//
@@ -133,41 +133,41 @@ static void load_demo(ladder_ctx_t *ladder_ctx) {
     (*ladder_ctx).network[1].enable = true;
 
     (*ladder_ctx).network[1].cells[0][0].code = LADDER_INS_NO;
-    (*ladder_ctx).network[1].cells[0][0].data.i16 = 3;
+    (*ladder_ctx).network[1].cells[0][0].data.i32 = 3;
     (*ladder_ctx).network[1].cells[0][0].type = LADDER_TYPE_M;
 
     (*ladder_ctx).network[1].cells[0][1].code = LADDER_INS_NC;
-    (*ladder_ctx).network[1].cells[0][1].data.i16 = 4;
+    (*ladder_ctx).network[1].cells[0][1].data.i32 = 4;
     (*ladder_ctx).network[1].cells[0][1].type = LADDER_TYPE_M;
 
     (*ladder_ctx).network[1].cells[0][2].code = LADDER_INS_NC;
-    (*ladder_ctx).network[1].cells[0][2].data.i16 = 5;
+    (*ladder_ctx).network[1].cells[0][2].data.i32 = 5;
     (*ladder_ctx).network[1].cells[0][2].type = LADDER_TYPE_M;
 
     (*ladder_ctx).network[1].cells[0][3].code = LADDER_INS_TON;
-    (*ladder_ctx).network[1].cells[0][3].data.i16 = 2;
+    (*ladder_ctx).network[1].cells[0][3].data.i32 = 2;
     (*ladder_ctx).network[1].cells[0][3].type = LADDER_TYPE_T;
     (*ladder_ctx).network[1].cells[1][3].code = LADDER_INS_MULTI;
-    (*ladder_ctx).network[1].cells[1][3].data.i16 = 5;
+    (*ladder_ctx).network[1].cells[1][3].data.i32 = 5;
     (*ladder_ctx).network[1].cells[1][3].type = LADDER_BASETIME_SEC;
 
     (*ladder_ctx).network[1].cells[0][4].code = LADDER_INS_CONN;
 
     (*ladder_ctx).network[1].cells[0][5].code = LADDER_INS_COIL;
-    (*ladder_ctx).network[1].cells[0][5].data.i16 = 6;
+    (*ladder_ctx).network[1].cells[0][5].data.i32 = 6;
     (*ladder_ctx).network[1].cells[0][5].type = LADDER_TYPE_M;
 
     // ----------------------------- //
 
     (*ladder_ctx).network[1].cells[2][0].code = LADDER_INS_NO;
-    (*ladder_ctx).network[1].cells[2][0].data.i16 = 6;
+    (*ladder_ctx).network[1].cells[2][0].data.i32 = 6;
     (*ladder_ctx).network[1].cells[2][0].type = LADDER_TYPE_M;
 
     (*ladder_ctx).network[1].cells[2][1].code = LADDER_INS_TON;
-    (*ladder_ctx).network[1].cells[2][1].data.i16 = 3;
+    (*ladder_ctx).network[1].cells[2][1].data.i32 = 3;
     (*ladder_ctx).network[1].cells[2][1].type = LADDER_TYPE_T;
     (*ladder_ctx).network[1].cells[3][1].code = LADDER_INS_MULTI;
-    (*ladder_ctx).network[1].cells[3][1].data.i16 = 5;
+    (*ladder_ctx).network[1].cells[3][1].data.i32 = 5;
     (*ladder_ctx).network[1].cells[3][1].type = LADDER_BASETIME_SEC;
 
     (*ladder_ctx).network[1].cells[2][2].code = LADDER_INS_CONN;
@@ -175,13 +175,13 @@ static void load_demo(ladder_ctx_t *ladder_ctx) {
     (*ladder_ctx).network[1].cells[2][4].code = LADDER_INS_CONN;
 
     (*ladder_ctx).network[1].cells[2][5].code = LADDER_INS_COIL;
-    (*ladder_ctx).network[1].cells[2][5].data.i16 = 5;
+    (*ladder_ctx).network[1].cells[2][5].data.i32 = 5;
     (*ladder_ctx).network[1].cells[2][5].type = LADDER_TYPE_M;
 
     // ----------------------------- //
 
     (*ladder_ctx).network[1].cells[4][0].code = LADDER_INS_NO;
-    (*ladder_ctx).network[1].cells[4][0].data.i16 = 6;
+    (*ladder_ctx).network[1].cells[4][0].data.i32 = 6;
     (*ladder_ctx).network[1].cells[4][0].type = LADDER_TYPE_M;
 
     (*ladder_ctx).network[1].cells[4][1].code = LADDER_INS_CONN;
@@ -190,20 +190,20 @@ static void load_demo(ladder_ctx_t *ladder_ctx) {
     (*ladder_ctx).network[1].cells[4][4].code = LADDER_INS_CONN;
 
     (*ladder_ctx).network[1].cells[4][5].code = LADDER_INS_COIL;
-    (*ladder_ctx).network[1].cells[4][5].data.i16 = 1;
+    (*ladder_ctx).network[1].cells[4][5].data.i32 = 1;
     (*ladder_ctx).network[1].cells[4][5].type = LADDER_TYPE_Q;
 
     // ----------------------------- //
 
     (*ladder_ctx).network[1].cells[5][0].code = LADDER_INS_NO;
-    (*ladder_ctx).network[1].cells[5][0].data.i16 = 1;
+    (*ladder_ctx).network[1].cells[5][0].data.i32 = 1;
     (*ladder_ctx).network[1].cells[5][0].type = LADDER_TYPE_Q;
 
     (*ladder_ctx).network[1].cells[5][1].code = LADDER_INS_CTU;
-    (*ladder_ctx).network[1].cells[5][1].data.i16 = 1;
+    (*ladder_ctx).network[1].cells[5][1].data.i32 = 1;
     (*ladder_ctx).network[1].cells[5][1].type = LADDER_TYPE_C;
     (*ladder_ctx).network[1].cells[6][1].code = LADDER_INS_MULTI;
-    (*ladder_ctx).network[1].cells[6][1].data.i16 = 5;
+    (*ladder_ctx).network[1].cells[6][1].data.i32 = 5;
     (*ladder_ctx).network[1].cells[6][1].type = LADDER_TYPE_NONE;
 
     (*ladder_ctx).network[1].cells[5][2].code = LADDER_INS_CONN;
@@ -211,7 +211,7 @@ static void load_demo(ladder_ctx_t *ladder_ctx) {
     (*ladder_ctx).network[1].cells[5][4].code = LADDER_INS_CONN;
 
     (*ladder_ctx).network[1].cells[5][5].code = LADDER_INS_COIL;
-    (*ladder_ctx).network[1].cells[5][5].data.i16 = 4;
+    (*ladder_ctx).network[1].cells[5][5].data.i32 = 4;
     (*ladder_ctx).network[1].cells[5][5].type = LADDER_TYPE_M;
 }
 
