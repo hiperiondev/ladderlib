@@ -148,6 +148,7 @@ typedef enum LADDER_TYPE {
     LADDER_TYPE_T,    /**< Type T */
     LADDER_TYPE_D,    /**< Type D */
     LADDER_TYPE_CSTR, /**< Type constant string */
+    LADDER_TYPE_REAL, /**< Type float */
     LADDER_TYPE_INV,  /**< First invalid */
 } ladder_type_t;
 
@@ -185,8 +186,9 @@ typedef struct ladder_instructions_ioc_s {
 typedef struct ladder_cell_s {
     ladder_instruction_t code; /**< Code */
     union {
-           int32_t i32;        /**< integer */
+           int32_t i32;        /**< Integer */
         const char *cstr;      /**< Constant string */
+             float real;       /**< Real */
     } data;                    /**< Data */
       ladder_type_t type;      /**< Data type */
 } ladder_cell_t;

@@ -33,6 +33,13 @@
 
 #include "ladder.h"
 
+#define forcecast(val, type)       \
+    (                              \
+    (val == 0) ? (uint32_t)(val) : \
+    (val == 1) ? (int32_t)(val)  : \
+    0                              \
+    )
+
 /**
  * @def ladder_get_data_value
  * @brief Get data values
@@ -53,7 +60,8 @@
         ((*(*lctx).exec_network).cells[r][c].type == LADDER_TYPE_C)    ? (uint32_t)((*lctx).registers.IW[(*(*lctx).exec_network).cells[r][c].data.i32]) : \
         ((*(*lctx).exec_network).cells[r][c].type == LADDER_TYPE_T)    ? (uint64_t)((*lctx).timers[(*(*lctx).exec_network).cells[r][c].data.i32].acc)   : \
         ((*(*lctx).exec_network).cells[r][c].type == LADDER_TYPE_D)    ? (int32_t)((*lctx).registers.IW[(*(*lctx).exec_network).cells[r][c].data.i32])  : \
-        ((*(*lctx).exec_network).cells[r][c].type == LADDER_TYPE_INV)  ? (uint8_t)((*(*lctx).exec_network).cells[r][c].data.i32)                        : \
+        ((*(*lctx).exec_network).cells[r][c].type == LADDER_TYPE_REAL) ? (float)((*lctx).registers.IW[(*(*lctx).exec_network).cells[r][c].data.i32])    : \
+        ((*(*lctx).exec_network).cells[r][c].type == LADDER_TYPE_INV)  ? 0                                                                              : \
         0                                                                                                                                                 \
         )
 
