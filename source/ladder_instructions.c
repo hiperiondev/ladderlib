@@ -134,15 +134,16 @@ ladder_ins_err_t execTON(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row
 
     // timer is running, update acc value
     if ((*ladder_ctx).memory.Tr[(*(*ladder_ctx).exec_network).cells[row][column].data.i32]) {
-        (*ladder_ctx).timers[(*(*ladder_ctx).exec_network).cells[row][column].data.i32].acc =
-                (uint16_t) (((*ladder_ctx).hw.time.millis() - (*ladder_ctx).timers[(*(*ladder_ctx).exec_network).cells[row][column].data.i32].time_stamp)
-                        / basetime_factor[(*(*ladder_ctx).exec_network).cells[row + 1][column].type]);
+        (*ladder_ctx).timers[(*(*ladder_ctx).exec_network).cells[row][column].data.i32].acc = (uint16_t) (((*ladder_ctx).hw.time.millis()
+                - (*ladder_ctx).timers[(*(*ladder_ctx).exec_network).cells[row][column].data.i32].time_stamp)
+                / basetime_factor[(*(*ladder_ctx).exec_network).cells[row + 1][column].type]);
     }
 
     // timer done --> activate timer done flag and set acc value to his set point
     if ((*ladder_ctx).memory.Tr[(*(*ladder_ctx).exec_network).cells[row][column].data.i32]
             && (((*ladder_ctx).hw.time.millis() - (*ladder_ctx).timers[(*(*ladder_ctx).exec_network).cells[row][column].data.i32].time_stamp)
-                    >= ((*(*ladder_ctx).exec_network).cells[row + 1][column].data.i32 * basetime_factor[(*(*ladder_ctx).exec_network).cells[row + 1][column].type]))) {
+                    >= ((*(*ladder_ctx).exec_network).cells[row + 1][column].data.i32
+                            * basetime_factor[(*(*ladder_ctx).exec_network).cells[row + 1][column].type]))) {
         (*ladder_ctx).memory.Tr[(*(*ladder_ctx).exec_network).cells[row][column].data.i32] = false;
         (*ladder_ctx).memory.Td[(*(*ladder_ctx).exec_network).cells[row][column].data.i32] = true;
         (*ladder_ctx).timers[(*(*ladder_ctx).exec_network).cells[row][column].data.i32].acc = (*(*ladder_ctx).exec_network).cells[row + 1][column].data.i32;
@@ -181,15 +182,16 @@ ladder_ins_err_t execTOFF(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t ro
 
     // timer is running, update acc value
     if ((*ladder_ctx).memory.Tr[(*(*ladder_ctx).exec_network).cells[row][column].data.i32]) {
-        (*ladder_ctx).timers[(*(*ladder_ctx).exec_network).cells[row][column].data.i32].acc =
-                (uint16_t) (((*ladder_ctx).hw.time.millis() - (*ladder_ctx).timers[(*(*ladder_ctx).exec_network).cells[row][column].data.i32].time_stamp)
-                        / basetime_factor[(*(*ladder_ctx).exec_network).cells[row + 1][column].type]);
+        (*ladder_ctx).timers[(*(*ladder_ctx).exec_network).cells[row][column].data.i32].acc = (uint16_t) (((*ladder_ctx).hw.time.millis()
+                - (*ladder_ctx).timers[(*(*ladder_ctx).exec_network).cells[row][column].data.i32].time_stamp)
+                / basetime_factor[(*(*ladder_ctx).exec_network).cells[row + 1][column].type]);
     }
 
     // timer done --> activate timer done flag and set acc value to his set point
     if ((*ladder_ctx).memory.Tr[(*(*ladder_ctx).exec_network).cells[row][column].data.i32]
             && (((*ladder_ctx).hw.time.millis() - (*ladder_ctx).timers[(*(*ladder_ctx).exec_network).cells[row][column].data.i32].time_stamp)
-                    >= ((*(*ladder_ctx).exec_network).cells[row + 1][column].data.i32 * basetime_factor[(*(*ladder_ctx).exec_network).cells[row + 1][column].type]))) {
+                    >= ((*(*ladder_ctx).exec_network).cells[row + 1][column].data.i32
+                            * basetime_factor[(*(*ladder_ctx).exec_network).cells[row + 1][column].type]))) {
         (*ladder_ctx).memory.Tr[(*(*ladder_ctx).exec_network).cells[row][column].data.i32] = false;
         (*ladder_ctx).memory.Td[(*(*ladder_ctx).exec_network).cells[row][column].data.i32] = false;
         (*ladder_ctx).timers[(*(*ladder_ctx).exec_network).cells[row][column].data.i32].acc = (*(*ladder_ctx).exec_network).cells[row + 1][column].data.i32;
@@ -224,15 +226,16 @@ ladder_ins_err_t execTP(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row,
 
     // timer is running, update acc value
     if ((*ladder_ctx).memory.Td[(*(*ladder_ctx).exec_network).cells[row][column].data.i32]) {
-        (*ladder_ctx).timers[(*(*ladder_ctx).exec_network).cells[row][column].data.i32].acc =
-                (uint16_t) (((*ladder_ctx).hw.time.millis() - (*ladder_ctx).timers[(*(*ladder_ctx).exec_network).cells[row][column].data.i32].time_stamp)
-                        / basetime_factor[(*(*ladder_ctx).exec_network).cells[row + 1][column].type]);
+        (*ladder_ctx).timers[(*(*ladder_ctx).exec_network).cells[row][column].data.i32].acc = (uint16_t) (((*ladder_ctx).hw.time.millis()
+                - (*ladder_ctx).timers[(*(*ladder_ctx).exec_network).cells[row][column].data.i32].time_stamp)
+                / basetime_factor[(*(*ladder_ctx).exec_network).cells[row + 1][column].type]);
     }
 
     // timer done --> activate timer done flag and set acc value to his setpoint
     if ((*ladder_ctx).memory.Td[(*(*ladder_ctx).exec_network).cells[row][column].data.i32]
             && (((*ladder_ctx).hw.time.millis() - (*ladder_ctx).timers[(*(*ladder_ctx).exec_network).cells[row][column].data.i32].time_stamp)
-                    >= ((*(*ladder_ctx).exec_network).cells[row + 1][column].data.i32 * basetime_factor[(*(*ladder_ctx).exec_network).cells[row + 1][column].type]))) {
+                    >= ((*(*ladder_ctx).exec_network).cells[row + 1][column].data.i32
+                            * basetime_factor[(*(*ladder_ctx).exec_network).cells[row + 1][column].type]))) {
         (*ladder_ctx).memory.Td[(*(*ladder_ctx).exec_network).cells[row][column].data.i32] = false;
         (*ladder_ctx).timers[(*(*ladder_ctx).exec_network).cells[row][column].data.i32].acc = (*(*ladder_ctx).exec_network).cells[row + 1][column].data.i32;
     }
@@ -283,11 +286,11 @@ ladder_ins_err_t execCTU(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row
     }
 
     // copy counter flags to dynamic flags on network
-    if ((*ladder_ctx).memory.Cd[(*(*ladder_ctx).exec_network).cells[row][column].data.i32]){
+    if ((*ladder_ctx).memory.Cd[(*(*ladder_ctx).exec_network).cells[row][column].data.i32]) {
         LADDER_ACTUALIZE_FLAGS(column, row);
     }
 
-    if ((*ladder_ctx).memory.Cr[(*(*ladder_ctx).exec_network).cells[row][column].data.i32]){
+    if ((*ladder_ctx).memory.Cr[(*(*ladder_ctx).exec_network).cells[row][column].data.i32]) {
         LADDER_ACTUALIZE_FLAGS(column, row + 1);
     }
 
@@ -298,13 +301,15 @@ ladder_ins_err_t execCTD(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row
     // reset counter
     if (column == 0) {
         if ((*ladder_ctx).ladder.state == LADDER_ST_RUNNING) {
-            (*ladder_ctx).registers.C[(*(*ladder_ctx).exec_network).cells[row][column].data.i32] = (*(*ladder_ctx).exec_network).cells[row + 1][column].data.i32;
+            (*ladder_ctx).registers.C[(*(*ladder_ctx).exec_network).cells[row][column].data.i32] =
+                    (*(*ladder_ctx).exec_network).cells[row + 1][column].data.i32;
             (*ladder_ctx).memory.Cd[(*(*ladder_ctx).exec_network).cells[row][column].data.i32] = false;
             (*ladder_ctx).memory.Cr[(*(*ladder_ctx).exec_network).cells[row][column].data.i32] = false;
         }
     } else {
         if ((*ladder_ctx).scan_internals.network_flags[column - 1] & LADDER_FLAG_MASK(row + 1)) {
-            (*ladder_ctx).registers.C[(*(*ladder_ctx).exec_network).cells[row][column].data.i32] = (*(*ladder_ctx).exec_network).cells[row + 1][column].data.i32;
+            (*ladder_ctx).registers.C[(*(*ladder_ctx).exec_network).cells[row][column].data.i32] =
+                    (*(*ladder_ctx).exec_network).cells[row + 1][column].data.i32;
             (*ladder_ctx).memory.Cd[(*(*ladder_ctx).exec_network).cells[row][column].data.i32] = false;
             (*ladder_ctx).memory.Cr[(*(*ladder_ctx).exec_network).cells[row][column].data.i32] = false;
         }
@@ -368,7 +373,8 @@ ladder_ins_err_t execSUB(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row
 
 ladder_ins_err_t execADD(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag) {
     if (flag) {
-        ladder_set_data_value(ladder_ctx, row + 2, column, ladder_get_data_value(ladder_ctx, row, column) + ladder_get_data_value(ladder_ctx, row + 1, column), &error);
+        ladder_set_data_value(ladder_ctx, row + 2, column, ladder_get_data_value(ladder_ctx, row, column) + ladder_get_data_value(ladder_ctx, row + 1, column),
+                &error);
         LADDER_ACTUALIZE_FLAGS(column, row);
     }
 
@@ -391,7 +397,8 @@ ladder_ins_err_t execDIV(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row
             ladder_set_data_value(ladder_ctx, row + 2, column, 0, &error);
             LADDER_ACTUALIZE_FLAGS(column, row + 2);
         } else {
-            ladder_set_data_value(ladder_ctx, row + 2, column, ladder_get_data_value(ladder_ctx, row, column) / ladder_get_data_value(ladder_ctx, row + 1, column), &error);
+            ladder_set_data_value(ladder_ctx, row + 2, column,
+                    ladder_get_data_value(ladder_ctx, row, column) / ladder_get_data_value(ladder_ctx, row + 1, column), &error);
             LADDER_ACTUALIZE_FLAGS(column, row);
         }
     }
@@ -401,7 +408,8 @@ ladder_ins_err_t execDIV(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row
 
 ladder_ins_err_t execMOD(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag) {
     if (flag) {
-        ladder_set_data_value(ladder_ctx, row + 2, column, ladder_get_data_value(ladder_ctx, row, column) % ladder_get_data_value(ladder_ctx, row+1, column), &error);
+        ladder_set_data_value(ladder_ctx, row + 2, column, ladder_get_data_value(ladder_ctx, row, column) % ladder_get_data_value(ladder_ctx, row + 1, column),
+                &error);
         LADDER_ACTUALIZE_FLAGS(column, row);
     }
 
@@ -464,7 +472,8 @@ ladder_ins_err_t execROR(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row
 
 ladder_ins_err_t execAND(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag) {
     if (flag) {
-        ladder_set_data_value(ladder_ctx, row + 2, column, ladder_get_data_value(ladder_ctx, row, column) & ladder_get_data_value(ladder_ctx, row + 1, column), &error);
+        ladder_set_data_value(ladder_ctx, row + 2, column, ladder_get_data_value(ladder_ctx, row, column) & ladder_get_data_value(ladder_ctx, row + 1, column),
+                &error);
         LADDER_ACTUALIZE_FLAGS(column, row);
     }
 
@@ -473,7 +482,8 @@ ladder_ins_err_t execAND(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row
 
 ladder_ins_err_t execOR(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag) {
     if (flag) {
-        ladder_set_data_value(ladder_ctx, row + 2, column, ladder_get_data_value(ladder_ctx, row, column) | ladder_get_data_value(ladder_ctx, row+1, column), &error);
+        ladder_set_data_value(ladder_ctx, row + 2, column, ladder_get_data_value(ladder_ctx, row, column) | ladder_get_data_value(ladder_ctx, row + 1, column),
+                &error);
         LADDER_ACTUALIZE_FLAGS(column, row);
     }
 
@@ -482,7 +492,8 @@ ladder_ins_err_t execOR(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row,
 
 ladder_ins_err_t execXOR(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag) {
     if (flag) {
-        ladder_set_data_value(ladder_ctx, row + 2, column, ladder_get_data_value(ladder_ctx, row, column) ^ ladder_get_data_value(ladder_ctx, row+1, column), &error);
+        ladder_set_data_value(ladder_ctx, row + 2, column, ladder_get_data_value(ladder_ctx, row, column) ^ ladder_get_data_value(ladder_ctx, row + 1, column),
+                &error);
         LADDER_ACTUALIZE_FLAGS(column, row);
     }
 
@@ -500,7 +511,7 @@ ladder_ins_err_t execNOT(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row
 
 ladder_ins_err_t execEQ(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag) {
     if (flag) {
-        if (ladder_get_data_value(ladder_ctx, row, column) == ladder_get_data_value(ladder_ctx, row+1, column)) {
+        if (ladder_get_data_value(ladder_ctx, row, column) == ladder_get_data_value(ladder_ctx, row + 1, column)) {
             LADDER_ACTUALIZE_FLAGS(column, row);
         }
     }
@@ -510,7 +521,7 @@ ladder_ins_err_t execEQ(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row,
 
 ladder_ins_err_t execGT(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag) {
     if (flag) {
-        if (ladder_get_data_value(ladder_ctx, row, column) > ladder_get_data_value(ladder_ctx, row+1, column)) {
+        if (ladder_get_data_value(ladder_ctx, row, column) > ladder_get_data_value(ladder_ctx, row + 1, column)) {
             LADDER_ACTUALIZE_FLAGS(column, row);
         }
     }
@@ -520,7 +531,7 @@ ladder_ins_err_t execGT(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row,
 
 ladder_ins_err_t execGE(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag) {
     if (flag) {
-        if (ladder_get_data_value(ladder_ctx, row, column) >= ladder_get_data_value(ladder_ctx, row+1, column)) {
+        if (ladder_get_data_value(ladder_ctx, row, column) >= ladder_get_data_value(ladder_ctx, row + 1, column)) {
             LADDER_ACTUALIZE_FLAGS(column, row);
         }
     }
@@ -530,7 +541,7 @@ ladder_ins_err_t execGE(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row,
 
 ladder_ins_err_t execLT(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag) {
     if (flag) {
-        if (ladder_get_data_value(ladder_ctx, row, column) < ladder_get_data_value(ladder_ctx, row+1, column)) {
+        if (ladder_get_data_value(ladder_ctx, row, column) < ladder_get_data_value(ladder_ctx, row + 1, column)) {
             LADDER_ACTUALIZE_FLAGS(column, row);
         }
     }
@@ -540,7 +551,7 @@ ladder_ins_err_t execLT(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row,
 
 ladder_ins_err_t execLE(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag) {
     if (flag) {
-        if (ladder_get_data_value(ladder_ctx, row, column) <= ladder_get_data_value(ladder_ctx, row+1, column)) {
+        if (ladder_get_data_value(ladder_ctx, row, column) <= ladder_get_data_value(ladder_ctx, row + 1, column)) {
             LADDER_ACTUALIZE_FLAGS(column, row);
         }
     }
@@ -550,7 +561,7 @@ ladder_ins_err_t execLE(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row,
 
 ladder_ins_err_t execNE(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag) {
     if (flag) {
-        if (ladder_get_data_value(ladder_ctx, row, column) != ladder_get_data_value(ladder_ctx, row+1, column)) {
+        if (ladder_get_data_value(ladder_ctx, row, column) != ladder_get_data_value(ladder_ctx, row + 1, column)) {
             LADDER_ACTUALIZE_FLAGS(column, row);
         }
     }
@@ -559,45 +570,45 @@ ladder_ins_err_t execNE(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row,
 }
 
 ladder_ins_err_t execFOREIGN(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag) {
-    return (*ladder_ctx).foreign.fn[ladder_get_data_value(ladder_ctx, row, column)].exec(ladder_ctx, column, row,  flag);
+    return (*ladder_ctx).foreign.fn[ladder_get_data_value(ladder_ctx, row, column)].exec(ladder_ctx, column, row, flag);
 }
 
-void ladder_set_data_value(ladder_ctx_t *ladder_ctx, uint32_t row, uint32_t column, int32_t value, uint8_t *error) { // Issue #55 - Change to uint16_t ?
+void ladder_set_data_value(ladder_ctx_t *ladder_ctx, uint32_t row, uint32_t column, int32_t value, uint8_t *error) {
     *error = LADDER_INS_ERR_OK;
 
     switch ((*(*ladder_ctx).exec_network).cells[row][column].type) {
         case LADDER_TYPE_M:
-            (*ladder_ctx).memory.M[(*(*ladder_ctx).exec_network).cells[row][column].data.i32] = (uint8_t) (value);
+            (*ladder_ctx).memory.M[(*(*ladder_ctx).exec_network).cells[row][column].data.i32] = value;
             break;
         case LADDER_TYPE_Q:
-            (*ladder_ctx).memory.Q[(*(*ladder_ctx).exec_network).cells[row][column].data.i32] = (uint8_t) (value);
+            (*ladder_ctx).memory.Q[(*(*ladder_ctx).exec_network).cells[row][column].data.i32] = value;
             break;
         case LADDER_TYPE_I:
-            (*ladder_ctx).memory.I[(*(*ladder_ctx).exec_network).cells[row][column].data.i32] = (uint8_t) (value);
+            (*ladder_ctx).memory.I[(*(*ladder_ctx).exec_network).cells[row][column].data.i32] = value;
             break;
         case LADDER_TYPE_Cd:
-            (*ladder_ctx).memory.Cd[(*(*ladder_ctx).exec_network).cells[row][column].data.i32] = (uint8_t) (value);
+            (*ladder_ctx).memory.Cd[(*(*ladder_ctx).exec_network).cells[row][column].data.i32] = value;
             break;
         case LADDER_TYPE_Cr:
-            (*ladder_ctx).memory.Cr[(*(*ladder_ctx).exec_network).cells[row][column].data.i32] = (uint8_t) (value);
+            (*ladder_ctx).memory.Cr[(*(*ladder_ctx).exec_network).cells[row][column].data.i32] = value;
             break;
         case LADDER_TYPE_Td:
-            (*ladder_ctx).memory.Td[(*(*ladder_ctx).exec_network).cells[row][column].data.i32] = (uint8_t) (value);
+            (*ladder_ctx).memory.Td[(*(*ladder_ctx).exec_network).cells[row][column].data.i32] = value;
             break;
         case LADDER_TYPE_Tr:
-            (*ladder_ctx).memory.Tr[(*(*ladder_ctx).exec_network).cells[row][column].data.i32] = (uint8_t) (value);
+            (*ladder_ctx).memory.Tr[(*(*ladder_ctx).exec_network).cells[row][column].data.i32] = value;
             break;
         case LADDER_TYPE_IW:
-            (*ladder_ctx).registers.IW[(*(*ladder_ctx).exec_network).cells[row][column].data.i32] = (uint16_t) (value);
+            (*ladder_ctx).registers.IW[(*(*ladder_ctx).exec_network).cells[row][column].data.i32] = value;
             break;
         case LADDER_TYPE_QW:
-            (*ladder_ctx).registers.QW[(*(*ladder_ctx).exec_network).cells[row][column].data.i32] = (uint16_t) (value);
+            (*ladder_ctx).registers.QW[(*(*ladder_ctx).exec_network).cells[row][column].data.i32] = value;
             break;
         case LADDER_TYPE_C:
-            (*ladder_ctx).registers.C[(*(*ladder_ctx).exec_network).cells[row][column].data.i32] = (uint16_t) (value);
+            (*ladder_ctx).registers.C[(*(*ladder_ctx).exec_network).cells[row][column].data.i32] = value;
             break;
         case LADDER_TYPE_D:
-            (*ladder_ctx).registers.D[(*(*ladder_ctx).exec_network).cells[row][column].data.i32] = (uint16_t) (value);
+            (*ladder_ctx).registers.D[(*(*ladder_ctx).exec_network).cells[row][column].data.i32] = value;
             break;
 
         default:

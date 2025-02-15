@@ -173,19 +173,19 @@ void dummy_write_outputs_local(ladder_ctx_t *ladder_ctx) {
     printf("        +----+----+-------+-----------------+\n");
     printf("        | Td | Tr |  acc  |   time_stamp    |\n");
     printf("        +----+----+-------+------- ---------+\n");
-    printf("Timer 0 | %d  | %d  | %05lu | %15lu |\n", (*ladder_ctx).memory.Td[0], (*ladder_ctx).memory.Tr[0], (*ladder_ctx).timers[0].acc,
+    printf("Timer 0 | %d  | %d  | %05u | %15lu |\n", (*ladder_ctx).memory.Td[0], (*ladder_ctx).memory.Tr[0], (*ladder_ctx).timers[0].acc,
             (*ladder_ctx).timers[0].time_stamp);
-    printf("Timer 1 | %d  | %d  | %05lu | %15lu |\n", (*ladder_ctx).memory.Td[1], (*ladder_ctx).memory.Tr[1], (*ladder_ctx).timers[1].acc,
+    printf("Timer 1 | %d  | %d  | %05u | %15lu |\n", (*ladder_ctx).memory.Td[1], (*ladder_ctx).memory.Tr[1], (*ladder_ctx).timers[1].acc,
             (*ladder_ctx).timers[1].time_stamp);
-    printf("Timer 2 | %d  | %d  | %05lu | %15lu |\n", (*ladder_ctx).memory.Td[2], (*ladder_ctx).memory.Tr[2], (*ladder_ctx).timers[2].acc,
+    printf("Timer 2 | %d  | %d  | %05u | %15lu |\n", (*ladder_ctx).memory.Td[2], (*ladder_ctx).memory.Tr[2], (*ladder_ctx).timers[2].acc,
             (*ladder_ctx).timers[2].time_stamp);
-    printf("Timer 3 | %d  | %d  | %05lu | %15lu |\n", (*ladder_ctx).memory.Td[3], (*ladder_ctx).memory.Tr[3], (*ladder_ctx).timers[3].acc,
+    printf("Timer 3 | %d  | %d  | %05u | %15lu |\n", (*ladder_ctx).memory.Td[3], (*ladder_ctx).memory.Tr[3], (*ladder_ctx).timers[3].acc,
             (*ladder_ctx).timers[3].time_stamp);
-    printf("Timer 4 | %d  | %d  | %05lu | %15lu |\n", (*ladder_ctx).memory.Td[4], (*ladder_ctx).memory.Tr[4], (*ladder_ctx).timers[4].acc,
+    printf("Timer 4 | %d  | %d  | %05u | %15lu |\n", (*ladder_ctx).memory.Td[4], (*ladder_ctx).memory.Tr[4], (*ladder_ctx).timers[4].acc,
             (*ladder_ctx).timers[4].time_stamp);
-    printf("Timer 5 | %d  | %d  | %05lu | %15lu |\n", (*ladder_ctx).memory.Td[5], (*ladder_ctx).memory.Tr[5], (*ladder_ctx).timers[5].acc,
+    printf("Timer 5 | %d  | %d  | %05u | %15lu |\n", (*ladder_ctx).memory.Td[5], (*ladder_ctx).memory.Tr[5], (*ladder_ctx).timers[5].acc,
             (*ladder_ctx).timers[5].time_stamp);
-    printf("Timer 6 | %d  | %d  | %05lu | %15lu |\n", (*ladder_ctx).memory.Td[6], (*ladder_ctx).memory.Tr[6], (*ladder_ctx).timers[6].acc,
+    printf("Timer 6 | %d  | %d  | %05u | %15lu |\n", (*ladder_ctx).memory.Td[6], (*ladder_ctx).memory.Tr[6], (*ladder_ctx).timers[6].acc,
             (*ladder_ctx).timers[6].time_stamp);
     printf("        +----+----+-------+-----------------+\n");
 
