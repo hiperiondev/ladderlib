@@ -209,7 +209,7 @@ typedef struct ladder_network_s {
  */
 typedef struct ladder_timer_s {
     uint64_t time_stamp; /**< Time stamp */
-    uint64_t acc;        /**< Activated counter */
+    uint32_t acc;        /**< Activated counter */
 } ladder_timer_t;
 
 /**
@@ -398,10 +398,10 @@ typedef struct ladder_prev_scan_vals_s {
     uint8_t *Mh;  /**< Regular flags previous */
     uint8_t *Ih;  /**< Digital Inputs previous */
     uint8_t *Qh;  /**< Digital Outputs previous */
-    uint8_t *Crh; /**< Counter running previous */
-    uint8_t *Cdh; /**< Counter done previous */
-    uint8_t *Trh; /**< Timer running previous */
-    uint8_t *Tdh; /**< Timer done previous */
+       bool *Crh; /**< Counter running previous */
+       bool *Cdh; /**< Counter done previous */
+       bool *Trh; /**< Timer running previous */
+       bool *Tdh; /**< Timer done previous */
 } ladder_prev_scan_vals_t;
 
 /**

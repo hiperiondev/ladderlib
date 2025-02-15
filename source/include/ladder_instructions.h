@@ -38,23 +38,23 @@
  * @brief Get data values
  *
  */
-#define ladder_get_data_value(lctx, r, c)                                                                                                                \
-        (                                                                                                                                                \
-        ((*(*lctx).exec_network).cells[r][c].type == LADDER_TYPE_NONE) ? (uint8_t)((*(*lctx).exec_network).cells[r][c].data.i32)                       : \
-        ((*(*lctx).exec_network).cells[r][c].type == LADDER_TYPE_M)    ? (uint8_t)((*lctx).memory.M[(*(*lctx).exec_network).cells[r][c].data.i32])     : \
-        ((*(*lctx).exec_network).cells[r][c].type == LADDER_TYPE_Q)    ? (uint8_t)((*lctx).memory.Q[(*(*lctx).exec_network).cells[r][c].data.i32])     : \
-        ((*(*lctx).exec_network).cells[r][c].type == LADDER_TYPE_I)    ? (uint8_t)((*lctx).memory.I[(*(*lctx).exec_network).cells[r][c].data.i32])     : \
-        ((*(*lctx).exec_network).cells[r][c].type == LADDER_TYPE_Cd)   ? (uint8_t)((*lctx).memory.Cd[(*(*lctx).exec_network).cells[r][c].data.i32])    : \
-        ((*(*lctx).exec_network).cells[r][c].type == LADDER_TYPE_Cr)   ? (uint8_t)((*lctx).memory.Cr[(*(*lctx).exec_network).cells[r][c].data.i32])    : \
-        ((*(*lctx).exec_network).cells[r][c].type == LADDER_TYPE_Td)   ? (uint8_t)((*lctx).memory.Td[(*(*lctx).exec_network).cells[r][c].data.i32])    : \
-        ((*(*lctx).exec_network).cells[r][c].type == LADDER_TYPE_Tr)   ? (uint8_t)((*lctx).memory.Tr[(*(*lctx).exec_network).cells[r][c].data.i32])    : \
-        ((*(*lctx).exec_network).cells[r][c].type == LADDER_TYPE_IW)   ? (uint8_t)((*lctx).registers.IW[(*(*lctx).exec_network).cells[r][c].data.i32]) : \
-        ((*(*lctx).exec_network).cells[r][c].type == LADDER_TYPE_QW)   ? (uint8_t)((*lctx).registers.IW[(*(*lctx).exec_network).cells[r][c].data.i32]) : \
-        ((*(*lctx).exec_network).cells[r][c].type == LADDER_TYPE_C)    ? (uint8_t)((*lctx).registers.IW[(*(*lctx).exec_network).cells[r][c].data.i32]) : \
-        ((*(*lctx).exec_network).cells[r][c].type == LADDER_TYPE_T)    ? (uint8_t)((*lctx).timers[(*(*lctx).exec_network).cells[r][c].data.i32].acc)   : \
-        ((*(*lctx).exec_network).cells[r][c].type == LADDER_TYPE_D)    ? (uint8_t)((*lctx).registers.IW[(*(*lctx).exec_network).cells[r][c].data.i32]) : \
-        ((*(*lctx).exec_network).cells[r][c].type == LADDER_TYPE_INV)  ? (uint8_t)((*(*lctx).exec_network).cells[r][c].data.i32)                       : \
-        0                                                                                                                                                \
+#define ladder_get_data_value(lctx, r, c)                                                                                                                 \
+        (                                                                                                                                                 \
+        ((*(*lctx).exec_network).cells[r][c].type == LADDER_TYPE_NONE) ? (uint8_t)((*(*lctx).exec_network).cells[r][c].data.i32)                        : \
+        ((*(*lctx).exec_network).cells[r][c].type == LADDER_TYPE_M)    ? (uint8_t)((*lctx).memory.M[(*(*lctx).exec_network).cells[r][c].data.i32])      : \
+        ((*(*lctx).exec_network).cells[r][c].type == LADDER_TYPE_Q)    ? (uint8_t)((*lctx).memory.Q[(*(*lctx).exec_network).cells[r][c].data.i32])      : \
+        ((*(*lctx).exec_network).cells[r][c].type == LADDER_TYPE_I)    ? (uint8_t)((*lctx).memory.I[(*(*lctx).exec_network).cells[r][c].data.i32])      : \
+        ((*(*lctx).exec_network).cells[r][c].type == LADDER_TYPE_Cd)   ? (bool)((*lctx).memory.Cd[(*(*lctx).exec_network).cells[r][c].data.i32])        : \
+        ((*(*lctx).exec_network).cells[r][c].type == LADDER_TYPE_Cr)   ? (bool)((*lctx).memory.Cr[(*(*lctx).exec_network).cells[r][c].data.i32])        : \
+        ((*(*lctx).exec_network).cells[r][c].type == LADDER_TYPE_Td)   ? (bool)((*lctx).memory.Td[(*(*lctx).exec_network).cells[r][c].data.i32])        : \
+        ((*(*lctx).exec_network).cells[r][c].type == LADDER_TYPE_Tr)   ? (bool)((*lctx).memory.Tr[(*(*lctx).exec_network).cells[r][c].data.i32])        : \
+        ((*(*lctx).exec_network).cells[r][c].type == LADDER_TYPE_IW)   ? (int32_t)((*lctx).registers.IW[(*(*lctx).exec_network).cells[r][c].data.i32])  : \
+        ((*(*lctx).exec_network).cells[r][c].type == LADDER_TYPE_QW)   ? (int32_t)((*lctx).registers.IW[(*(*lctx).exec_network).cells[r][c].data.i32])  : \
+        ((*(*lctx).exec_network).cells[r][c].type == LADDER_TYPE_C)    ? (uint32_t)((*lctx).registers.IW[(*(*lctx).exec_network).cells[r][c].data.i32]) : \
+        ((*(*lctx).exec_network).cells[r][c].type == LADDER_TYPE_T)    ? (uint64_t)((*lctx).timers[(*(*lctx).exec_network).cells[r][c].data.i32].acc)   : \
+        ((*(*lctx).exec_network).cells[r][c].type == LADDER_TYPE_D)    ? (int32_t)((*lctx).registers.IW[(*(*lctx).exec_network).cells[r][c].data.i32])  : \
+        ((*(*lctx).exec_network).cells[r][c].type == LADDER_TYPE_INV)  ? (uint8_t)((*(*lctx).exec_network).cells[r][c].data.i32)                        : \
+        0                                                                                                                                                 \
         )
 
 /**
@@ -62,16 +62,16 @@
  * @brief Get previous value
  *
  */
-#define ladder_get_previous_value(lctx, r, c)                                                                                                                \
-        (                                                                                                                                                    \
-        ((*(*lctx).exec_network).cells[r][c].type == LADDER_TYPE_M)  ? (uint8_t)((*lctx).prev_scan_vals.Mh[(*(*lctx).exec_network).cells[r][c].data.i32])  : \
-        ((*(*lctx).exec_network).cells[r][c].type == LADDER_TYPE_Q)  ? (uint8_t)((*lctx).prev_scan_vals.Qh[(*(*lctx).exec_network).cells[r][c].data.i32])  : \
-        ((*(*lctx).exec_network).cells[r][c].type == LADDER_TYPE_I)  ? (uint8_t)((*lctx).prev_scan_vals.Ih[(*(*lctx).exec_network).cells[r][c].data.i32])  : \
-        ((*(*lctx).exec_network).cells[r][c].type == LADDER_TYPE_Cd) ? (uint8_t)((*lctx).prev_scan_vals.Cdh[(*(*lctx).exec_network).cells[r][c].data.i32]) : \
-        ((*(*lctx).exec_network).cells[r][c].type == LADDER_TYPE_Cr) ? (uint8_t)((*lctx).prev_scan_vals.Crh[(*(*lctx).exec_network).cells[r][c].data.i32]) : \
-        ((*(*lctx).exec_network).cells[r][c].type == LADDER_TYPE_Td) ? (uint8_t)((*lctx).prev_scan_vals.Tdh[(*(*lctx).exec_network).cells[r][c].data.i32]) : \
-        ((*(*lctx).exec_network).cells[r][c].type == LADDER_TYPE_Tr) ? (uint8_t)((*lctx).prev_scan_vals.Trh[(*(*lctx).exec_network).cells[r][c].data.i32]) : \
-        0                                                                                                                                                    \
+#define ladder_get_previous_value(lctx, r, c)                                                                                                               \
+        (                                                                                                                                                   \
+        ((*(*lctx).exec_network).cells[r][c].type == LADDER_TYPE_M)  ? (uint8_t)((*lctx).prev_scan_vals.Mh[(*(*lctx).exec_network).cells[r][c].data.i32]) : \
+        ((*(*lctx).exec_network).cells[r][c].type == LADDER_TYPE_Q)  ? (uint8_t)((*lctx).prev_scan_vals.Qh[(*(*lctx).exec_network).cells[r][c].data.i32]) : \
+        ((*(*lctx).exec_network).cells[r][c].type == LADDER_TYPE_I)  ? (uint8_t)((*lctx).prev_scan_vals.Ih[(*(*lctx).exec_network).cells[r][c].data.i32]) : \
+        ((*(*lctx).exec_network).cells[r][c].type == LADDER_TYPE_Cd) ? (bool)((*lctx).prev_scan_vals.Cdh[(*(*lctx).exec_network).cells[r][c].data.i32])   : \
+        ((*(*lctx).exec_network).cells[r][c].type == LADDER_TYPE_Cr) ? (bool)((*lctx).prev_scan_vals.Crh[(*(*lctx).exec_network).cells[r][c].data.i32])   : \
+        ((*(*lctx).exec_network).cells[r][c].type == LADDER_TYPE_Td) ? (bool)((*lctx).prev_scan_vals.Tdh[(*(*lctx).exec_network).cells[r][c].data.i32])   : \
+        ((*(*lctx).exec_network).cells[r][c].type == LADDER_TYPE_Tr) ? (bool)((*lctx).prev_scan_vals.Trh[(*(*lctx).exec_network).cells[r][c].data.i32])   : \
+        0                                                                                                                                                   \
         )
 
 /**
@@ -79,8 +79,8 @@
  * @brief Actualize flags in/after execution
  *
  */
-#define LADDER_ACTUALIZE_FLAGS(column, row)                                                                       \
-        (*ladder_ctx).scan_internals.network_flags[(column)] =                                                    \
+#define LADDER_ACTUALIZE_FLAGS(column, row)                                              \
+        (*ladder_ctx).scan_internals.network_flags[(column)] =                           \
             (*ladder_ctx).scan_internals.network_flags[(column)] | LADDER_FLAG_MASK(row)
 
 /**
