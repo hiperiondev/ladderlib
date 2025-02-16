@@ -77,14 +77,7 @@ static void load_demo(ladder_ctx_t *ladder_ctx) {
     (*ladder_ctx).network[0].cells[3][1].type = LADDER_BASETIME_SEC;
 
     (*ladder_ctx).network[0].cells[2][2].code = LADDER_INS_CONN;
-
-    (*ladder_ctx).network[0].cells[2][3].code = LADDER_INS_FOREIGN;
-    (*ladder_ctx).network[0].cells[2][3].data.i32 = 0;
-    (*ladder_ctx).network[0].cells[2][3].type = LADDER_TYPE_NONE;
-    (*ladder_ctx).network[0].cells[3][3].code = LADDER_INS_MULTI;
-    (*ladder_ctx).network[0].cells[3][3].data.cstr = "0 0 0 31 6 *";
-    (*ladder_ctx).network[0].cells[3][3].type = LADDER_TYPE_CSTR;
-
+    (*ladder_ctx).network[0].cells[2][3].code = LADDER_INS_CONN;
     (*ladder_ctx).network[0].cells[2][4].code = LADDER_INS_CONN;
 
     (*ladder_ctx).network[0].cells[2][5].code = LADDER_INS_COIL;
@@ -213,6 +206,35 @@ static void load_demo(ladder_ctx_t *ladder_ctx) {
     (*ladder_ctx).network[1].cells[5][5].code = LADDER_INS_COIL;
     (*ladder_ctx).network[1].cells[5][5].data.i32 = 4;
     (*ladder_ctx).network[1].cells[5][5].type = LADDER_TYPE_M;
+
+    //------------------------------------------------------------//
+
+    // Network 2
+    (*ladder_ctx).network[2].enable = true;
+
+    (*ladder_ctx).network[2].cells[0][0].code = LADDER_INS_NO;
+    (*ladder_ctx).network[2].cells[0][0].data.i32 = 7;
+    (*ladder_ctx).network[2].cells[0][0].type = LADDER_TYPE_I;
+
+    (*ladder_ctx).network[2].cells[0][1].code = LADDER_INS_CONN;
+    (*ladder_ctx).network[2].cells[0][2].code = LADDER_INS_CONN;
+
+    (*ladder_ctx).network[2].cells[0][3].code = LADDER_INS_FOREIGN;
+    (*ladder_ctx).network[2].cells[0][3].data.i32 = 0;
+    (*ladder_ctx).network[2].cells[0][3].type = LADDER_TYPE_NONE;
+    (*ladder_ctx).network[2].cells[1][3].code = LADDER_INS_MULTI;
+    (*ladder_ctx).network[2].cells[1][3].data.cstr = "0 0 0 31 6 *";
+    (*ladder_ctx).network[2].cells[1][3].type = LADDER_TYPE_CSTR;
+    (*ladder_ctx).network[2].cells[2][3].type = LADDER_INS_MULTI;
+    (*ladder_ctx).network[2].cells[2][3].data.i32 = 3;
+    (*ladder_ctx).network[2].cells[2][3].type = LADDER_TYPE_M;
+
+    (*ladder_ctx).network[2].cells[0][4].code = LADDER_INS_CONN;
+
+    (*ladder_ctx).network[2].cells[0][5].code = LADDER_INS_COIL;
+    (*ladder_ctx).network[2].cells[0][5].data.i32 = 7;
+    (*ladder_ctx).network[2].cells[0][5].type = LADDER_TYPE_Q;
+
 }
 
 int main(void) {
@@ -230,7 +252,7 @@ int main(void) {
     //printf("Function tests: OK\n\n");
 
     // initialize context
-    if (!ladder_ctx_init(&ladder_ctx, 6, 7, 2, QTY_M, QTY_I, QTY_Q, QTY_IW, QTY_QW, QTY_C, QTY_T, QTY_D, QTY_R)) {
+    if (!ladder_ctx_init(&ladder_ctx, 6, 7, 3, QTY_M, QTY_I, QTY_Q, QTY_IW, QTY_QW, QTY_C, QTY_T, QTY_D, QTY_R)) {
         printf("ERROR Initializing\n");
         return 1;
     }

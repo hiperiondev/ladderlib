@@ -33,7 +33,7 @@
 
 #include "ladder.h"
 
-#define forcecast(val, type)       \
+#define to_integer(val, type)      \
     (                              \
     (val == 0) ? (uint32_t)(val) : \
     (val == 1) ? (int32_t)(val)  : \

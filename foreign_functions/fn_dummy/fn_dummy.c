@@ -36,7 +36,7 @@
 #include "ladder_instructions.h"
 #include "fn_dummy.h"
 
-ladder_instructions_ioc_t dummy_description = { 1, 1, 2, false };
+ladder_instructions_ioc_t dummy_description = { 3, 3, 3, false };
 
 bool dummy_init(ladder_foreign_function_t *function, void *data, uint32_t qty) {
     if (qty == 0)

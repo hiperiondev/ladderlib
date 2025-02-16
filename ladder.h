@@ -125,6 +125,7 @@ typedef enum LADDER_INS_ERROR {
     LADDER_INS_ERR_GETPREVVAL,/**< Error get previous value */
     LADDER_INS_ERR_GETDATAVAL,/**< Error get data value */
     LADDER_INS_ERR_SETDATAVAL,/**< Error set data value */
+    LADDER_INS_ERR_NOFOREIGN, /**< Error foreign function not exist */
     //...//
     LADDER_INS_ERR_FAIL,      /**< Generic fail */
 } ladder_ins_err_t;
