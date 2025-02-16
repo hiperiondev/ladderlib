@@ -226,8 +226,9 @@ static void load_demo(ladder_ctx_t *ladder_ctx) {
     (*ladder_ctx).network[2].cells[1][3].data.cstr = "0 0 0 31 6 *";
     (*ladder_ctx).network[2].cells[1][3].type = LADDER_TYPE_CSTR;
     (*ladder_ctx).network[2].cells[2][3].type = LADDER_INS_MULTI;
-    (*ladder_ctx).network[2].cells[2][3].data.i32 = 3;
-    (*ladder_ctx).network[2].cells[2][3].type = LADDER_TYPE_M;
+    (*ladder_ctx).network[2].cells[2][3].data.vector.a = 45;
+    (*ladder_ctx).network[2].cells[2][3].data.vector.b = 73;
+    (*ladder_ctx).network[2].cells[2][3].type = LADDER_TYPE_VECT;
 
     (*ladder_ctx).network[2].cells[0][4].code = LADDER_INS_CONN;
 
@@ -243,13 +244,6 @@ int main(void) {
 
     // clear screen
     printf("\e[1;1H\e[2J");
-
-    //printf("Start function tests ...\n");
-    //if(!function_tests()){
-    //    printf("ERROR!!\n");
-    //    exit(1);
-    //}
-    //printf("Function tests: OK\n\n");
 
     // initialize context
     if (!ladder_ctx_init(&ladder_ctx, 6, 7, 3, QTY_M, QTY_I, QTY_Q, QTY_IW, QTY_QW, QTY_C, QTY_T, QTY_D, QTY_R)) {

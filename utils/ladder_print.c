@@ -89,6 +89,7 @@ static const char *dt_graph[] = {
         " D", //
         "ST", //
         "RE", //
+        "VE", //
         "??", //
         };
 
@@ -150,6 +151,7 @@ static void fn_to_str(ladder_ctx_t ladder_ctx, uint32_t net, char (*cells)[6][32
     }
 
     if (ladder_ctx.network[net].cells[row][column].code == LADDER_INS_MULTI) {
+        printf("MULTI\n");
         sprintf((*cells)[0], "---+-ERR MULTI--+--");
         sprintf((*cells)[1], "---++++++++++++++--");
         return;
@@ -179,6 +181,10 @@ static void fn_to_str(ladder_ctx_t ladder_ctx, uint32_t net, char (*cells)[6][32
     switch (actual_ioc.cells) {
         case 1:
             switch (ladder_ctx.network[net].cells[row][column].type) {
+                case LADDER_TYPE_VECT:
+                    sprintf((*cells)[1], "   |VE %04u,%04u|  ", ladder_ctx.network[net].cells[row][column].data.vector.a,
+                            ladder_ctx.network[net].cells[row][column].data.vector.b);
+                    break;
                 case LADDER_TYPE_CSTR:
                     sprintf((*cells)[1], "     %.10s    ", ladder_ctx.network[net].cells[row][column].data.cstr);
                     break;
@@ -200,6 +206,10 @@ static void fn_to_str(ladder_ctx_t ladder_ctx, uint32_t net, char (*cells)[6][32
                 break;
 
             switch (ladder_ctx.network[net].cells[row][column].type) {
+                case LADDER_TYPE_VECT:
+                    sprintf((*cells)[1], "   |VE %04u,%04u|  ", ladder_ctx.network[net].cells[row][column].data.vector.a,
+                            ladder_ctx.network[net].cells[row][column].data.vector.b);
+                    break;
                 case LADDER_TYPE_CSTR:
                     sprintf((*cells)[1], "   | %.10s |  ", ladder_ctx.network[net].cells[row][column].data.cstr);
                     break;
@@ -216,6 +226,10 @@ static void fn_to_str(ladder_ctx_t ladder_ctx, uint32_t net, char (*cells)[6][32
             }
 
             switch (ladder_ctx.network[net].cells[row + 1][column].type) {
+                case LADDER_TYPE_VECT:
+                    sprintf((*cells)[2], "%s|VE %04u,%04u|%s", actual_ioc.inputs == 1 ? "   " : "---", ladder_ctx.network[net].cells[row][column].data.vector.a,
+                            ladder_ctx.network[net].cells[row][column].data.vector.b, actual_ioc.outputs == 1 ? "  " : "--");
+                    break;
                 case LADDER_BASETIME_SEC:
                     sprintf((*cells)[2], "%s| %04d %s |%s", actual_ioc.inputs == 1 ? "   " : "---", ladder_ctx.network[net].cells[row + 1][column].data.i32,
                             basetime_graph[ladder_ctx.network[net].cells[row + 1][column].type], actual_ioc.outputs == 1 ? "  " : "--");
@@ -243,6 +257,10 @@ static void fn_to_str(ladder_ctx_t ladder_ctx, uint32_t net, char (*cells)[6][32
                 break;
 
             switch (ladder_ctx.network[net].cells[row][column].type) {
+                case LADDER_TYPE_VECT:
+                    sprintf((*cells)[1], "   |VE %04u,%04u|  ", ladder_ctx.network[net].cells[row][column].data.vector.a,
+                            ladder_ctx.network[net].cells[row][column].data.vector.b);
+                    break;
                 case LADDER_TYPE_CSTR:
                     sprintf((*cells)[1], "   | %.10s |  ", ladder_ctx.network[net].cells[row][column].data.cstr);
                     break;
@@ -259,6 +277,11 @@ static void fn_to_str(ladder_ctx_t ladder_ctx, uint32_t net, char (*cells)[6][32
             }
 
             switch (ladder_ctx.network[net].cells[row + 1][column].type) {
+                case LADDER_TYPE_VECT:
+                    sprintf((*cells)[2], "%s|VE %04u,%04u|%s", actual_ioc.inputs == 1 ? "   " : "---",
+                            ladder_ctx.network[net].cells[row + 1][column].data.vector.a, ladder_ctx.network[net].cells[row + 1][column].data.vector.b,
+                            actual_ioc.outputs == 1 ? "  " : "--");
+                    break;
                 case LADDER_BASETIME_SEC:
                     sprintf((*cells)[2], "%s| %04d %s |%s", actual_ioc.inputs < 2 ? "   " : "---", ladder_ctx.network[net].cells[row + 1][column].data.i32,
                             basetime_graph[ladder_ctx.network[net].cells[row + 1][column].type], actual_ioc.outputs < 2 ? "  " : "--");
@@ -279,6 +302,11 @@ static void fn_to_str(ladder_ctx_t ladder_ctx, uint32_t net, char (*cells)[6][32
             }
 
             switch (ladder_ctx.network[net].cells[row + 2][column].type) {
+                case LADDER_TYPE_VECT:
+                    sprintf((*cells)[3], "%s|VE %04u,%04u|%s", actual_ioc.inputs == 1 ? "   " : "---",
+                            ladder_ctx.network[net].cells[row + 2][column].data.vector.a, ladder_ctx.network[net].cells[row + 2][column].data.vector.b,
+                            actual_ioc.outputs == 1 ? "  " : "--");
+                    break;
                 case LADDER_BASETIME_SEC:
                     sprintf((*cells)[3], "   | %04d %s |  ", ladder_ctx.network[net].cells[row + 2][column].data.i32,
                             basetime_graph[ladder_ctx.network[net].cells[row + 2][column].type]);
@@ -287,7 +315,7 @@ static void fn_to_str(ladder_ctx_t ladder_ctx, uint32_t net, char (*cells)[6][32
                     sprintf((*cells)[3], "   | %.10s |  ", ladder_ctx.network[net].cells[row + 2][column].data.cstr);
                     break;
                 case LADDER_TYPE_REAL:
-                    sprintf((*cells)[3], "   | %s %04f    |  ", dt_graph[ladder_ctx.network[net].cells[row + 2][column].type],
+                    sprintf((*cells)[3], "   | %s %5.2f |  ", dt_graph[ladder_ctx.network[net].cells[row + 2][column].type],
                             ladder_ctx.network[net].cells[row + 2][column].data.real);
                     break;
                 default:

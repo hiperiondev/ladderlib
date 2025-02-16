@@ -150,6 +150,7 @@ typedef enum LADDER_TYPE {
     LADDER_TYPE_D,    /**< Type D */
     LADDER_TYPE_CSTR, /**< Type constant string */
     LADDER_TYPE_REAL, /**< Type float */
+    LADDER_TYPE_VECT, /**< Type vector */
     LADDER_TYPE_INV,  /**< First invalid */
 } ladder_type_t;
 
@@ -169,7 +170,7 @@ typedef enum LADDER_BASETIME {
 
 /**
  * @struct ladder_instructions_ioc_s
- * @brief Instruction description: inputs, outputs, occupied cells and timer (for basetime)
+ * @brief Instruction description: inputs, outputs, occupied cells
  *
  */
 typedef struct ladder_instructions_ioc_s {
@@ -179,18 +180,29 @@ typedef struct ladder_instructions_ioc_s {
 } ladder_instructions_ioc_t;
 
 /**
+ * @struct ladder_dtype_vector_s
+ * @brief
+ *
+ */
+typedef struct ladder_dtype_vector_s {
+    uint32_t a;
+    uint32_t b;
+} ladder_dtype_vector_s;
+
+/**
  * @struct ladder_cell_s
  * @brief Type definition for Networks and global declarations
  *
  */
 typedef struct ladder_cell_s {
-    ladder_instruction_t code; /**< Code */
+    ladder_instruction_t code;        /**< Code */
     union {
-           int32_t i32;        /**< Integer */
-        const char *cstr;      /**< Constant string */
-             float real;       /**< Real */
-    } data;                    /**< Data */
-      ladder_type_t type;      /**< Data type */
+                       int32_t i32;   /**< Integer */
+                  const char *cstr;   /**< Constant string */
+                        float real;   /**< Real */
+        ladder_dtype_vector_s vector; /**< Vector */
+    } data;                           /**< Data */
+      ladder_type_t type;             /**< Data type */
 } ladder_cell_t;
 
 /**
