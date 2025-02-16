@@ -101,43 +101,43 @@ static const char *basetime_graph[] = {
 };
 
 static const ladder_instructions_ioc_t ladder_fn_ioc[] = {
-        { 1, 1, 1, false }, // NOP
-        { 1, 1, 1, false }, // CONN
-        { 1, 1, 1, false }, // NEG
-        { 1, 1, 1, false }, // NO
-        { 1, 1, 1, false }, // NC
-        { 1, 1, 1, false }, // RE
-        { 1, 1, 1, false }, // FE
-        { 1, 1, 1, false }, // COIL
-        { 1, 1, 1, false }, // COILL
-        { 1, 1, 1, false }, // COILU
-        { 1, 2, 2, true  }, // TON
-        { 1, 2, 2, true  }, // TOFF
-        { 1, 2, 2, true  }, // TP
-        { 2, 2, 2, false }, // CTU
-        { 2, 2, 2, false }, // CTD
-        { 1, 1, 2, false }, // MOVE
-        { 1, 3, 3, false }, // SUB
-        { 1, 1, 3, false }, // ADD
-        { 1, 1, 3, false }, // MUL
-        { 1, 2, 3, false }, // DIV
-        { 1, 1, 3, false }, // MOD
-        { 1, 1, 2, false }, // SHL
-        { 1, 1, 2, false }, // SHR
-        { 1, 1, 2, false }, // ROL
-        { 1, 1, 2, false }, // ROR
-        { 1, 1, 3, false }, // AND
-        { 1, 1, 3, false }, // OR
-        { 1, 1, 3, false }, // XOR
-        { 1, 1, 2, false }, // NOT
-        { 1, 1, 2, false }, // EQ
-        { 1, 1, 2, false }, // GT
-        { 1, 1, 2, false }, // GE
-        { 1, 1, 2, false }, // LT
-        { 1, 1, 2, false }, // LE
-        { 1, 1, 2, false }, // NE
-        { 0, 0, 0, false }, // FOREIGN
-        { 1, 1, 1, false }, // INV
+        { 1, 1, 1 }, // NOP
+        { 1, 1, 1 }, // CONN
+        { 1, 1, 1 }, // NEG
+        { 1, 1, 1 }, // NO
+        { 1, 1, 1 }, // NC
+        { 1, 1, 1 }, // RE
+        { 1, 1, 1 }, // FE
+        { 1, 1, 1 }, // COIL
+        { 1, 1, 1 }, // COILL
+        { 1, 1, 1 }, // COILU
+        { 1, 2, 2 }, // TON
+        { 1, 2, 2 }, // TOFF
+        { 1, 2, 2 }, // TP
+        { 2, 2, 2 }, // CTU
+        { 2, 2, 2 }, // CTD
+        { 1, 1, 2 }, // MOVE
+        { 1, 3, 3 }, // SUB
+        { 1, 1, 3 }, // ADD
+        { 1, 1, 3 }, // MUL
+        { 1, 2, 3 }, // DIV
+        { 1, 1, 3 }, // MOD
+        { 1, 1, 2 }, // SHL
+        { 1, 1, 2 }, // SHR
+        { 1, 1, 2 }, // ROL
+        { 1, 1, 2 }, // ROR
+        { 1, 1, 3 }, // AND
+        { 1, 1, 3 }, // OR
+        { 1, 1, 3 }, // XOR
+        { 1, 1, 2 }, // NOT
+        { 1, 1, 2 }, // EQ
+        { 1, 1, 2 }, // GT
+        { 1, 1, 2 }, // GE
+        { 1, 1, 2 }, // LT
+        { 1, 1, 2 }, // LE
+        { 1, 1, 2 }, // NE
+        { 0, 0, 0 }, // FOREIGN
+        { 1, 1, 1 }, // INV
         };
 
 static void fn_to_str(ladder_ctx_t ladder_ctx, uint32_t net, char (*cells)[6][32], uint32_t row, uint32_t column) {

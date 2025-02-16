@@ -176,7 +176,6 @@ typedef struct ladder_instructions_ioc_s {
     uint8_t inputs;   /**< Inputs quantity */
     uint8_t outputs;  /**< Outputs quantity */
     uint8_t cells;    /**< Cells quantity */
-       bool basetime; /**< it's timer, have basetime */
 } ladder_instructions_ioc_t;
 
 /**
