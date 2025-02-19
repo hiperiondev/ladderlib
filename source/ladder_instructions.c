@@ -666,13 +666,13 @@ void ladder_set_data_value(ladder_ctx_t *ladder_ctx, uint32_t row, uint32_t colu
 
     switch (ladder_cell_data_exec(ladder_ctx, row, column, pos).type) {
         case LADDER_TYPE_M:
-            (*ladder_ctx).memory.M[ladder_cell_data_exec(ladder_ctx, row, column, pos).value.i32] = *((int32_t*) value);
+            (*ladder_ctx).memory.M[ladder_cell_data_exec(ladder_ctx, row, column, pos).value.i32] = *((uint8_t*) value);
             break;
         case LADDER_TYPE_Q:
-            (*ladder_ctx).memory.Q[ladder_cell_data_exec(ladder_ctx, row, column, pos).value.i32] = *((int32_t*) value);
+            (*ladder_ctx).memory.Q[ladder_cell_data_exec(ladder_ctx, row, column, pos).value.i32] = *((uint8_t*) value);
             break;
         case LADDER_TYPE_I:
-            (*ladder_ctx).memory.I[ladder_cell_data_exec(ladder_ctx, row, column, pos).value.i32] = *((int32_t*) value);
+            (*ladder_ctx).memory.I[ladder_cell_data_exec(ladder_ctx, row, column, pos).value.i32] = *((uint8_t*) value);
             break;
         case LADDER_TYPE_Cd:
             (*ladder_ctx).memory.Cd[ladder_cell_data_exec(ladder_ctx, row, column, pos).value.i32] = *((int32_t*) value);
