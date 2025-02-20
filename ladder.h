@@ -166,7 +166,7 @@ typedef enum LADDER_INSTRUCTIONS {
     LADDER_INS_NE,           /**< Instruction NE */
     LADDER_INS_FOREIGN,      /**< Instruction FOREIGN */
     LADDER_INS_TMOVE,        /**< Instruction TMOVE */
-    //...//
+    ///////////////////
     LADDER_INS_INV,          /**< First invalid */
     LADDER_INS_MULTI = 0xff, /**< cell is a part of multi cell instruction */
 } ladder_instruction_t;
@@ -224,8 +224,8 @@ typedef enum LADDER_TYPE {
     LADDER_TYPE_REAL,          /**< Type float */
     LADDER_TYPE_INV,           /**< First invalid */
     LADDER_BASETIME_MS = 0xf0, /**< Basetime ms */
-    LADDER_BASETIME_10MS,      /**< Basetime 10ms */
-    LADDER_BASETIME_100MS,     /**< Basetime 100ms */
+    LADDER_BASETIME_10MS,      /**< Basetime 10 ms */
+    LADDER_BASETIME_100MS,     /**< Basetime 100 ms */
     LADDER_BASETIME_SEC,       /**< Basetime seconds */
     LADDER_BASETIME_MIN,       /**< Basetime minutes */
 } ladder_type_t;
@@ -399,11 +399,11 @@ typedef bool (*_on_task_after)(ladder_ctx_t *ladder_ctx);
 typedef void (*_on_panic)(ladder_ctx_t *ladder_ctx);
 
 /**
- * @fn void (*_on_end_task)(void)
+ * @fn void (*_on_end_task)(ladder_ctx_t *ladder_ctx)
  * @brief Function for end task
  *
  */
-typedef void (*_on_end_task)(void);
+typedef void (*_on_end_task)(ladder_ctx_t *ladder_ctx);
 
 /**
  * @fn int (*_delay)(long msec)

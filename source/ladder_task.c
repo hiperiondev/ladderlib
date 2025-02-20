@@ -85,5 +85,5 @@ void ladder_task(void *ladderctx) {
 
     exit:
     if ((*ladder_ctx).on.end_task != NULL)
-        (*ladder_ctx).on.end_task();
+        (*ladder_ctx).on.end_task(ladder_ctx);
 }
