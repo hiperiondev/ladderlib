@@ -75,7 +75,7 @@ static ladder_fn_t const ladder_function[] = { //
         };
 
 void ladder_scan(ladder_ctx_t *ladder_ctx) {
-    ladder_ins_err_t ins_err;
+    ladder_ins_err_t ins_err = 0;
 
     for (uint32_t network = 0; network < (*ladder_ctx).ladder.quantity.networks; network++) {
         if (!(*ladder_ctx).network[network].enable)

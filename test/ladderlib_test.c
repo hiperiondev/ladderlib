@@ -45,138 +45,140 @@
 #define QTY_D  8
 #define QTY_R  8
 
-static void load_demo1(ladder_ctx_t *ladder_ctx) {
+static bool load_demo1(ladder_ctx_t *ladder_ctx) {
+    bool ret = true;
+
     printf("blink (2 network, 7 rows, 6 columns)");
 
     // Network 0
     (*ladder_ctx).network[0].enable = true;
     //                           N  R  C  D
-      ladder_fn_cell(ladder_ctx, 0, 0, 0,    LADDER_INS_NC, 0);
+    ret &= ladder_fn_cell(ladder_ctx, 0, 0, 0, LADDER_INS_NC, 0);
     ladder_cell_data(ladder_ctx, 0, 0, 0, 0, LADDER_TYPE_M, 3)
 
-      ladder_fn_cell(ladder_ctx, 0, 0, 1,    LADDER_INS_NC, 0);
+    ret &= ladder_fn_cell(ladder_ctx, 0, 0, 1, LADDER_INS_NC, 0);
     ladder_cell_data(ladder_ctx, 0, 0, 1, 0, LADDER_TYPE_M, 2);
 
-      ladder_fn_cell(ladder_ctx, 0, 0, 2,    LADDER_INS_TON, 0);
+    ret &= ladder_fn_cell(ladder_ctx, 0, 0, 2, LADDER_INS_TON, 0);
     ladder_cell_data(ladder_ctx, 0, 0, 2, 0, LADDER_TYPE_T, 0);
     ladder_cell_data(ladder_ctx, 0, 0, 2, 1, LADDER_BASETIME_SEC, 5);
 
-      ladder_fn_cell(ladder_ctx, 0, 0, 3,    LADDER_INS_CONN, 0);
-      ladder_fn_cell(ladder_ctx, 0, 0, 4,    LADDER_INS_CONN, 0);
+    ret &= ladder_fn_cell(ladder_ctx, 0, 0, 3, LADDER_INS_CONN, 0);
+    ret &= ladder_fn_cell(ladder_ctx, 0, 0, 4, LADDER_INS_CONN, 0);
 
-      ladder_fn_cell(ladder_ctx, 0, 0, 5,    LADDER_INS_COIL, 0);
+    ret &= ladder_fn_cell(ladder_ctx, 0, 0, 5, LADDER_INS_COIL, 0);
     ladder_cell_data(ladder_ctx, 0, 0, 5, 0, LADDER_TYPE_M, 1);
 
     // ----------------------------- //
 
-      ladder_fn_cell(ladder_ctx, 0, 2, 0,    LADDER_INS_NO, 0);
+    ret &= ladder_fn_cell(ladder_ctx, 0, 2, 0, LADDER_INS_NO, 0);
     ladder_cell_data(ladder_ctx, 0, 2, 0, 0, LADDER_TYPE_M, 1);
 
-      ladder_fn_cell(ladder_ctx, 0, 2, 1,    LADDER_INS_TON, 0);
+    ret &= ladder_fn_cell(ladder_ctx, 0, 2, 1, LADDER_INS_TON, 0);
     ladder_cell_data(ladder_ctx, 0, 2, 1, 0, LADDER_TYPE_T, 1);
     ladder_cell_data(ladder_ctx, 0, 2, 1, 1, LADDER_BASETIME_SEC, 5);
 
-      ladder_fn_cell(ladder_ctx, 0, 2, 2,    LADDER_INS_CONN, 0);
-      ladder_fn_cell(ladder_ctx, 0, 2, 3,    LADDER_INS_CONN, 0);
-      ladder_fn_cell(ladder_ctx, 0, 2, 4,    LADDER_INS_CONN, 0);
+    ret &= ladder_fn_cell(ladder_ctx, 0, 2, 2, LADDER_INS_CONN, 0);
+    ret &= ladder_fn_cell(ladder_ctx, 0, 2, 3, LADDER_INS_CONN, 0);
+    ret &= ladder_fn_cell(ladder_ctx, 0, 2, 4, LADDER_INS_CONN, 0);
 
-      ladder_fn_cell(ladder_ctx, 0, 2, 5,    LADDER_INS_COIL, 0);
+    ret &= ladder_fn_cell(ladder_ctx, 0, 2, 5, LADDER_INS_COIL, 0);
     ladder_cell_data(ladder_ctx, 0, 2, 5, 0, LADDER_TYPE_M, 2);
 
     // ----------------------------- //
 
-      ladder_fn_cell(ladder_ctx, 0, 4, 0,    LADDER_INS_NO, 0);
+    ret &= ladder_fn_cell(ladder_ctx, 0, 4, 0, LADDER_INS_NO, 0);
     ladder_cell_data(ladder_ctx, 0, 4, 0, 0, LADDER_TYPE_M, 1);
 
-      ladder_fn_cell(ladder_ctx, 0, 4, 1,    LADDER_INS_CONN, 0);
-      ladder_fn_cell(ladder_ctx, 0, 4, 2,    LADDER_INS_CONN, 0);
-      ladder_fn_cell(ladder_ctx, 0, 4, 3,    LADDER_INS_CONN, 0);
-      ladder_fn_cell(ladder_ctx, 0, 4, 4,    LADDER_INS_CONN, 0);
+    ret &= ladder_fn_cell(ladder_ctx, 0, 4, 1, LADDER_INS_CONN, 0);
+    ret &= ladder_fn_cell(ladder_ctx, 0, 4, 2, LADDER_INS_CONN, 0);
+    ret &= ladder_fn_cell(ladder_ctx, 0, 4, 3, LADDER_INS_CONN, 0);
+    ret &= ladder_fn_cell(ladder_ctx, 0, 4, 4, LADDER_INS_CONN, 0);
 
-      ladder_fn_cell(ladder_ctx, 0, 4, 5,    LADDER_INS_COIL, 0);
+    ret &= ladder_fn_cell(ladder_ctx, 0, 4, 5, LADDER_INS_COIL, 0);
     ladder_cell_data(ladder_ctx, 0, 4, 5, 0, LADDER_TYPE_Q, 0);
 
     // ----------------------------- //
 
-      ladder_fn_cell(ladder_ctx, 0, 5, 0,    LADDER_INS_NO, 0);
+    ret &= ladder_fn_cell(ladder_ctx, 0, 5, 0, LADDER_INS_NO, 0);
     ladder_cell_data(ladder_ctx, 0, 5, 0, 0, LADDER_TYPE_Q, 0);
 
-      ladder_fn_cell(ladder_ctx, 0, 5, 1,    LADDER_INS_CTU, 0);
+    ret &= ladder_fn_cell(ladder_ctx, 0, 5, 1, LADDER_INS_CTU, 0);
     ladder_cell_data(ladder_ctx, 0, 5, 1, 0, LADDER_TYPE_C, 0);
     ladder_cell_data(ladder_ctx, 0, 5, 1, 1, LADDER_TYPE_NONE, 5);
 
-      ladder_fn_cell(ladder_ctx, 0, 5, 2,    LADDER_INS_CONN, 0);
-      ladder_fn_cell(ladder_ctx, 0, 5, 3,    LADDER_INS_CONN, 0);
-      ladder_fn_cell(ladder_ctx, 0, 5, 4,    LADDER_INS_CONN, 0);
+    ret &= ladder_fn_cell(ladder_ctx, 0, 5, 2, LADDER_INS_CONN, 0);
+    ret &= ladder_fn_cell(ladder_ctx, 0, 5, 3, LADDER_INS_CONN, 0);
+    ret &= ladder_fn_cell(ladder_ctx, 0, 5, 4, LADDER_INS_CONN, 0);
 
-      ladder_fn_cell(ladder_ctx, 0, 5, 5,    LADDER_INS_COIL, 0);
+    ret &= ladder_fn_cell(ladder_ctx, 0, 5, 5, LADDER_INS_COIL, 0);
     ladder_cell_data(ladder_ctx, 0, 5, 5, 0, LADDER_TYPE_M, 3);
     //------------------------------------------------------------//
 
     // Network 1
     (*ladder_ctx).network[1].enable = true;
 
-      ladder_fn_cell(ladder_ctx, 1, 0, 0,    LADDER_INS_NO, 0);
+    ret &= ladder_fn_cell(ladder_ctx, 1, 0, 0, LADDER_INS_NO, 0);
     ladder_cell_data(ladder_ctx, 1, 0, 0, 0, LADDER_TYPE_M, 3)
 
-      ladder_fn_cell(ladder_ctx, 1, 0, 1,    LADDER_INS_NC, 0);
+    ret &= ladder_fn_cell(ladder_ctx, 1, 0, 1, LADDER_INS_NC, 0);
     ladder_cell_data(ladder_ctx, 1, 0, 1, 0, LADDER_TYPE_M, 4);
 
-      ladder_fn_cell(ladder_ctx, 1, 0, 2,    LADDER_INS_NC, 0);
+    ret &= ladder_fn_cell(ladder_ctx, 1, 0, 2, LADDER_INS_NC, 0);
     ladder_cell_data(ladder_ctx, 1, 0, 2, 0, LADDER_TYPE_M, 5)
 
-      ladder_fn_cell(ladder_ctx, 1, 0, 3,    LADDER_INS_TON, 0);
+    ret &= ladder_fn_cell(ladder_ctx, 1, 0, 3, LADDER_INS_TON, 0);
     ladder_cell_data(ladder_ctx, 1, 0, 3, 0, LADDER_TYPE_T, 2);
     ladder_cell_data(ladder_ctx, 1, 0, 3, 1, LADDER_BASETIME_SEC, 5);
 
-      ladder_fn_cell(ladder_ctx, 1, 0, 4,    LADDER_INS_CONN, 0);
+    ret &= ladder_fn_cell(ladder_ctx, 1, 0, 4, LADDER_INS_CONN, 0);
 
-      ladder_fn_cell(ladder_ctx, 1, 0, 5,    LADDER_INS_COIL, 0);
+    ret &= ladder_fn_cell(ladder_ctx, 1, 0, 5, LADDER_INS_COIL, 0);
     ladder_cell_data(ladder_ctx, 1, 0, 5, 0, LADDER_TYPE_M, 6);
 
     // ----------------------------- //
 
-      ladder_fn_cell(ladder_ctx, 1, 2, 0,    LADDER_INS_NO, 0);
+    ret &= ladder_fn_cell(ladder_ctx, 1, 2, 0, LADDER_INS_NO, 0);
     ladder_cell_data(ladder_ctx, 1, 2, 0, 0, LADDER_TYPE_M, 6);
 
-      ladder_fn_cell(ladder_ctx, 1, 2, 1,    LADDER_INS_TON, 0);
+    ret &= ladder_fn_cell(ladder_ctx, 1, 2, 1, LADDER_INS_TON, 0);
     ladder_cell_data(ladder_ctx, 1, 2, 1, 0, LADDER_TYPE_T, 3);
     ladder_cell_data(ladder_ctx, 1, 2, 1, 1, LADDER_BASETIME_SEC, 5);
 
-      ladder_fn_cell(ladder_ctx, 1, 2, 2,    LADDER_INS_CONN, 0);
-      ladder_fn_cell(ladder_ctx, 1, 2, 3,    LADDER_INS_CONN, 0);
-      ladder_fn_cell(ladder_ctx, 1, 2, 4,    LADDER_INS_CONN, 0);
+    ret &= ladder_fn_cell(ladder_ctx, 1, 2, 2, LADDER_INS_CONN, 0);
+    ret &= ladder_fn_cell(ladder_ctx, 1, 2, 3, LADDER_INS_CONN, 0);
+    ret &= ladder_fn_cell(ladder_ctx, 1, 2, 4, LADDER_INS_CONN, 0);
 
-      ladder_fn_cell(ladder_ctx, 1, 2, 5,    LADDER_INS_COIL, 0);
+    ret &= ladder_fn_cell(ladder_ctx, 1, 2, 5, LADDER_INS_COIL, 0);
     ladder_cell_data(ladder_ctx, 1, 2, 5, 0, LADDER_TYPE_M, 5);
 
     // ----------------------------- //
 
-      ladder_fn_cell(ladder_ctx, 1, 4, 0,    LADDER_INS_NO, 0);
+    ret &= ladder_fn_cell(ladder_ctx, 1, 4, 0, LADDER_INS_NO, 0);
     ladder_cell_data(ladder_ctx, 1, 4, 0, 0, LADDER_TYPE_M, 6);
 
-      ladder_fn_cell(ladder_ctx, 1, 4, 1,    LADDER_INS_CONN, 0);
-      ladder_fn_cell(ladder_ctx, 1, 4, 2,    LADDER_INS_CONN, 0);
-      ladder_fn_cell(ladder_ctx, 1, 4, 3,    LADDER_INS_CONN, 0);
-      ladder_fn_cell(ladder_ctx, 1, 4, 4,    LADDER_INS_CONN, 0);
+    ret &= ladder_fn_cell(ladder_ctx, 1, 4, 1, LADDER_INS_CONN, 0);
+    ret &= ladder_fn_cell(ladder_ctx, 1, 4, 2, LADDER_INS_CONN, 0);
+    ret &= ladder_fn_cell(ladder_ctx, 1, 4, 3, LADDER_INS_CONN, 0);
+    ret &= ladder_fn_cell(ladder_ctx, 1, 4, 4, LADDER_INS_CONN, 0);
 
-      ladder_fn_cell(ladder_ctx, 1, 4, 5,    LADDER_INS_COIL, 0);
+    ret &= ladder_fn_cell(ladder_ctx, 1, 4, 5, LADDER_INS_COIL, 0);
     ladder_cell_data(ladder_ctx, 1, 4, 5, 0, LADDER_TYPE_Q, 1);
 
     // ----------------------------- //
 
-      ladder_fn_cell(ladder_ctx, 1, 5, 0,    LADDER_INS_NO, 0);
+    ret &= ladder_fn_cell(ladder_ctx, 1, 5, 0, LADDER_INS_NO, 0);
     ladder_cell_data(ladder_ctx, 1, 5, 0, 0, LADDER_TYPE_Q, 1);
 
-      ladder_fn_cell(ladder_ctx, 1, 5, 1,    LADDER_INS_CTU, 0);
+    ret &= ladder_fn_cell(ladder_ctx, 1, 5, 1, LADDER_INS_CTU, 0);
     ladder_cell_data(ladder_ctx, 1, 5, 1, 0, LADDER_TYPE_C, 1);
     ladder_cell_data(ladder_ctx, 1, 5, 1, 1, LADDER_TYPE_NONE, 5);
 
-      ladder_fn_cell(ladder_ctx, 1, 5, 2,    LADDER_INS_CONN, 0);
-      ladder_fn_cell(ladder_ctx, 1, 5, 3,    LADDER_INS_CONN, 0);
-      ladder_fn_cell(ladder_ctx, 1, 5, 4,    LADDER_INS_CONN, 0);
+    ret &= ladder_fn_cell(ladder_ctx, 1, 5, 2, LADDER_INS_CONN, 0);
+    ret &= ladder_fn_cell(ladder_ctx, 1, 5, 3, LADDER_INS_CONN, 0);
+    ret &= ladder_fn_cell(ladder_ctx, 1, 5, 4, LADDER_INS_CONN, 0);
 
-      ladder_fn_cell(ladder_ctx, 1, 5, 5,    LADDER_INS_COIL, 0);
+    ret &= ladder_fn_cell(ladder_ctx, 1, 5, 5, LADDER_INS_COIL, 0);
     ladder_cell_data(ladder_ctx, 1, 5, 5, 0, LADDER_TYPE_M, 4);
 
     //------------------------------------------------------------//
@@ -184,21 +186,25 @@ static void load_demo1(ladder_ctx_t *ladder_ctx) {
     // Network 2
     (*ladder_ctx).network[2].enable = true;
 
-      ladder_fn_cell(ladder_ctx, 2, 0, 0,    LADDER_INS_NO, 0);
+    ret &= ladder_fn_cell(ladder_ctx, 2, 0, 0, LADDER_INS_NO, 0);
     ladder_cell_data(ladder_ctx, 2, 0, 0, 0, LADDER_TYPE_I, 7);
 
-      ladder_fn_cell(ladder_ctx, 2, 0, 1,    LADDER_INS_CONN, 0);
-      ladder_fn_cell(ladder_ctx, 2, 0, 2,    LADDER_INS_CONN, 0);
+    ret &= ladder_fn_cell(ladder_ctx, 2, 0, 1, LADDER_INS_CONN, 0);
+    ret &= ladder_fn_cell(ladder_ctx, 2, 0, 2, LADDER_INS_CONN, 0);
 
-      ladder_fn_cell(ladder_ctx, 2, 0, 3,    LADDER_INS_FOREIGN, 0);
-    ladder_cell_data(ladder_ctx, 2, 0, 3, 0, LADDER_TYPE_NONE, 0);
-    ladder_cell_data_cstr(ladder_ctx, 2, 0, 3, 1, "0 0 0 31 6 *");
-    ladder_cell_data(ladder_ctx, 2, 0, 3, 2, LADDER_TYPE_REAL, -45.3);
+    ret &= ladder_fn_cell(ladder_ctx, 2, 0, 3, LADDER_INS_CONN, 0);
+    /*
+     ret &=   ladder_fn_cell(ladder_ctx, 2, 0, 3,    LADDER_INS_FOREIGN, 0);
+     ladder_cell_data(ladder_ctx, 2, 0, 3, 0, LADDER_TYPE_NONE, 0);
+     ladder_cell_data_cstr(ladder_ctx, 2, 0, 3, 1, "0 0 0 31 6 *");
+     ladder_cell_data(ladder_ctx, 2, 0, 3, 2, LADDER_TYPE_REAL, -45.3);
+     */
+    ret &= ladder_fn_cell(ladder_ctx, 2, 0, 4, LADDER_INS_CONN, 0);
 
-      ladder_fn_cell(ladder_ctx, 2, 0, 4,    LADDER_INS_CONN, 0);
-
-      ladder_fn_cell(ladder_ctx, 2, 0, 5,    LADDER_INS_COIL, 7);
+    ret &= ladder_fn_cell(ladder_ctx, 2, 0, 5, LADDER_INS_COIL, 7);
     ladder_cell_data(ladder_ctx, 2, 0, 5, 0, LADDER_TYPE_Q, 4);
+
+    return ret;
 }
 
 int main(void) {
@@ -242,7 +248,10 @@ int main(void) {
     }
 
     printf("Load demo program: ");
-    load_demo1(&ladder_ctx);
+    if (!load_demo1(&ladder_ctx)) {
+        printf("ERROR: Load demo program: ");
+        goto end;
+    }
     printf("\n");
 
     ladder_print(ladder_ctx);
@@ -252,6 +261,7 @@ int main(void) {
 
     ///////////////////////////////////////////////////////
 
+    end:
     // release context
     if (!ladder_ctx_deinit(&ladder_ctx)) {
         printf("ERROR Deinitializing\n");

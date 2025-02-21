@@ -27,9 +27,9 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdio.h>
 
 #include "ladder.h"
 #include "ladder_internals.h"
@@ -227,8 +227,7 @@ bool ladder_add_foreign(ladder_ctx_t *ladder_ctx, _foreign_fn_init fn_init, void
 
     if ((*ladder_ctx).foreign.qty == 0)
         (*ladder_ctx).foreign.fn = malloc(sizeof(ladder_foreign_function_t));
-    else
-        (*ladder_ctx).foreign.fn = realloc((*ladder_ctx).foreign.fn, ((*ladder_ctx).foreign.qty + 1) * sizeof(ladder_foreign_function_t));
+    else (*ladder_ctx).foreign.fn = realloc((*ladder_ctx).foreign.fn, ((*ladder_ctx).foreign.qty + 1) * sizeof(ladder_foreign_function_t));
 
     memcpy(&((*ladder_ctx).foreign.fn[(*ladder_ctx).foreign.qty]), &fn_new, sizeof(ladder_foreign_function_t));
     ++(*ladder_ctx).foreign.qty;
@@ -239,11 +238,11 @@ bool ladder_add_foreign(ladder_ctx_t *ladder_ctx, _foreign_fn_init fn_init, void
 bool ladder_fn_cell(ladder_ctx_t *ladder_ctx, uint32_t network, uint32_t row, uint32_t column, ladder_instruction_t function, uint32_t foreign_id) {
     ladder_instructions_iocd_t actual_ioc;
 
-    if(function == LADDER_INS_FOREIGN)
-        memcpy(&actual_ioc, &((*ladder_ctx).foreign.fn[foreign_id]).description, sizeof(ladder_instructions_iocd_t));
-    else
-        memcpy(&actual_ioc, &(ladder_fn_iocd[function]), sizeof(ladder_instructions_iocd_t));
-
+    if (function == LADDER_INS_FOREIGN) {
+        if ((*ladder_ctx).foreign.qty < foreign_id + 1)
+            return false;
+        else memcpy(&actual_ioc, &((*ladder_ctx).foreign.fn[foreign_id]).description, sizeof(ladder_instructions_iocd_t));
+    } else memcpy(&actual_ioc, &(ladder_fn_iocd[function]), sizeof(ladder_instructions_iocd_t));
 
     // not available rows for function
     if ((*ladder_ctx).ladder.quantity.net_rows < actual_ioc.cells + row)
@@ -255,7 +254,7 @@ bool ladder_fn_cell(ladder_ctx_t *ladder_ctx, uint32_t network, uint32_t row, ui
     (*ladder_ctx).network[network].cells[row][column].code = function;
     (*ladder_ctx).network[network].cells[row][column].data_qty = actual_ioc.data_qty;
 
-    if(actual_ioc.data_qty == 0) {
+    if (actual_ioc.data_qty == 0) {
         (*ladder_ctx).network[network].cells[row][column].data = NULL;
         return true;
     }

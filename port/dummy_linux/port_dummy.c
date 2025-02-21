@@ -245,5 +245,5 @@ void dummy_on_panic(ladder_ctx_t *ladder_ctx) {
     printf("-------------------------------\n\n");
 }
 
-void dummy_on_end_task(void) {
+void dummy_on_end_task(ladder_ctx_t *ladder_ctx) {
 }

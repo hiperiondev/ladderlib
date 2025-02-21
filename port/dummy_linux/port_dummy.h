@@ -42,7 +42,7 @@
     bool dummy_on_task_before(ladder_ctx_t *ladder_ctx);
     bool dummy_on_task_after(ladder_ctx_t *ladder_ctx);
     void dummy_on_panic(ladder_ctx_t *ladder_ctx);
-    void dummy_on_end_task(void);
+    void dummy_on_end_task(ladder_ctx_t *ladder_ctx);
 
      int dummy_delay(long msec);
 uint64_t dummy_millis(void);
