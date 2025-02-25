@@ -48,7 +48,7 @@ void ladder_task(void *ladderctx) {
             if ((*ladder_ctx).on.panic != NULL)
                 (*ladder_ctx).on.panic(ladder_ctx);
 
-            goto exit;
+            break;
         }
 
         while ((*ladder_ctx).ladder.state != LADDER_ST_RUNNING) {
