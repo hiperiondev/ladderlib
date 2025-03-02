@@ -32,7 +32,6 @@
 #include <stdint.h>
 
 #include "ladder.h"
-#include "ladder_instructions.h"
 
 #define LADDER_FLAG_MASK(n) (1L << (n))
 

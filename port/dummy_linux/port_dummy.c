@@ -38,8 +38,7 @@
 #include "ladder.h"
 #include "port_dummy.h"
 
-static const char *_ladder_status_str[] = {
-        "STOPPED",  //
+static const char *_ladder_status_str[] = { "STOPPED",  //
         "RUNNING",  //
         "ERROR",    //
         "EXIT_TSK", //
@@ -47,8 +46,7 @@ static const char *_ladder_status_str[] = {
         "INVALID",  //
         };
 
-static const char *_fn_str[] = {
-        "NOP",     //
+static const char *_fn_str[] = { "NOP",     //
         "CONN",    //
         "NEG",     //
         "NO",      //
@@ -87,8 +85,7 @@ static const char *_fn_str[] = {
         "TMOVE",   //
         };
 
-static const char *_fn_err_str[] = {
-        "OK",         //
+static const char *_fn_err_str[] = { "OK",         //
         "GETPREVVAL", //
         "GETDATAVAL", //
         "NOFOREIGN",  //
@@ -142,7 +139,7 @@ void dummy_read_inputs_local(ladder_ctx_t *ladder_ctx) {
         ;
     tcsetattr(STDIN_FILENO, TCSANOW, &orig_term);
 
-    if(ch == 81 || ch == 113)
+    if (ch == 81 || ch == 113)
         (*ladder_ctx).ladder.state = LADDER_ST_EXIT_TSK;
 
     if (ch > 47 && ch < 56)
@@ -203,10 +200,10 @@ void dummy_write_outputs_local(ladder_ctx_t *ladder_ctx) {
     printf("Counter 4 | %d  | %d  | %05d |\n", (*ladder_ctx).memory.Cd[4], (*ladder_ctx).memory.Cr[4], (*ladder_ctx).registers.C[4]);
     printf("Counter 5 | %d  | %d  | %05d |\n", (*ladder_ctx).memory.Cd[5], (*ladder_ctx).memory.Cr[5], (*ladder_ctx).registers.C[5]);
     printf("Counter 6 | %d  | %d  | %05d |\n", (*ladder_ctx).memory.Cd[6], (*ladder_ctx).memory.Cr[6], (*ladder_ctx).registers.C[6]);
-    printf("          +----+----+-------+\n");
+    printf("          +----+----+-------+");
 
     printf("\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A"
-            "\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A");
+            "\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A");
 
     (*ladder_ctx).hw.time.delay(5);
 }

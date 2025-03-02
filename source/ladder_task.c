@@ -25,10 +25,6 @@
  *
  */
 
-#include <stdbool.h>
-#include <stdint.h>
-#include <stdio.h>
-
 #include "ladder.h"
 #include "ladder_internals.h"
 

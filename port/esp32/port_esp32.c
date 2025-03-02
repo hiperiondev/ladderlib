@@ -28,66 +28,51 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "esp_log.h"
-#include "esp_timer.h"
 #include "freertos/FreeRTOS.h"
-#include "freertos/queue.h"
 #include "freertos/task.h"
+#include "esp_log.h"
 
 #include "ladder.h"
 #include "port_esp32.h"
 
-static const char *TAG = "port_esp32";
+static const char* TAG = "port_esp32";
 
-bool esp32_port_initialize(void) {
-    return true;
-}
+bool esp32_port_initialize(void) { return true; }
 
 int esp32_delay(long msec) {
     vTaskDelay(msec / portTICK_PERIOD_MS);
-    
+
     return 1;
 }
 
-uint64_t esp32_millis(void) {
-    return esp_timer_get_time() / 1000;
-}
+uint64_t esp32_millis(void) { return esp_timer_get_time() / 1000; }
 
-void esp32_read_inputs_local(ladder_ctx_t *ladder_ctx) {
-}
+void esp32_read_inputs_local(ladder_ctx_t* ladder_ctx) {}
 
-void esp32_write_outputs_local(ladder_ctx_t *ladder_ctx) {
-}
+void esp32_write_outputs_local(ladder_ctx_t* ladder_ctx) {}
 
-void esp32_read_inputs_remote(ladder_ctx_t *ladder_ctx) {
-}
+void esp32_read_inputs_remote(ladder_ctx_t* ladder_ctx) {}
 
-void esp32_write_outputs_remote(ladder_ctx_t *ladder_ctx) {
-}
+void esp32_write_outputs_remote(ladder_ctx_t* ladder_ctx) {}
 
-bool esp32_on_scan_end(ladder_ctx_t *ladder_ctx) {
-    return false;
-}
+bool esp32_on_scan_end(ladder_ctx_t* ladder_ctx) { return false; }
 
-bool esp32_on_instruction(ladder_ctx_t *ladder_ctx) {
-    return false;
-}
+bool esp32_on_instruction(ladder_ctx_t* ladder_ctx) { return false; }
 
-bool esp32_on_task_before(ladder_ctx_t *ladder_ctx) {
-    return false;
-}
+bool esp32_on_task_before(ladder_ctx_t* ladder_ctx) { return false; }
 
-bool esp32_on_task_after(ladder_ctx_t *ladder_ctx) {
+bool esp32_on_task_after(ladder_ctx_t* ladder_ctx) {
     if ((*ladder_ctx).scan_internals.actual_scan_time < 1)
         esp32_delay(1);
 
     return false;
 }
 
-void esp32_on_panic(ladder_ctx_t *ladder_ctx) {
+void esp32_on_panic(ladder_ctx_t* ladder_ctx) {
+     ESP_LOGI(TAG, "Panic");
 }
 
-void esp32_on_end_task(ladder_ctx_t *ladder_ctx) {
+void esp32_on_end_task(ladder_ctx_t* ladder_ctx) {
     ESP_LOGI(TAG, "End Task Ladder");
     vTaskDelete(NULL);
 }
