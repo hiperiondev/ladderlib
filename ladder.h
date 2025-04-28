@@ -43,7 +43,7 @@
  * @def LADDERLIB_VERSION_MAYOR
  * @brief Indicate a really big change that can cause a incompatibilities with previous versions.
  */
-#define LADDERLIB_VERSION_MAYOR 1
+#define LADDERLIB_VERSION_MAYOR 2
 
 /**
  * @def LADDERLIB_VERSION_MINOR
