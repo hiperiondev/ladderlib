@@ -246,7 +246,7 @@ static void fn_to_str(ladder_ctx_t ladder_ctx, uint32_t net, char (*cells)[6][32
                 sprintf((*cells)[1], "                   ");
                 sprintf((*cells)[2], "                   ");
             }
-            sprintf((*cells)[3], "   +------------+  ");
+            sprintf((*cells)[3], "   +------------+ %s", SPACE_BAR(ladder_ctx, net, row, column));
 
             break;
         case 3:
@@ -317,7 +317,7 @@ static void fn_to_str(ladder_ctx_t ladder_ctx, uint32_t net, char (*cells)[6][32
 
             sprintf((*cells)[4], "%s|            |%s", actual_ioc.inputs < 3 ? "   " : "---",
                     actual_ioc.outputs < 3 ? "  " : PIN_OUT(ladder_ctx, net, row, column));
-            sprintf((*cells)[5], "   +------------+  ");
+            sprintf((*cells)[5], "   +------------+ %s", SPACE_BAR(ladder_ctx, net, row, column));
 
             break;
         default:
