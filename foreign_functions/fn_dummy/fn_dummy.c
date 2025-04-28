@@ -57,10 +57,8 @@ bool dummy_init(ladder_foreign_function_t *function, void *data, uint32_t qty) {
     return true;
 }
 
-ladder_ins_err_t dummy_exec(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag) {
-    if (flag) {
-        LADDER_ACTUALIZE_FLAGS(column, row);
-    }
+ladder_ins_err_t dummy_exec(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row) {
+    CELL_STATE(ladder_ctx, column, row) = CELL_STATE_LEFT(ladder_ctx, column, row);
 
     return LADDER_INS_ERR_OK;
 }

@@ -198,16 +198,15 @@ static bool load_demo1(ladder_ctx_t *ladder_ctx) {
     ret &= ladder_fn_cell(ladder_ctx, 2, 0, 2, LADDER_INS_CONN, 0);
 
     ret &= ladder_fn_cell(ladder_ctx, 2, 0, 3, LADDER_INS_CONN, 0);
-    /*
-     ret &=   ladder_fn_cell(ladder_ctx, 2, 0, 3,    LADDER_INS_FOREIGN, 0);
-     ladder_cell_data(ladder_ctx, 2, 0, 3, 0, LADDER_TYPE_NONE, 0);
-     ladder_cell_data_cstr(ladder_ctx, 2, 0, 3, 1, "0 0 0 31 6 *");
-     ladder_cell_data(ladder_ctx, 2, 0, 3, 2, LADDER_TYPE_REAL, -45.3);
-     */
     ret &= ladder_fn_cell(ladder_ctx, 2, 0, 4, LADDER_INS_CONN, 0);
 
     ret &= ladder_fn_cell(ladder_ctx, 2, 0, 5, LADDER_INS_COIL, 7);
     ladder_cell_data(ladder_ctx, 2, 0, 5, 0, LADDER_TYPE_Q, 4);
+
+    LADDER_VERTICAL_BAR(ladder_ctx, 2, 1, 4) = true;
+
+    ret &= ladder_fn_cell(ladder_ctx, 2, 1, 5, LADDER_INS_COIL, 7);
+    ladder_cell_data(ladder_ctx, 2, 1, 5, 0, LADDER_TYPE_Q, 5);
 
     return ret;
 }

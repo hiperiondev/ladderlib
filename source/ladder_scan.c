@@ -76,18 +76,17 @@ static ladder_fn_t const ladder_function[] = { //
         fn_TMOVE,    // 36
         };
 
+ladder_ins_err_t ins_err;
+bool state;
+
 void ladder_scan(ladder_ctx_t *ladder_ctx) {
-    ladder_ins_err_t ins_err = 0;
+    ins_err = 0;
 
     for (uint32_t network = 0; network < (*ladder_ctx).ladder.quantity.networks; network++) {
         if (!(*ladder_ctx).network[network].enable)
             continue;
 
         (*ladder_ctx).exec_network = &((*ladder_ctx).network[network]);
-
-        // resets dynamic flags before to start each network
-        for (uint32_t nfl = 0; nfl < (*ladder_ctx).ladder.quantity.net_columns - 1; nfl++)
-            (*ladder_ctx).scan_internals.network_flags[nfl] = 0;
 
         // call ladder instructions
         for (uint32_t column = 0; column < (*ladder_ctx).ladder.quantity.net_columns; column++) {
@@ -109,27 +108,20 @@ void ladder_scan(ladder_ctx_t *ladder_ctx) {
 
                 // execute instruction
                 if ((*(*ladder_ctx).exec_network).cells[row][column].code != LADDER_INS_MULTI) {
-                    ins_err = ladder_function[(*(*ladder_ctx).exec_network).cells[row][column].code](ladder_ctx, column, row,
-                            column == 0 ? true : ((*ladder_ctx).scan_internals.network_flags[column - 1] & LADDER_FLAG_MASK(row)));
+                    ins_err = ladder_function[(*(*ladder_ctx).exec_network).cells[row][column].code](ladder_ctx, column, row);
 
                     if (ins_err != LADDER_INS_ERR_OK) {
                         (*ladder_ctx).ladder.state = LADDER_ST_INV;
                         return;
                     }
+
+                    if ((*(*ladder_ctx).exec_network).cells[row][column].vertical_bar)
+                        (*(*ladder_ctx).exec_network).cells[row][column].state =
+                                state | (row == 0 ? 0 : (*(*ladder_ctx).exec_network).cells[row - 1][column].state);
                 }
 
                 if((*ladder_ctx).on.instruction != NULL)
                     (*ladder_ctx).on.instruction(ladder_ctx);
-            }
-
-            // update dynamic flags vs bars (not for last column)
-            if ((column < (*ladder_ctx).ladder.quantity.net_columns - 1) && ((*ladder_ctx).scan_internals.network_flags[column] != 0)) {
-                for (uint32_t i = 0; i < (*ladder_ctx).ladder.quantity.net_rows - 1; i++) {
-                    (*ladder_ctx).scan_internals.network_flags[column] = (*ladder_ctx).scan_internals.network_flags[column]
-                            | (((*ladder_ctx).scan_internals.network_flags[column] & (*(*ladder_ctx).exec_network).bars[column]) << 1);
-                    (*ladder_ctx).scan_internals.network_flags[column] = (*ladder_ctx).scan_internals.network_flags[column]
-                            | (((*ladder_ctx).scan_internals.network_flags[column] & ((*(*ladder_ctx).exec_network).bars[column] << 1)) >> 1);
-                }
             }
         }
 

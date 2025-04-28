@@ -150,9 +150,9 @@ void dummy_read_inputs_local(ladder_ctx_t *ladder_ctx) {
     if (ch > 47 && ch < 56)
         (*ladder_ctx).memory.I[ch - 48] = (*ladder_ctx).memory.I[ch - 48] > 0 ? 0 : 1;
 
-    printf("[scan time: %lu ms]                                  \n", (*ladder_ctx).scan_internals.actual_scan_time);
+    printf("[scan time: %lu ms]                                                               \n", (*ladder_ctx).scan_internals.actual_scan_time);
     printf("Toggle I: 0-7  (Q: exit)                                                                                                      \n");
-    printf("-----------------------                              \n");
+    printf("-----------------------                                                           \n");
 
     printf("I0-I1-I2-I3-I4-I5-I6-I7                              \n");
     printf("%02d-%02d-%02d-%02d-%02d-%02d-%02d-%02d                              \n", (*ladder_ctx).memory.I[0], (*ladder_ctx).memory.I[1],
@@ -162,6 +162,8 @@ void dummy_read_inputs_local(ladder_ctx_t *ladder_ctx) {
 }
 
 void dummy_write_outputs_local(ladder_ctx_t *ladder_ctx) {
+    uint32_t rets = 0;
+
     printf("                                                                                                                      \n");
     printf("M0-M1-M2-M3-M4-M5-M6-M7                                \n");
     printf("%02d-%02d-%02d-%02d-%02d-%02d-%02d-%02d                              \n", (*ladder_ctx).memory.M[0], (*ladder_ctx).memory.M[1],
@@ -176,24 +178,17 @@ void dummy_write_outputs_local(ladder_ctx_t *ladder_ctx) {
             (*ladder_ctx).memory.Q[7]);
 
     printf("-----------------------                                                     \n");
-    printf("        +----+----+-------+-----------------+\n");
-    printf("        | Td | Tr |  acc  |   time_stamp    |\n");
-    printf("        +----+----+-------+------- ---------+\n");
-    printf("Timer 0 | %d  | %d  | %05u | %15lu |\n", (*ladder_ctx).memory.Td[0], (*ladder_ctx).memory.Tr[0], (*ladder_ctx).timers[0].acc,
-            (*ladder_ctx).timers[0].time_stamp);
-    printf("Timer 1 | %d  | %d  | %05u | %15lu |\n", (*ladder_ctx).memory.Td[1], (*ladder_ctx).memory.Tr[1], (*ladder_ctx).timers[1].acc,
-            (*ladder_ctx).timers[1].time_stamp);
-    printf("Timer 2 | %d  | %d  | %05u | %15lu |\n", (*ladder_ctx).memory.Td[2], (*ladder_ctx).memory.Tr[2], (*ladder_ctx).timers[2].acc,
-            (*ladder_ctx).timers[2].time_stamp);
-    printf("Timer 3 | %d  | %d  | %05u | %15lu |\n", (*ladder_ctx).memory.Td[3], (*ladder_ctx).memory.Tr[3], (*ladder_ctx).timers[3].acc,
-            (*ladder_ctx).timers[3].time_stamp);
-    printf("Timer 4 | %d  | %d  | %05u | %15lu |\n", (*ladder_ctx).memory.Td[4], (*ladder_ctx).memory.Tr[4], (*ladder_ctx).timers[4].acc,
-            (*ladder_ctx).timers[4].time_stamp);
-    printf("Timer 5 | %d  | %d  | %05u | %15lu |\n", (*ladder_ctx).memory.Td[5], (*ladder_ctx).memory.Tr[5], (*ladder_ctx).timers[5].acc,
-            (*ladder_ctx).timers[5].time_stamp);
-    printf("Timer 6 | %d  | %d  | %05u | %15lu |\n", (*ladder_ctx).memory.Td[6], (*ladder_ctx).memory.Tr[6], (*ladder_ctx).timers[6].acc,
-            (*ladder_ctx).timers[6].time_stamp);
-    printf("        +----+----+-------+-----------------+\n");
+    printf("        +----+----+-------+\n");
+    printf("        | Td | Tr |  acc  |\n");
+    printf("        +----+----+-------+\n");
+    printf("Timer 0 | %d  | %d  | %05u |\n", (*ladder_ctx).memory.Td[0], (*ladder_ctx).memory.Tr[0], (*ladder_ctx).timers[0].acc);
+    printf("Timer 1 | %d  | %d  | %05u |\n", (*ladder_ctx).memory.Td[1], (*ladder_ctx).memory.Tr[1], (*ladder_ctx).timers[1].acc);
+    printf("Timer 2 | %d  | %d  | %05u |\n", (*ladder_ctx).memory.Td[2], (*ladder_ctx).memory.Tr[2], (*ladder_ctx).timers[2].acc);
+    printf("Timer 3 | %d  | %d  | %05u |\n", (*ladder_ctx).memory.Td[3], (*ladder_ctx).memory.Tr[3], (*ladder_ctx).timers[3].acc);
+    printf("Timer 4 | %d  | %d  | %05u |\n", (*ladder_ctx).memory.Td[4], (*ladder_ctx).memory.Tr[4], (*ladder_ctx).timers[4].acc);
+    printf("Timer 5 | %d  | %d  | %05u |\n", (*ladder_ctx).memory.Td[5], (*ladder_ctx).memory.Tr[5], (*ladder_ctx).timers[5].acc);
+    printf("Timer 6 | %d  | %d  | %05u |\n", (*ladder_ctx).memory.Td[6], (*ladder_ctx).memory.Tr[6], (*ladder_ctx).timers[6].acc);
+    printf("        +----+----+-------+\n");
 
     printf("          +----+----+-------+\n");
     printf("          | Cd | Cr |   C   |\n");
@@ -205,10 +200,32 @@ void dummy_write_outputs_local(ladder_ctx_t *ladder_ctx) {
     printf("Counter 4 | %d  | %d  | %05d |\n", (*ladder_ctx).memory.Cd[4], (*ladder_ctx).memory.Cr[4], (*ladder_ctx).registers.C[4]);
     printf("Counter 5 | %d  | %d  | %05d |\n", (*ladder_ctx).memory.Cd[5], (*ladder_ctx).memory.Cr[5], (*ladder_ctx).registers.C[5]);
     printf("Counter 6 | %d  | %d  | %05d |\n", (*ladder_ctx).memory.Cd[6], (*ladder_ctx).memory.Cr[6], (*ladder_ctx).registers.C[6]);
-    printf("          +----+----+-------+");
+    printf("          +----+----+-------+\n");
 
+    ////////////////////////////
+
+    for (uint32_t nt = 0; nt < (*ladder_ctx).ladder.quantity.networks; nt++) {
+        printf("network %d:\n", nt);
+        ++rets;
+        for (uint32_t r = 0; r < (*ladder_ctx).ladder.quantity.net_rows - 1; r++) {
+            printf("|");
+            for (uint32_t c = 0; c < (*ladder_ctx).ladder.quantity.net_columns; c++) {
+                printf("%s|", (*ladder_ctx).network[nt].cells[r][c].state == 1 ? "#" : "-");
+            }
+            printf("\n");
+            ++rets;
+        }
+        printf("\n");
+        ++rets;
+    }
+
+    // data
     printf("\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A"
-            "\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A");
+            "\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A");
+
+    //networks
+    for (uint32_t n = 0; n < rets; n++)
+        printf("\033[A");
 
     (*ladder_ctx).hw.time.delay(5);
 }

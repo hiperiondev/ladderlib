@@ -80,106 +80,106 @@ const ladder_instructions_iocd_t ladder_fn_iocd[] = {
         { 1, 1, 3, 3 }, // TMOVE
         { 1, 1, 1, 0 }, // INV
         };
-
-ladder_ins_err_t fn_NOP(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag) {
+#include <stdio.h>
+ladder_ins_err_t fn_NOP(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row) {
     return LADDER_INS_ERR_OK;
 }
 
-ladder_ins_err_t fn_CONN(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag) {
-    if (flag) {
-        LADDER_ACTUALIZE_FLAGS(column, row);
-    }
-
-    return LADDER_INS_ERR_OK;
-}
-
-ladder_ins_err_t fn_NEG(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag) {
-    if (!flag) {
-        LADDER_ACTUALIZE_FLAGS(column, row);
-    }
+ladder_ins_err_t fn_CONN(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row) {
+    CELL_STATE(ladder_ctx, column, row) = CELL_STATE_LEFT(ladder_ctx, column, row);
 
     return LADDER_INS_ERR_OK;
 }
 
-ladder_ins_err_t fn_NO(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag) {
-    if ((flag) && ladder_get_data_value(ladder_ctx, row, column, 0)) {
-        LADDER_ACTUALIZE_FLAGS(column, row);
-    }
+ladder_ins_err_t fn_NEG(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row) {
+    CELL_STATE(ladder_ctx, column, row) = !CELL_STATE_LEFT(ladder_ctx, column, row);
 
     return LADDER_INS_ERR_OK;
 }
 
-ladder_ins_err_t fn_NC(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag) {
-    if ((flag) && !ladder_get_data_value(ladder_ctx, row, column, 0)) {
-        LADDER_ACTUALIZE_FLAGS(column, row);
-    }
+ladder_ins_err_t fn_NO(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row) {
+    CELL_STATE(ladder_ctx, column, row) = ladder_get_data_value(ladder_ctx, row, column, 0) && CELL_STATE_LEFT(ladder_ctx, column, row);
 
     return LADDER_INS_ERR_OK;
 }
 
-ladder_ins_err_t fn_RE(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag) {
-    if ((flag) && ladder_get_data_value(ladder_ctx, row, column, 0) && !ladder_get_previous_value(ladder_ctx, row, column, 0)) {
-        LADDER_ACTUALIZE_FLAGS(column, row);
-    }
+ladder_ins_err_t fn_NC(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row) {
+    CELL_STATE(ladder_ctx, column, row) = (!ladder_get_data_value(ladder_ctx, row, column, 0)) && CELL_STATE_LEFT(ladder_ctx, column, row);
 
     return LADDER_INS_ERR_OK;
 }
 
-ladder_ins_err_t fn_FE(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag) {
-    if ((flag) && !ladder_get_data_value(ladder_ctx, row, column, 0) && ladder_get_previous_value(ladder_ctx, row, column, 0)) {
-        LADDER_ACTUALIZE_FLAGS(column, row);
-    }
+ladder_ins_err_t fn_RE(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row) {
+    CELL_STATE(ladder_ctx, column, row) =
+    MAKE_BOOL(ladder_get_data_value(ladder_ctx, row, column, 0) &&
+            !ladder_get_previous_value(ladder_ctx, row, column, 0)) && CELL_STATE_LEFT(ladder_ctx, column, row);
 
     return LADDER_INS_ERR_OK;
 }
 
-ladder_ins_err_t fn_COIL(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag) {
-    uint32_t val;
+ladder_ins_err_t fn_FE(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row) {
+    CELL_STATE(ladder_ctx, column, row) =
+            MAKE_BOOL(
+                    !ladder_get_data_value(ladder_ctx, row, column, 0) && ladder_get_previous_value(ladder_ctx, row, column, 0)) && CELL_STATE_LEFT(ladder_ctx, column, row);
 
-    if (flag) {
+    return LADDER_INS_ERR_OK;
+}
+
+ladder_ins_err_t fn_COIL(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row) {
+    uint32_t val = 0;
+
+    CELL_STATE(ladder_ctx, column, row) = CELL_STATE_LEFT(ladder_ctx, column, row);
+
+    if (CELL_STATE(ladder_ctx, column, row))
         val = 1;
-        ladder_set_data_value(ladder_ctx, row, column, 0, (void*) &val, &error);
-        LADDER_ACTUALIZE_FLAGS(column, row);
-    } else {
-        val = 0;
-        ladder_set_data_value(ladder_ctx, row, column, 0, (void*) &val, &error);
-    }
+
+    ladder_set_data_value(ladder_ctx, row, column, 0, (void*) &val, &error);
 
     return LADDER_INS_ERR_OK;
 }
 
-ladder_ins_err_t fn_COILL(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag) {
-    if (flag) {
-        uint32_t val = 1;
-        ladder_set_data_value(ladder_ctx, row, column, 0, (void*) &val, &error);
-        LADDER_ACTUALIZE_FLAGS(column, row);
-    }
+ladder_ins_err_t fn_COILL(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row) {
+    uint32_t val = 0;
+
+    CELL_STATE(ladder_ctx, column, row) = CELL_STATE_LEFT(ladder_ctx, column, row);
+
+    if (CELL_STATE(ladder_ctx, column, row))
+        val = 1;
+
+    ladder_set_data_value(ladder_ctx, row, column, 0, (void*) &val, &error);
 
     return LADDER_INS_ERR_OK;
 }
 
-ladder_ins_err_t fn_COILU(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag) {
-    if (flag) {
-        uint32_t val = 0;
-        ladder_set_data_value(ladder_ctx, row, column, 0, (void*) &val, &error);
-        LADDER_ACTUALIZE_FLAGS(column, row);
-    }
+ladder_ins_err_t fn_COILU(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row) {
+    uint32_t val = 0;
+
+    CELL_STATE(ladder_ctx, column, row) = CELL_STATE_LEFT(ladder_ctx, column, row);
+
+    if (!(CELL_STATE(ladder_ctx, column, row)))
+        val = 1;
+
+    ladder_set_data_value(ladder_ctx, row, column, 0, (void*) &val, &error);
 
     return LADDER_INS_ERR_OK;
 }
 
-ladder_ins_err_t fn_TON(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag) {
+ladder_ins_err_t fn_TON(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row) {
     // timer is not active --> reset
-    if (!flag) {
+    if (!CELL_STATE_LEFT(ladder_ctx, column, row)) {
         (*ladder_ctx).timers[ladder_cell_data_exec(ladder_ctx, row, column, 0).value.i32].acc = 0;
+
         (*ladder_ctx).memory.Tr[ladder_cell_data_exec(ladder_ctx, row, column, 0).value.i32] = false;
         (*ladder_ctx).memory.Td[ladder_cell_data_exec(ladder_ctx, row, column, 0).value.i32] = false;
+        CELL_STATE(ladder_ctx, column, row) = false;
+        CELL_STATE(ladder_ctx, column, row + 1) = false;
     }
 
     // timer is activated in this scan, set timer running flag and snapshot the timestamp
-    if (flag && !(*ladder_ctx).memory.Td[ladder_cell_data_exec(ladder_ctx, row, column, 0).value.i32]
+    if (CELL_STATE_LEFT(ladder_ctx, column, row) && !(*ladder_ctx).memory.Td[ladder_cell_data_exec(ladder_ctx, row, column, 0).value.i32]
             && !(*ladder_ctx).memory.Tr[ladder_cell_data_exec(ladder_ctx, row, column, 0).value.i32]) {
         (*ladder_ctx).memory.Tr[ladder_cell_data_exec(ladder_ctx, row, column, 0).value.i32] = true;
+        CELL_STATE(ladder_ctx, column, row + 1) = true;
         (*ladder_ctx).timers[ladder_cell_data_exec(ladder_ctx, row, column, 0).value.i32].time_stamp = (*ladder_ctx).hw.time.millis();
     }
 
@@ -197,37 +197,34 @@ ladder_ins_err_t fn_TON(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row,
                             * basetime_factor[(*(*ladder_ctx).exec_network).cells[row][column].data[1].type - 0xf0]))) {
         (*ladder_ctx).memory.Tr[ladder_cell_data_exec(ladder_ctx, row, column, 0).value.i32] = false;
         (*ladder_ctx).memory.Td[ladder_cell_data_exec(ladder_ctx, row, column, 0).value.i32] = true;
-        (*ladder_ctx).timers[ladder_cell_data_exec(ladder_ctx, row, column, 0).value.i32].acc = (*(*ladder_ctx).exec_network).cells[row][column].data[1].value.i32;
-    }
-
-    // copy timer flags to dynamic flags on network
-    if ((*ladder_ctx).memory.Td[ladder_cell_data_exec(ladder_ctx, row, column, 0).value.i32]) {
-        LADDER_ACTUALIZE_FLAGS(column, row);
-    }
-
-    if ((*ladder_ctx).memory.Tr[ladder_cell_data_exec(ladder_ctx, row, column, 0).value.i32]) {
-        LADDER_ACTUALIZE_FLAGS(column, row + 1);
+        CELL_STATE(ladder_ctx, column, row + 1) = false;
+        CELL_STATE(ladder_ctx, column, row) = true;
+        (*ladder_ctx).timers[ladder_cell_data_exec(ladder_ctx, row, column, 0).value.i32].acc =
+                (*(*ladder_ctx).exec_network).cells[row][column].data[1].value.i32;
     }
 
     return LADDER_INS_ERR_OK;
 }
 
-ladder_ins_err_t fn_TOFF(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag) {
+ladder_ins_err_t fn_TOFF(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row) {
     // timer is activated
-    if (flag && !(*ladder_ctx).memory.Td[ladder_cell_data_exec(ladder_ctx, row, column, 0).value.i32]
-            && !(*ladder_ctx).memory.Tr[ladder_cell_data_exec(ladder_ctx, row, column, 0).value.i32]) {
+    if (CELL_STATE_LEFT(ladder_ctx, column, row)) {
         (*ladder_ctx).memory.Td[ladder_cell_data_exec(ladder_ctx, row, column, 0).value.i32] = true;
+        CELL_STATE(ladder_ctx, column, row) = false;
+        CELL_STATE(ladder_ctx, column, row + 1) = true;
     }
 
     // timer reactivated while running --> reset
-    if (flag && (*ladder_ctx).memory.Tr[ladder_cell_data_exec(ladder_ctx, row, column, 0).value.i32]) {
+    if (CELL_STATE_LEFT(ladder_ctx, column, row) && (*ladder_ctx).memory.Tr[ladder_cell_data_exec(ladder_ctx, row, column, 0).value.i32]) {
         (*ladder_ctx).memory.Tr[ladder_cell_data_exec(ladder_ctx, row, column, 0).value.i32] = false;
+        CELL_STATE(ladder_ctx, column, row + 1) = false;
     }
 
     // timer is activated in this scan, set timer running flag and snapshot the timestamp
-    if (!flag && (*ladder_ctx).memory.Td[ladder_cell_data_exec(ladder_ctx, row, column, 0).value.i32]
+    if (!CELL_STATE_LEFT(ladder_ctx, column, row) && (*ladder_ctx).memory.Td[ladder_cell_data_exec(ladder_ctx, row, column, 0).value.i32]
             && !(*ladder_ctx).memory.Tr[ladder_cell_data_exec(ladder_ctx, row, column, 0).value.i32]) {
         (*ladder_ctx).memory.Tr[ladder_cell_data_exec(ladder_ctx, row, column, 0).value.i32] = true;
+        CELL_STATE(ladder_ctx, column, row) = true;
         (*ladder_ctx).timers[ladder_cell_data_exec(ladder_ctx, row, column, 0).value.i32].time_stamp = (*ladder_ctx).hw.time.millis();
     }
 
@@ -245,34 +242,30 @@ ladder_ins_err_t fn_TOFF(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row
                             * basetime_factor[(*(*ladder_ctx).exec_network).cells[row][column].data[1].type - 0xf0]))) {
         (*ladder_ctx).memory.Tr[ladder_cell_data_exec(ladder_ctx, row, column, 0).value.i32] = false;
         (*ladder_ctx).memory.Td[ladder_cell_data_exec(ladder_ctx, row, column, 0).value.i32] = false;
-        (*ladder_ctx).timers[ladder_cell_data_exec(ladder_ctx, row, column, 0).value.i32].acc = (*(*ladder_ctx).exec_network).cells[row][column].data[1].value.i32;
-    }
-
-    // copy timer flags to dynamic flags on network
-    if ((*ladder_ctx).memory.Td[ladder_cell_data_exec(ladder_ctx, row, column, 0).value.i32]) {
-        LADDER_ACTUALIZE_FLAGS(column, row);
-    }
-
-    if ((*ladder_ctx).memory.Tr[ladder_cell_data_exec(ladder_ctx, row, column, 0).value.i32]) {
-        LADDER_ACTUALIZE_FLAGS(column, row + 1);
+        CELL_STATE(ladder_ctx, column, row) = false;
+        CELL_STATE(ladder_ctx, column, row + 1) = false;
+        (*ladder_ctx).timers[ladder_cell_data_exec(ladder_ctx, row, column, 0).value.i32].acc =
+                (*(*ladder_ctx).exec_network).cells[row][column].data[1].value.i32;
     }
 
     return LADDER_INS_ERR_OK;
 }
 
-ladder_ins_err_t fn_TP(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag) {
+ladder_ins_err_t fn_TP(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row) {
     // timer is activated in this scan, set timer running flag and snapshot the timestamp
-    if (flag && !(*ladder_ctx).memory.Td[ladder_cell_data_exec(ladder_ctx, row, column, 0).value.i32]
-            && !(*ladder_ctx).memory.Tr[ladder_cell_data_exec(ladder_ctx, row, column, 0).value.i32]) {
+    if (CELL_STATE_LEFT(ladder_ctx, column, row) && !(*ladder_ctx).memory.Tr[ladder_cell_data_exec(ladder_ctx, row, column, 0).value.i32]) {
         (*ladder_ctx).memory.Td[ladder_cell_data_exec(ladder_ctx, row, column, 0).value.i32] = true;
         (*ladder_ctx).memory.Tr[ladder_cell_data_exec(ladder_ctx, row, column, 0).value.i32] = true;
+        CELL_STATE(ladder_ctx, column, row) = true;
+        CELL_STATE(ladder_ctx, column, row + 1) = true;
         (*ladder_ctx).timers[ladder_cell_data_exec(ladder_ctx, row, column, 0).value.i32].time_stamp = (*ladder_ctx).hw.time.millis();
     }
 
     // reset timer running when input goes false to avoid continuously running the timer if input stays true
-    if (!flag && !(*ladder_ctx).memory.Td[ladder_cell_data_exec(ladder_ctx, row, column, 0).value.i32]
+    if (!CELL_STATE_LEFT(ladder_ctx, column, row) && !(*ladder_ctx).memory.Td[ladder_cell_data_exec(ladder_ctx, row, column, 0).value.i32]
             && (*ladder_ctx).memory.Tr[ladder_cell_data_exec(ladder_ctx, row, column, 0).value.i32]) {
         (*ladder_ctx).memory.Tr[ladder_cell_data_exec(ladder_ctx, row, column, 0).value.i32] = false;
+        CELL_STATE(ladder_ctx, column, row + 1) = false;
     }
 
     // timer is running, update acc value
@@ -288,67 +281,59 @@ ladder_ins_err_t fn_TP(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, 
                     >= ((*(*ladder_ctx).exec_network).cells[row][column].data[1].value.i32
                             * basetime_factor[(*(*ladder_ctx).exec_network).cells[row][column].data[1].type - 0xf0]))) {
         (*ladder_ctx).memory.Td[ladder_cell_data_exec(ladder_ctx, row, column, 0).value.i32] = false;
-        (*ladder_ctx).timers[ladder_cell_data_exec(ladder_ctx, row, column, 0).value.i32].acc = (*(*ladder_ctx).exec_network).cells[row][column].data[1].value.i32;
-    }
-
-    // copy timer flags to dynamic flags on network
-    if ((*ladder_ctx).memory.Td[ladder_cell_data_exec(ladder_ctx, row, column, 0).value.i32]) {
-        LADDER_ACTUALIZE_FLAGS(column, row);
-    }
-
-    if ((*ladder_ctx).memory.Tr[ladder_cell_data_exec(ladder_ctx, row, column, 0).value.i32]) {
-        LADDER_ACTUALIZE_FLAGS(column, row + 1);
+        CELL_STATE(ladder_ctx, column, row) = false;
+        (*ladder_ctx).timers[ladder_cell_data_exec(ladder_ctx, row, column, 0).value.i32].acc =
+                (*(*ladder_ctx).exec_network).cells[row][column].data[1].value.i32;
     }
 
     return LADDER_INS_ERR_OK;
 }
 
-ladder_ins_err_t fn_CTU(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag) {
+ladder_ins_err_t fn_CTU(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row) {
     // reset counter
     if (column == 0) {
         if ((*ladder_ctx).ladder.state == LADDER_ST_RUNNING) {
             (*ladder_ctx).registers.C[ladder_cell_data_exec(ladder_ctx, row, column, 0).value.i32] = 0;
             (*ladder_ctx).memory.Cd[ladder_cell_data_exec(ladder_ctx, row, column, 0).value.i32] = false;
             (*ladder_ctx).memory.Cr[ladder_cell_data_exec(ladder_ctx, row, column, 0).value.i32] = false;
+            CELL_STATE(ladder_ctx, column, row) = false;
+            CELL_STATE(ladder_ctx, column, row + 1) = false;
         }
     } else {
-        if ((*ladder_ctx).scan_internals.network_flags[column - 1] & LADDER_FLAG_MASK(row + 1)) {
+        if (CELL_STATE_LEFT(ladder_ctx, column, row + 1)) {
             (*ladder_ctx).registers.C[ladder_cell_data_exec(ladder_ctx, row, column, 0).value.i32] = 0;
             (*ladder_ctx).memory.Cd[ladder_cell_data_exec(ladder_ctx, row, column, 0).value.i32] = false;
             (*ladder_ctx).memory.Cr[ladder_cell_data_exec(ladder_ctx, row, column, 0).value.i32] = false;
+            CELL_STATE(ladder_ctx, column, row) = false;
+            CELL_STATE(ladder_ctx, column, row + 1) = false;
         }
     }
 
     // counter is activated in this scan, change count
-    if (flag && !(*ladder_ctx).memory.Cr[ladder_cell_data_exec(ladder_ctx, row, column, 0).value.i32]
+    if (CELL_STATE_LEFT(ladder_ctx, column, row) && !(*ladder_ctx).memory.Cr[ladder_cell_data_exec(ladder_ctx, row, column, 0).value.i32]
             && !(*ladder_ctx).memory.Cd[ladder_cell_data_exec(ladder_ctx, row, column, 0).value.i32]) {
         (*ladder_ctx).memory.Cr[ladder_cell_data_exec(ladder_ctx, row, column, 0).value.i32] = true;
+        CELL_STATE(ladder_ctx, column, row + 1) = true;
         (*ladder_ctx).registers.C[ladder_cell_data_exec(ladder_ctx, row, column, 0).value.i32]++;
     }
 
     // reset counter edge detection
-    if (!flag) {
+    if (!CELL_STATE_LEFT(ladder_ctx, column, row)) {
         (*ladder_ctx).memory.Cr[ladder_cell_data_exec(ladder_ctx, row, column, 0).value.i32] = false;
+        CELL_STATE(ladder_ctx, column, row + 1) = false;
     }
 
     // counter done
-    if ((*ladder_ctx).registers.C[ladder_cell_data_exec(ladder_ctx, row, column, 0).value.i32] >= (*(*ladder_ctx).exec_network).cells[row][column].data[1].value.i32) {
+    if ((*ladder_ctx).registers.C[ladder_cell_data_exec(ladder_ctx, row, column, 0).value.i32]
+            >= (*(*ladder_ctx).exec_network).cells[row][column].data[1].value.i32) {
         (*ladder_ctx).memory.Cd[ladder_cell_data_exec(ladder_ctx, row, column, 0).value.i32] = true;
-    }
-
-    // copy counter flags to dynamic flags on network
-    if ((*ladder_ctx).memory.Cd[ladder_cell_data_exec(ladder_ctx, row, column, 0).value.i32]) {
-        LADDER_ACTUALIZE_FLAGS(column, row);
-    }
-
-    if ((*ladder_ctx).memory.Cr[ladder_cell_data_exec(ladder_ctx, row, column, 0).value.i32]) {
-        LADDER_ACTUALIZE_FLAGS(column, row + 1);
+        CELL_STATE(ladder_ctx, column, row) = true;
     }
 
     return LADDER_INS_ERR_OK;
 }
 
-ladder_ins_err_t fn_CTD(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag) {
+ladder_ins_err_t fn_CTD(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row) {
     // reset counter
     if (column == 0) {
         if ((*ladder_ctx).ladder.state == LADDER_ST_RUNNING) {
@@ -356,66 +341,66 @@ ladder_ins_err_t fn_CTD(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row,
                     (*(*ladder_ctx).exec_network).cells[row][column].data[1].value.i32;
             (*ladder_ctx).memory.Cd[ladder_cell_data_exec(ladder_ctx, row, column, 0).value.i32] = false;
             (*ladder_ctx).memory.Cr[ladder_cell_data_exec(ladder_ctx, row, column, 0).value.i32] = false;
+            CELL_STATE(ladder_ctx, column, row) = false;
+            CELL_STATE(ladder_ctx, column, row + 1) = false;
         }
     } else {
-        if ((*ladder_ctx).scan_internals.network_flags[column - 1] & LADDER_FLAG_MASK(row + 1)) {
+        if (CELL_STATE_LEFT(ladder_ctx, column, row + 1)) {
             (*ladder_ctx).registers.C[ladder_cell_data_exec(ladder_ctx, row, column, 0).value.i32] =
                     (*(*ladder_ctx).exec_network).cells[row][column].data[1].value.i32;
             (*ladder_ctx).memory.Cd[ladder_cell_data_exec(ladder_ctx, row, column, 0).value.i32] = false;
             (*ladder_ctx).memory.Cr[ladder_cell_data_exec(ladder_ctx, row, column, 0).value.i32] = false;
+            CELL_STATE(ladder_ctx, column, row) = false;
+            CELL_STATE(ladder_ctx, column, row + 1) = false;
         }
     }
 
     // counter is activated in this scan, change count
-    if (flag && !(*ladder_ctx).memory.Cr[ladder_cell_data_exec(ladder_ctx, row, column, 0).value.i32]
+    if (CELL_STATE_LEFT(ladder_ctx, column, row) && !(*ladder_ctx).memory.Cr[ladder_cell_data_exec(ladder_ctx, row, column, 0).value.i32]
             && !(*ladder_ctx).memory.Cd[ladder_cell_data_exec(ladder_ctx, row, column, 0).value.i32]) {
         (*ladder_ctx).memory.Cr[ladder_cell_data_exec(ladder_ctx, row, column, 0).value.i32] = true;
+        CELL_STATE(ladder_ctx, column, row + 1) = true;
         (*ladder_ctx).registers.C[ladder_cell_data_exec(ladder_ctx, row, column, 0).value.i32]--;
     }
 
     // reset counter edge detection
-    if (!flag) {
+    if (!CELL_STATE_LEFT(ladder_ctx, column, row)) {
         (*ladder_ctx).memory.Cr[ladder_cell_data_exec(ladder_ctx, row, column, 0).value.i32] = false;
+        CELL_STATE(ladder_ctx, column, row + 1) = false;
     }
 
     // counter done
     if ((*ladder_ctx).registers.C[ladder_cell_data_exec(ladder_ctx, row, column, 0).value.i32] == 0) {
         (*ladder_ctx).memory.Cd[ladder_cell_data_exec(ladder_ctx, row, column, 0).value.i32] = true;
-    }
-
-    // copy counter flags to dynamic flags on network
-    if ((*ladder_ctx).memory.Cd[ladder_cell_data_exec(ladder_ctx, row, column, 0).value.i32]) {
-        LADDER_ACTUALIZE_FLAGS(column, row);
-    }
-
-    if ((*ladder_ctx).memory.Cr[ladder_cell_data_exec(ladder_ctx, row, column, 0).value.i32]) {
-        LADDER_ACTUALIZE_FLAGS(column, row + 1);
+        CELL_STATE(ladder_ctx, column, row) = true;
     }
 
     return LADDER_INS_ERR_OK;
 }
 
-ladder_ins_err_t fn_MOVE(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag) {
-    if (flag) {
+ladder_ins_err_t fn_MOVE(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row) {
+    CELL_STATE(ladder_ctx, column, row) = CELL_STATE_LEFT(ladder_ctx, column, row);
+
+    if (CELL_STATE_LEFT(ladder_ctx, column, row)) {
         uint32_t val = ladder_get_data_value(ladder_ctx, row, column, 0);
         ladder_set_data_value(ladder_ctx, row, column, 1, (void*) &val, &error);
-        LADDER_ACTUALIZE_FLAGS(column, row);
     }
 
     return LADDER_INS_ERR_OK;
 }
 
-ladder_ins_err_t fn_SUB(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag) {
+ladder_ins_err_t fn_SUB(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row) {
+    CELL_STATE(ladder_ctx, column, row) = CELL_STATE_LEFT(ladder_ctx, column, row);
     int32_t auxValue1 = ladder_get_data_value(ladder_ctx, row, column, 0);
     int32_t auxValue2 = ladder_get_data_value(ladder_ctx, row, column, 1);
 
-    if (flag) {
+    if (CELL_STATE_LEFT(ladder_ctx, column, row)) {
         if (auxValue1 > auxValue2) {
-            LADDER_ACTUALIZE_FLAGS(column, row);
+            CELL_STATE(ladder_ctx, column, row) = true;
         } else if (auxValue1 == auxValue2) {
-            LADDER_ACTUALIZE_FLAGS(column, row + 1);
+            CELL_STATE(ladder_ctx, column, row + 1) = true;
         } else {
-            LADDER_ACTUALIZE_FLAGS(column, row + 2);
+            CELL_STATE(ladder_ctx, column, row + 2) = true;
         }
 
         uint32_t res = auxValue1 - auxValue2;
@@ -425,73 +410,79 @@ ladder_ins_err_t fn_SUB(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row,
     return LADDER_INS_ERR_OK;
 }
 
-ladder_ins_err_t fn_ADD(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag) {
-    if (flag) {
+ladder_ins_err_t fn_ADD(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row) {
+    CELL_STATE(ladder_ctx, column, row) = CELL_STATE_LEFT(ladder_ctx, column, row);
+
+    if (CELL_STATE_LEFT(ladder_ctx, column, row)) {
         int32_t val = ladder_get_data_value(ladder_ctx, row, column, 0) + ladder_get_data_value(ladder_ctx, row, column, 1);
         ladder_set_data_value(ladder_ctx, row, column, 2, (void*) &val, &error);
-        LADDER_ACTUALIZE_FLAGS(column, row);
     }
 
     return LADDER_INS_ERR_OK;
 }
 
-ladder_ins_err_t fn_MUL(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag) {
-    if (flag) {
+ladder_ins_err_t fn_MUL(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row) {
+    CELL_STATE(ladder_ctx, column, row) = CELL_STATE_LEFT(ladder_ctx, column, row);
+
+    if (CELL_STATE_LEFT(ladder_ctx, column, row)) {
         int32_t val = ladder_get_data_value(ladder_ctx, row, column, 0) * ladder_get_data_value(ladder_ctx, row, column, 1);
         ladder_set_data_value(ladder_ctx, row, column, 2, (void*) &val, &error);
-        LADDER_ACTUALIZE_FLAGS(column, row);
     }
 
     return LADDER_INS_ERR_OK;
 }
 
-ladder_ins_err_t fn_DIV(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag) {
-    if (flag) {
+ladder_ins_err_t fn_DIV(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row) {
+    CELL_STATE(ladder_ctx, column, row) = CELL_STATE_LEFT(ladder_ctx, column, row);
+    if (CELL_STATE_LEFT(ladder_ctx, column, row)) {
         if (ladder_get_data_value(ladder_ctx, row +1, column, 0) == 0) {
             ladder_set_data_value(ladder_ctx, row, 2, column, 0, &error);
-            LADDER_ACTUALIZE_FLAGS(column, row + 2);
         } else {
             int32_t val = ladder_get_data_value(ladder_ctx, row, column, 0) / ladder_get_data_value(ladder_ctx, row, column, 1);
             ladder_set_data_value(ladder_ctx, row, column, 2, (void*) &val, &error);
-            LADDER_ACTUALIZE_FLAGS(column, row);
         }
     }
 
     return LADDER_INS_ERR_OK;
 }
 
-ladder_ins_err_t fn_MOD(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag) {
-    if (flag) {
+ladder_ins_err_t fn_MOD(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row) {
+    CELL_STATE(ladder_ctx, column, row) = CELL_STATE_LEFT(ladder_ctx, column, row);
+
+    if (CELL_STATE_LEFT(ladder_ctx, column, row)) {
         int32_t val = to_integer(ladder_get_data_value(ladder_ctx, row, column, 0), 1) % to_integer(ladder_get_data_value(ladder_ctx, row, column, 1), 1);
         ladder_set_data_value(ladder_ctx, row, column, 2, (void*) &val, &error);
-        LADDER_ACTUALIZE_FLAGS(column, row);
     }
 
     return LADDER_INS_ERR_OK;
 }
 
-ladder_ins_err_t fn_SHL(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag) {
-    if (flag) {
+ladder_ins_err_t fn_SHL(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row) {
+    CELL_STATE(ladder_ctx, column, row) = CELL_STATE_LEFT(ladder_ctx, column, row);
+
+    if (CELL_STATE_LEFT(ladder_ctx, column, row)) {
         uint32_t val = to_integer(ladder_get_data_value(ladder_ctx, row, column, 0), 1) << 1;
         ladder_set_data_value(ladder_ctx, row, column, 1, (void*) &val, &error);
-        LADDER_ACTUALIZE_FLAGS(column, row);
     }
 
     return LADDER_INS_ERR_OK;
 }
 
-ladder_ins_err_t fn_SHR(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag) {
-    if (flag) {
+ladder_ins_err_t fn_SHR(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row) {
+    CELL_STATE(ladder_ctx, column, row) = CELL_STATE_LEFT(ladder_ctx, column, row);
+
+    if (CELL_STATE_LEFT(ladder_ctx, column, row)) {
         uint32_t val = to_integer(ladder_get_data_value(ladder_ctx, row, column, 0), 1) >> 1;
         ladder_set_data_value(ladder_ctx, row, column, 1, (void*) &val, &error);
-        LADDER_ACTUALIZE_FLAGS(column, row);
     }
 
     return LADDER_INS_ERR_OK;
 }
 
-ladder_ins_err_t fn_ROL(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag) {
-    if (flag) {
+ladder_ins_err_t fn_ROL(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row) {
+    CELL_STATE(ladder_ctx, column, row) = CELL_STATE_LEFT(ladder_ctx, column, row);
+
+    if (CELL_STATE_LEFT(ladder_ctx, column, row)) {
         uint32_t auxCarryBit, auxValue;
 
         auxValue = ladder_get_data_value(ladder_ctx, row, column, 0);
@@ -501,15 +492,15 @@ ladder_ins_err_t fn_ROL(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row,
             auxValue = auxValue | 0x0001;
         }
         ladder_set_data_value(ladder_ctx, row, column, 1, (void*) &auxValue, &error);
-
-        LADDER_ACTUALIZE_FLAGS(column, row);
     }
 
     return LADDER_INS_ERR_OK;
 }
 
-ladder_ins_err_t fn_ROR(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag) {
-    if (flag) {
+ladder_ins_err_t fn_ROR(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row) {
+    CELL_STATE(ladder_ctx, column, row) = CELL_STATE_LEFT(ladder_ctx, column, row);
+
+    if (CELL_STATE_LEFT(ladder_ctx, column, row)) {
         uint32_t auxCarryBit, auxValue;
 
         auxValue = ladder_get_data_value(ladder_ctx, row, column, 0);
@@ -519,122 +510,113 @@ ladder_ins_err_t fn_ROR(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row,
             auxValue = auxValue | 0x8000;
         }
         ladder_set_data_value(ladder_ctx, row, 1, column, (void*) &auxValue, &error);
-
-        LADDER_ACTUALIZE_FLAGS(column, row);
     }
 
     return LADDER_INS_ERR_OK;
 }
 
-ladder_ins_err_t fn_AND(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag) {
-    if (flag) {
+ladder_ins_err_t fn_AND(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row) {
+    CELL_STATE(ladder_ctx, column, row) = CELL_STATE_LEFT(ladder_ctx, column, row);
+
+    if (CELL_STATE_LEFT(ladder_ctx, column, row)) {
         uint32_t val = to_integer(ladder_get_data_value(ladder_ctx, row, column, 0), 1) & to_integer(ladder_get_data_value(ladder_ctx, row, column, 1), 1);
         ladder_set_data_value(ladder_ctx, row, column, 2, (void*) &val, &error);
-        LADDER_ACTUALIZE_FLAGS(column, row);
     }
 
     return LADDER_INS_ERR_OK;
 }
 
-ladder_ins_err_t fn_OR(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag) {
-    if (flag) {
+ladder_ins_err_t fn_OR(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row) {
+    CELL_STATE(ladder_ctx, column, row) = CELL_STATE_LEFT(ladder_ctx, column, row);
+
+    if (CELL_STATE_LEFT(ladder_ctx, column, row)) {
         uint32_t val = to_integer(ladder_get_data_value(ladder_ctx, row, column, 0), 1) | to_integer(ladder_get_data_value(ladder_ctx, row, column, 1), 1);
         ladder_set_data_value(ladder_ctx, row, column, 2, (void*) &val, &error);
-        LADDER_ACTUALIZE_FLAGS(column, row);
     }
 
     return LADDER_INS_ERR_OK;
 }
 
-ladder_ins_err_t fn_XOR(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag) {
-    if (flag) {
+ladder_ins_err_t fn_XOR(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row) {
+    CELL_STATE(ladder_ctx, column, row) = CELL_STATE_LEFT(ladder_ctx, column, row);
+
+    if (CELL_STATE_LEFT(ladder_ctx, column, row)) {
         uint32_t val = to_integer(ladder_get_data_value(ladder_ctx, row, column, 0), 1) ^ to_integer(ladder_get_data_value(ladder_ctx, row, column, 1), 1);
         ladder_set_data_value(ladder_ctx, row, column, 2, (void*) &val, &error);
-        LADDER_ACTUALIZE_FLAGS(column, row);
     }
 
     return LADDER_INS_ERR_OK;
 }
 
-ladder_ins_err_t fn_NOT(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag) {
-    if (flag) {
+ladder_ins_err_t fn_NOT(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row) {
+    CELL_STATE(ladder_ctx, column, row) = CELL_STATE_LEFT(ladder_ctx, column, row);
+
+    if (CELL_STATE_LEFT(ladder_ctx, column, row)) {
         uint32_t val = ~to_integer(ladder_get_data_value(ladder_ctx, row, column, 0), 1);
         ladder_set_data_value(ladder_ctx, row, column, 1, (void*) &val, &error);
-        LADDER_ACTUALIZE_FLAGS(column, row);
     }
 
     return LADDER_INS_ERR_OK;
 }
 
-ladder_ins_err_t fn_EQ(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag) {
-    if (flag) {
-        if (ladder_get_data_value(ladder_ctx, row, column, 0) == ladder_get_data_value(ladder_ctx, row, column, 1)) {
-            LADDER_ACTUALIZE_FLAGS(column, row);
-        }
-    }
+ladder_ins_err_t fn_EQ(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row) {
+    CELL_STATE(ladder_ctx, column, row) =
+    CELL_STATE_LEFT(ladder_ctx, column, row) ? (ladder_get_data_value(ladder_ctx, row, column, 0) == ladder_get_data_value(ladder_ctx, row, column, 1)) : false;
 
     return LADDER_INS_ERR_OK;
 }
 
-ladder_ins_err_t fn_GT(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag) {
-    if (flag) {
-        if (ladder_get_data_value(ladder_ctx, row, column, 0) > ladder_get_data_value(ladder_ctx, row, column, 1)) {
-            LADDER_ACTUALIZE_FLAGS(column, row);
-        }
-    }
+ladder_ins_err_t fn_GT(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row) {
+    CELL_STATE(ladder_ctx, column, row) =
+            CELL_STATE_LEFT(ladder_ctx, column, row) ?
+                    (ladder_get_data_value(ladder_ctx, row, column, 0) > ladder_get_data_value(ladder_ctx, row, column, 1)) : false;
 
     return LADDER_INS_ERR_OK;
 }
 
-ladder_ins_err_t fn_GE(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag) {
-    if (flag) {
-        if (ladder_get_data_value(ladder_ctx, row, column, 0) >= ladder_get_data_value(ladder_ctx, row, column, 1)) {
-            LADDER_ACTUALIZE_FLAGS(column, row);
-        }
-    }
+ladder_ins_err_t fn_GE(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row) {
+    CELL_STATE(ladder_ctx, column, row) =
+            CELL_STATE_LEFT(ladder_ctx, column, row) ?
+                    (ladder_get_data_value(ladder_ctx, row, column, 0) >= ladder_get_data_value(ladder_ctx, row, column, 1)) : false;
 
     return LADDER_INS_ERR_OK;
 }
 
-ladder_ins_err_t fn_LT(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag) {
-    if (flag) {
-        if (ladder_get_data_value(ladder_ctx, row, column, 0) < ladder_get_data_value(ladder_ctx, row, column, 1)) {
-            LADDER_ACTUALIZE_FLAGS(column, row);
-        }
-    }
+ladder_ins_err_t fn_LT(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row) {
+    CELL_STATE(ladder_ctx, column, row) =
+            CELL_STATE_LEFT(ladder_ctx, column, row) ?
+                    (ladder_get_data_value(ladder_ctx, row, column, 0) < ladder_get_data_value(ladder_ctx, row, column, 1)) : false;
 
     return LADDER_INS_ERR_OK;
 }
 
-ladder_ins_err_t fn_LE(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag) {
-    if (flag) {
-        if (ladder_get_data_value(ladder_ctx, row, column, 0) <= ladder_get_data_value(ladder_ctx, row, column, 1)) {
-            LADDER_ACTUALIZE_FLAGS(column, row);
-        }
-    }
+ladder_ins_err_t fn_LE(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row) {
+    CELL_STATE(ladder_ctx, column, row) =
+            CELL_STATE_LEFT(ladder_ctx, column, row) ?
+                    (ladder_get_data_value(ladder_ctx, row, column, 0) <= ladder_get_data_value(ladder_ctx, row, column, 1)) : false;
 
     return LADDER_INS_ERR_OK;
 }
 
-ladder_ins_err_t fn_NE(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag) {
-    if (flag) {
-        if (ladder_get_data_value(ladder_ctx, row, column, 0) != ladder_get_data_value(ladder_ctx, row, column, 1)) {
-            LADDER_ACTUALIZE_FLAGS(column, row);
-        }
-    }
+ladder_ins_err_t fn_NE(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row) {
+    CELL_STATE(ladder_ctx, column, row) =
+            CELL_STATE_LEFT(ladder_ctx, column, row) ?
+                    (ladder_get_data_value(ladder_ctx, row, column, 0) != ladder_get_data_value(ladder_ctx, row, column, 1)) : false;
 
     return LADDER_INS_ERR_OK;
 }
 
-ladder_ins_err_t fn_FOREIGN(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag) {
+ladder_ins_err_t fn_FOREIGN(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row) {
     if (to_integer(ladder_get_data_value(ladder_ctx, row, column, 0), 0) >= (*ladder_ctx).foreign.qty)
         return LADDER_INS_ERR_NOFOREIGN;
 
-    return (*ladder_ctx).foreign.fn[to_integer(ladder_get_data_value(ladder_ctx, row, column, 0), 0)].exec(ladder_ctx, column, row, flag);
+    return (*ladder_ctx).foreign.fn[to_integer(ladder_get_data_value(ladder_ctx, row, column, 0), 0)].exec(ladder_ctx, column, row);
 }
 
-ladder_ins_err_t fn_TMOVE(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag) {
-    if (flag) {
+ladder_ins_err_t fn_TMOVE(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row) {
+    CELL_STATE(ladder_ctx, column, row) = CELL_STATE_LEFT(ladder_ctx, column, row);
+
+    if (CELL_STATE_LEFT(ladder_ctx, column, row)) {
         uint32_t table = to_integer(ladder_get_data_value(ladder_ctx, row, column, 0), 0);
         if (table > (*ladder_ctx).ladder.quantity.networks || (*ladder_ctx).exec_network[table].enable)
             return LADDER_INS_ERR_NOTABLE;
@@ -645,7 +627,6 @@ ladder_ins_err_t fn_TMOVE(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t ro
             uint32_t val = ladder_get_table_i32(ladder_ctx, table, pos);
             ladder_set_data_value(ladder_ctx, row, column, 1, (void*) &val, &error);
 
-            LADDER_ACTUALIZE_FLAGS(column, row);
             return error;
         }
 
@@ -655,7 +636,6 @@ ladder_ins_err_t fn_TMOVE(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t ro
             (*ladder_ctx).network[table].cells[ladder_table_pos_row(ladder_ctx, pos)][ladder_table_pos_column(ladder_ctx, pos)].data[0].value.i32 = to_integer(
                     ladder_get_data_value(ladder_ctx, row, column, 0), 1);
 
-            LADDER_ACTUALIZE_FLAGS(column, row);
             return LADDER_INS_ERR_OK;
         }
 

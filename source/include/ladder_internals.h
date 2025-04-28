@@ -38,8 +38,6 @@
 
 #include "ladder.h"
 
-#define LADDER_FLAG_MASK(n) (1L << (n))
-
 /**
  * @fn void ladder_clear_memory(ladder_ctx_t *ladder_ctx)
  * @brief Delete memory areas

@@ -128,456 +128,435 @@
     )
 
 /**
- * @def LADDER_ACTUALIZE_FLAGS
- * @brief Actualize flags in/after execution
+ * @def CELL_STATE
+ * @brief Cell state
  *
  */
-#define LADDER_ACTUALIZE_FLAGS(column, row)                                              \
-        (*ladder_ctx).scan_internals.network_flags[(column)] =                           \
-            (*ladder_ctx).scan_internals.network_flags[(column)] | LADDER_FLAG_MASK(row)
+#define CELL_STATE(lctx, c, r)  (exnet(lctx).cells[r][c].state)
 
 /**
- * @fn ladder_ins_err_t  fn_Nop(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag)
- * @brief No operation
+ * @def CELL_STATE_LEFT
+ * @brief Left cell state
  *
- * @param ladder_ctx Ladder context
- * @param column Column
- * @param row Row
- * @param flag Flag
- * @return Status
  */
-ladder_ins_err_t fn_NOP(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag);
+#define CELL_STATE_LEFT(lctx, c, r)  \
+    (c == 0 ? true : CELL_STATE(lctx, c - 1, r))
 
 /**
- * @fn ladder_ins_err_t  fn_Conn(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag)
- * @brief Connector
+ * @def MAKE_BOOL
+ * @brief Ensure bool value
  *
- * @param ladder_ctx Ladder context
- * @param column Column
- * @param row Row
- * @param flag Flag
- * @return Status
  */
-ladder_ins_err_t fn_CONN(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag);
+#define MAKE_BOOL(v)  ((v) == 0 ? false : true)
 
 /**
- * @fn ladder_ins_err_t  fn_Neg(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag)
- * @brief Negate
- *
- * @param ladder_ctx Ladder context
- * @param column Column
- * @param row Row
- * @param flag Flag
- * @return Status
- */
-ladder_ins_err_t fn_NEG(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag);
-
-/**
- * @fn ladder_ins_err_t  fn_NO(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag)
- * @brief Normally open contact
- *
- * @param ladder_ctx Ladder context
- * @param column Column
- * @param row Row
- * @param flag Flag
- * @return Status
- */
-ladder_ins_err_t fn_NO(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag);
-
-/**
- * @fn ladder_ins_err_t  fn_NC(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag)
- * @brief Normally closed contact
- *
- * @param ladder_ctx Ladder context
- * @param column Column
- * @param row Row
- * @param flag Flag
- * @return Status
- */
-ladder_ins_err_t fn_NC(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag);
-
-/**
- * @fn ladder_ins_err_t  fn_RE(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag)
- * @brief  Rise Edge Contact
- *
- * @param ladder_ctx Ladder context
- * @param column Column
- * @param row Row
- * @param flag Flag
- * @return Status
- */
-ladder_ins_err_t fn_RE(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag);
-
-/**
- * @fn ladder_ins_err_t  fn_FE(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag)
- * @brief Fall Edge Contact
- *
- * @param ladder_ctx Ladder context
- * @param column Column
- * @param row Row
- * @param flag Flag
- * @return Status
- */
-ladder_ins_err_t fn_FE(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag);
-
-/**
- * @fn ladder_ins_err_t  fn_Coil(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag)
- * @brief Coil
- *
- * @param ladder_ctx Ladder context
- * @param column
- * @param row
- * @param flag
- * @return
- */
-ladder_ins_err_t fn_COIL(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag);
-
-/**
- * @fn ladder_ins_err_t  fn_CoilL(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag)
- * @brief Latch coil
- *
- * @param ladder_ctx Ladder context
- * @param column
- * @param row
- * @param flag
- * @return
- */
-ladder_ins_err_t fn_COILL(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag);
-
-/**
- * @fn ladder_ins_err_t  fn_CoilU(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag)
- * @brief Unlatch coil
- *
- * @param ladder_ctx Ladder context
- * @param column
- * @param row
- * @param flag
- * @return
- */
-ladder_ins_err_t fn_COILU(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag);
-
-/**
- * @fn ladder_ins_err_t  fn_TON(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag)
- * @brief Timer on
- *
- * @param ladder_ctx Ladder context
- * @param column
- * @param row
- * @param flag
- * @return
- */
-ladder_ins_err_t fn_TON(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag);
-
-/**
- * @fn ladder_ins_err_t  fn_TOFF(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag)
- * @brief Timer off
- *
- * @param ladder_ctx Ladder context
- * @param column Column
- * @param row Row
- * @param flag Flag
- * @return Status
- */
-ladder_ins_err_t fn_TOFF(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag);
-
-/**
- * @fn ladder_ins_err_t  fn_TP(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag)
- * @brief Timer pulse
- *
- * @param ladder_ctx Ladder context
- * @param column Column
- * @param row Row
- * @param flag Flag
- * @return Status
- */
-ladder_ins_err_t fn_TP(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag);
-
-/**
- * @fn ladder_ins_err_t  fn_CTU(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag)
- * @brief Counter up
- *
- * @param ladder_ctx Ladder context
- * @param column Column
- * @param row Row
- * @param flag Flag
- * @return Status
- */
-ladder_ins_err_t fn_CTU(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag);
-
-/**
- * @fn ladder_ins_err_t  fn_CTD(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag)
- * @brief Counter down
- *
- * @param ladder_ctx Ladder context
- * @param column Column
- * @param row Row
- * @param flag Flag
- * @return Status
- */
-ladder_ins_err_t fn_CTD(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag);
-
-/**
- * @fn ladder_ins_err_t  fn_MOVE(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag)
- * @brief Register move
- *
- * @param ladder_ctx Ladder context
- * @param column Column
- * @param row Row
- * @param flag Flag
- * @return Status
- */
-ladder_ins_err_t fn_MOVE(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag);
-
-/**
- * @fn ladder_ins_err_t  fn_SUB(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag)
- * @brief Arithmetic subtraction
- *
- * @param ladder_ctx Ladder context
- * @param column Column
- * @param row Row
- * @param flag Flag
- * @return Status
- */
-ladder_ins_err_t fn_SUB(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag);
-
-/**
- * @fn ladder_ins_err_t  fn_ADD(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag)
- * @brief Arithmetic addition
- *
- * @param ladder_ctx Ladder context
- * @param column Column
- * @param row Row
- * @param flag Flag
- * @return Status
- */
-ladder_ins_err_t fn_ADD(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag);
-
-/**
- * @fn ladder_ins_err_t  fn_MUL(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag)
- * @brief Arithmetic multiplication
- *
- * @param ladder_ctx Ladder context
- * @param column Column
- * @param row Row
- * @param flag Flag
- * @return Status
- */
-ladder_ins_err_t fn_MUL(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag);
-
-/**
- * @fn ladder_ins_err_t  fn_DIV(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag)
- * @brief Arithmetic division
- *
- * @param ladder_ctx Ladder context
- * @param column Column
- * @param row Row
- * @param flag Flag
- * @return Status
- */
-ladder_ins_err_t fn_DIV(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag);
-
-/**
- * @fn ladder_ins_err_t  fn_MOD(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag)
- * @brief Arithmetic division module
- *
- * @param ladder_ctx Ladder context
- * @param column Column
- * @param row Row
- * @param flag Flag
- * @return Status
- */
-ladder_ins_err_t fn_MOD(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag);
-
-/**
- * @fn ladder_ins_err_t  fn_SHL(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag)
- * @brief Bit shifting left
- *
- * @param ladder_ctx Ladder context
- * @param column Column
- * @param row Row
- * @param flag Flag
- * @return Status
- */
-ladder_ins_err_t fn_SHL(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag);
-
-/**
- * @fn ladder_ins_err_t  fn_SHR(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag)
- * @brief Bit shifting right
- *
- * @param ladder_ctx Ladder context
- * @param column Column
- * @param row Row
- * @param flag Flag
- * @return Status
- */
-ladder_ins_err_t fn_SHR(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag);
-
-/**
- * @fn ladder_ins_err_t  fn_ROL(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag)
- * @brief Bit rotate left
- *
- * @param ladder_ctx Ladder context
- * @param column Column
- * @param row Row
- * @param flag Flag
- * @return Status
- */
-ladder_ins_err_t fn_ROL(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag);
-
-/**
- * @fn ladder_ins_err_t  fn_ROR(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag)
- * @brief Bit rotate right
- *
- * @param ladder_ctx Ladder context
- * @param column Column
- * @param row Row
- * @param flag Flag
- * @return Status
- */
-ladder_ins_err_t fn_ROR(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag);
-
-/**
- * @fn ladder_ins_err_t  fn_AND(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag)
- * @brief Bitwise AND
- *
- * @param ladder_ctx Ladder context
- * @param column Column
- * @param row Row
- * @param flag Flag
- * @return Status
- */
-ladder_ins_err_t fn_AND(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag);
-
-/**
- * @fn ladder_ins_err_t  fn_OR(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag)
- * @brief Bitwise OR
- *
- * @param ladder_ctx Ladder context
- * @param column Column
- * @param row Row
- * @param flag Flag
- * @return Status
- */
-ladder_ins_err_t fn_OR(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag);
-
-/**
- * @fn ladder_ins_err_t  fn_XOR(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag)
- * @brief Bitwise XOR
- *
- * @param ladder_ctx Ladder context
- * @param column Column
- * @param row Row
- * @param flag Flag
- * @return Status
- */
-ladder_ins_err_t fn_XOR(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag);
-
-/**
- * @fn ladder_ins_err_t  fn_NOT(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag)
- * @brief Bitwise NOT
- *
- * @param ladder_ctx Ladder context
- * @param column Column
- * @param row Row
- * @param flag Flag
- * @return Status
- */
-ladder_ins_err_t fn_NOT(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag);
-
-/**
- * @fn ladder_ins_err_t  fn_EQ(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag)
+ * @fn ladder_ins_err_t fn_NOP(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row)
  * @brief
  *
  * @param ladder_ctx Ladder context
  * @param column Column
  * @param row Row
- * @param flag Flag
  * @return Status
  */
-ladder_ins_err_t fn_EQ(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag);
+ladder_ins_err_t fn_NOP(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row);
 
 /**
- * @fn ladder_ins_err_t  fn_GT(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag)
+ * @fn ladder_ins_err_t  fn_Conn(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row)
+ * @brief Connector
+ *
+ * @param ladder_ctx Ladder context
+ * @param column Column
+ * @param row Row
+ * @return Status
+ */
+ladder_ins_err_t fn_CONN(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row);
+
+/**
+ * @fn ladder_ins_err_t  fn_Neg(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row)
+ * @brief Negate
+ *
+ * @param ladder_ctx Ladder context
+ * @param column Column
+ * @param row Row
+ * @return Status
+ */
+ladder_ins_err_t fn_NEG(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row);
+
+/**
+ * @fn ladder_ins_err_t  fn_NO(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row)
+ * @brief Normally open contact
+ *
+ * @param ladder_ctx Ladder context
+ * @param column Column
+ * @param row Row
+ * @return Status
+ */
+ladder_ins_err_t fn_NO(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row);
+
+/**
+ * @fn ladder_ins_err_t  fn_NC(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row)
+ * @brief Normally closed contact
+ *
+ * @param ladder_ctx Ladder context
+ * @param column Column
+ * @param row Row
+ * @return Status
+ */
+ladder_ins_err_t fn_NC(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row);
+
+/**
+ * @fn ladder_ins_err_t  fn_RE(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row)
+ * @brief  Rise Edge Contact
+ *
+ * @param ladder_ctx Ladder context
+ * @param column Column
+ * @param row Row
+ * @return Status
+ */
+ladder_ins_err_t fn_RE(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row);
+
+/**
+ * @fn ladder_ins_err_t  fn_FE(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row)
+ * @brief Fall Edge Contact
+ *
+ * @param ladder_ctx Ladder context
+ * @param column Column
+ * @param row Row
+ * @return Status
+ */
+ladder_ins_err_t fn_FE(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row);
+
+/**
+ * @fn ladder_ins_err_t  fn_Coil(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row)
+ * @brief Coil
+ *
+ * @param ladder_ctx Ladder context
+ * @param column Column
+ * @param row Row
+ * @return Status
+ * @return
+ */
+ladder_ins_err_t fn_COIL(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row);
+
+/**
+ * @fn ladder_ins_err_t  fn_CoilL(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row)
+ * @brief Latch coil
+ *
+ * @param ladder_ctx Ladder context
+ * @param column Column
+ * @param row Row
+ * @return Status
+ * @return
+ */
+ladder_ins_err_t fn_COILL(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row);
+
+/**
+ * @fn ladder_ins_err_t  fn_CoilU(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row)
+ * @brief Unlatch coil
+ *
+ * @param ladder_ctx Ladder context
+ * @param column Column
+ * @param row Row
+ * @return Status
+ * @return
+ */
+ladder_ins_err_t fn_COILU(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row);
+
+/**
+ * @fn ladder_ins_err_t  fn_TON(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row)
+ * @brief Timer on
+ *
+ * @param ladder_ctx Ladder context
+ * @param column Column
+ * @param row Row
+ * @return Status
+ */
+ladder_ins_err_t fn_TON(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row);
+
+/**
+ * @fn ladder_ins_err_t  fn_TOFF(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row)
+ * @brief Timer off
+ *
+ * @param ladder_ctx Ladder context
+ * @param column Column
+ * @param row Row
+ * @return Status
+ */
+ladder_ins_err_t fn_TOFF(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row);
+
+/**
+ * @fn ladder_ins_err_t  fn_TP(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row)
+ * @brief Timer pulse
+ *
+ * @param ladder_ctx Ladder context
+ * @param column Column
+ * @param row Row
+ * @return Status
+ */
+ladder_ins_err_t fn_TP(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row);
+
+/**
+ * @fn ladder_ins_err_t  fn_CTU(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row)
+ * @brief Counter up
+ *
+ * @param ladder_ctx Ladder context
+ * @param column Column
+ * @param row Row
+ * @return Status
+ */
+ladder_ins_err_t fn_CTU(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row);
+
+/**
+ * @fn ladder_ins_err_t  fn_CTD(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row)
+ * @brief Counter down
+ *
+ * @param ladder_ctx Ladder context
+ * @param column Column
+ * @param row Row
+ * @return Status
+ */
+ladder_ins_err_t fn_CTD(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row);
+
+/**
+ * @fn ladder_ins_err_t  fn_MOVE(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row)
+ * @brief Register move
+ *
+ * @param ladder_ctx Ladder context
+ * @param column Column
+ * @param row Row
+ * @return Status
+ */
+ladder_ins_err_t fn_MOVE(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row);
+
+/**
+ * @fn ladder_ins_err_t  fn_SUB(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row)
+ * @brief Arithmetic subtraction
+ *
+ * @param ladder_ctx Ladder context
+ * @param column Column
+ * @param row Row
+ * @return Status
+ */
+ladder_ins_err_t fn_SUB(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row);
+
+/**
+ * @fn ladder_ins_err_t  fn_ADD(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row)
+ * @brief Arithmetic addition
+ *
+ * @param ladder_ctx Ladder context
+ * @param column Column
+ * @param row Row
+ * @return Status
+ */
+ladder_ins_err_t fn_ADD(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row);
+
+/**
+ * @fn ladder_ins_err_t  fn_MUL(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row)
+ * @brief Arithmetic multiplication
+ *
+ * @param ladder_ctx Ladder context
+ * @param column Column
+ * @param row Row
+ * @return Status
+ */
+ladder_ins_err_t fn_MUL(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row);
+
+/**
+ * @fn ladder_ins_err_t  fn_DIV(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row)
+ * @brief Arithmetic division
+ *
+ * @param ladder_ctx Ladder context
+ * @param column Column
+ * @param row Row
+ * @return Status
+ */
+ladder_ins_err_t fn_DIV(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row);
+
+/**
+ * @fn ladder_ins_err_t  fn_MOD(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row)
+ * @brief Arithmetic division module
+ *
+ * @param ladder_ctx Ladder context
+ * @param column Column
+ * @param row Row
+ * @return Status
+ */
+ladder_ins_err_t fn_MOD(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row);
+
+/**
+ * @fn ladder_ins_err_t  fn_SHL(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row)
+ * @brief Bit shifting left
+ *
+ * @param ladder_ctx Ladder context
+ * @param column Column
+ * @param row Row
+ * @return Status
+ */
+ladder_ins_err_t fn_SHL(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row);
+
+/**
+ * @fn ladder_ins_err_t  fn_SHR(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row)
+ * @brief Bit shifting right
+ *
+ * @param ladder_ctx Ladder context
+ * @param column Column
+ * @param row Row
+ * @return Status
+ */
+ladder_ins_err_t fn_SHR(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row);
+
+/**
+ * @fn ladder_ins_err_t  fn_ROL(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row)
+ * @brief Bit rotate left
+ *
+ * @param ladder_ctx Ladder context
+ * @param column Column
+ * @param row Row
+ * @return Status
+ */
+ladder_ins_err_t fn_ROL(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row);
+
+/**
+ * @fn ladder_ins_err_t  fn_ROR(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row)
+ * @brief Bit rotate right
+ *
+ * @param ladder_ctx Ladder context
+ * @param column Column
+ * @param row Row
+ * @return Status
+ */
+ladder_ins_err_t fn_ROR(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row);
+
+/**
+ * @fn ladder_ins_err_t  fn_AND(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row)
+ * @brief Bitwise AND
+ *
+ * @param ladder_ctx Ladder context
+ * @param column Column
+ * @param row Row
+ * @return Status
+ */
+ladder_ins_err_t fn_AND(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row);
+
+/**
+ * @fn ladder_ins_err_t  fn_OR(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row)
+ * @brief Bitwise OR
+ *
+ * @param ladder_ctx Ladder context
+ * @param column Column
+ * @param row Row
+ * @return Status
+ */
+ladder_ins_err_t fn_OR(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row);
+
+/**
+ * @fn ladder_ins_err_t  fn_XOR(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row)
+ * @brief Bitwise XOR
+ *
+ * @param ladder_ctx Ladder context
+ * @param column Column
+ * @param row Row
+ * @return Status
+ */
+ladder_ins_err_t fn_XOR(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row);
+
+/**
+ * @fn ladder_ins_err_t  fn_NOT(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row)
+ * @brief Bitwise NOT
+ *
+ * @param ladder_ctx Ladder context
+ * @param column Column
+ * @param row Row
+ * @return Status
+ */
+ladder_ins_err_t fn_NOT(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row);
+
+/**
+ * @fn ladder_ins_err_t  fn_EQ(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row)
+ * @brief
+ *
+ * @param ladder_ctx Ladder context
+ * @param column Column
+ * @param row Row
+ * @return Status
+ */
+ladder_ins_err_t fn_EQ(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row);
+
+/**
+ * @fn ladder_ins_err_t  fn_GT(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row)
  * @brief Comparison equal to
  *
  * @param ladder_ctx Ladder context
  * @param column Column
  * @param row Row
- * @param flag Flag
  * @return Status
  */
-ladder_ins_err_t fn_GT(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag);
+ladder_ins_err_t fn_GT(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row);
 
 /**
- * @fn ladder_ins_err_t  fn_GE(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag)
+ * @fn ladder_ins_err_t  fn_GE(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row)
  * @brief Comparison greater than
  *
  * @param ladder_ctx Ladder context
  * @param column Column
  * @param row Row
- * @param flag Flag
  * @return Status
  */
-ladder_ins_err_t fn_GE(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag);
+ladder_ins_err_t fn_GE(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row);
 
 /**
- * @fn ladder_ins_err_t  fn_LT(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag)
+ * @fn ladder_ins_err_t  fn_LT(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row)
  * @brief Comparison lesser than
  *
  * @param ladder_ctx Ladder context
  * @param column Column
  * @param row Row
- * @param flag Flag
  * @return Status
  */
-ladder_ins_err_t fn_LT(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag);
+ladder_ins_err_t fn_LT(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row);
 
 /**
- * @fn ladder_ins_err_t  fn_LE(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag)
+ * @fn ladder_ins_err_t  fn_LE(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row)
  * @brief Comparison lesser or equal
  *
  * @param ladder_ctx Ladder context
  * @param column Column
  * @param row Row
- * @param flag Flag
  * @return Status
  */
-ladder_ins_err_t fn_LE(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag);
+ladder_ins_err_t fn_LE(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row);
 
 /**
- * @fn ladder_ins_err_t  fn_NE(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag)
+ * @fn ladder_ins_err_t  fn_NE(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row)
  * @brief Comparison not equal
  *
  * @param ladder_ctx Ladder context
  * @param column Column
  * @param row Row
- * @param flag Flag
  * @return Status
  */
-ladder_ins_err_t fn_NE(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag);
+ladder_ins_err_t fn_NE(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row);
 
 /**
- * @fn ladder_ins_err_t  fn_FOREIGN(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag)
+ * @fn ladder_ins_err_t  fn_FOREIGN(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row)
  * @brief Execute external functions
  *
  * @param ladder_ctx Ladder context
  * @param column Column
  * @param row Row
- * @param flag Flag
  * @return Status
  */
-ladder_ins_err_t fn_FOREIGN(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag);
+ladder_ins_err_t fn_FOREIGN(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row);
 
 /**
- * @fn ladder_ins_err_t  fn_TMOVE(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag)
+ * @fn ladder_ins_err_t  fn_TMOVE(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row)
  * @brief Execute table data move
  *
  * @param ladder_ctx Ladder context
  * @param column Column
  * @param row Row
- * @param flag Flag
  * @return Status
  */
-ladder_ins_err_t fn_TMOVE(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag);
+ladder_ins_err_t fn_TMOVE(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row);
 
 #endif /* LADDER_INSTRUCTIONS_H */

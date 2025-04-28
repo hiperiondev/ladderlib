@@ -59,6 +59,18 @@
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+/**
+ * @def LADDER_VERTICAL_BAR
+ * @brief Point to vertical bar flag
+ *
+ */
+#define LADDER_VERTICAL_BAR(lctx, n, r, c) ((*lctx).network[n].cells[r][c].vertical_bar)
+
+/**
+ * @def ladder_cell_data
+ * @brief
+ *
+ */
 #define ladder_cell_data(lctx, n, r, c, i, typ, val)                                                                                                           \
     (*lctx).network[n].cells[r][c].data[i].type = typ;                                                                                                         \
     switch (typ) {                                                                                                                                             \
@@ -109,6 +121,11 @@
         } break;                                                                                                                                               \
     }
 
+/**
+ * @def ladder_cell_data_cstr
+ * @brief
+ *
+ */
 #define ladder_cell_data_cstr(lctx, n, r, c, i, val)                                                                                                           \
     (*lctx).network[n].cells[r][c].data[i].type = LADDER_TYPE_CSTR;                                                                                            \
     (*lctx).network[n].cells[r][c].data[i].value.cstr = val
@@ -255,9 +272,11 @@ typedef struct ladder_value_s {
  *
  */
 typedef struct ladder_cell_s {
-    ladder_instruction_t code;     /**< Code */
-                 uint8_t data_qty; /**< Data quantity */
-         ladder_value_t *data;     /**< Data */
+                    bool state;        /**< Output state */
+                    bool vertical_bar; /**< Have vertical bar */
+    ladder_instruction_t code;         /**< Code */
+                 uint8_t data_qty;     /**< Data quantity */
+         ladder_value_t *data;         /**< Data */
 } ladder_cell_t;
 
 /**
@@ -268,7 +287,6 @@ typedef struct ladder_cell_s {
 typedef struct ladder_network_s {
              bool enable;  /**< Enabled for execution */
     ladder_cell_t **cells; /**< Cells */
-         uint32_t *bars;   /**< Bars */
 } ladder_network_t;
 
 /**
@@ -491,22 +509,20 @@ typedef struct ladder_registers_s {
  *
  */
 typedef struct ladder_scan_internals_s {
-    uint32_t *network_flags;   /**< Flags */
     uint64_t actual_scan_time; /**< Actual scan time */
     uint64_t start_time;       /**< Start time for calculate scan time */
 } ladder_scan_internals_t;
 
 /**
- * @fn  ladder_ins_err_t (*ladder_fn_t)(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag)
+ * @fn  ladder_ins_err_t (*ladder_fn_t)(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool *state)
  * @brief Instruction prototype
  *
  * @param ladder_ctx Ladder context
  * @param column Column
  * @param row Row
- * @param flag Flag
  * @return Status
  */
-typedef ladder_ins_err_t (*ladder_fn_t)(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag);
+typedef ladder_ins_err_t (*ladder_fn_t)(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row);
 
 typedef struct ladder_foreign_function_s ladder_foreign_function_t;
 

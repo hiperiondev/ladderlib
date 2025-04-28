@@ -49,16 +49,15 @@ typedef struct fn_dummy_value_s {
 } fn_dummy_value_t;
 
 /**
- * @fn ladder_ins_err_t dummy_exec(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag)
+ * @fn ladder_ins_err_t dummy_exec(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row)
  * @brief Function implementation
  *
  * @param ladder_ctx Ladder context
  * @param column Column
  * @param row Row
- * @param flag Flag
  * @return Status
  */
-ladder_ins_err_t dummy_exec(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool flag);
+ladder_ins_err_t dummy_exec(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row);
 
 /**
  * @fn bool dummy_init(ladder_foreign_function_t *function, uint32_t id, void *data, uint32_t qty)
