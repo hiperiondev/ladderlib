@@ -469,51 +469,7 @@ Clears the current ladder logic program, resetting the context.
 ### ladder_add_foreign  
 Adds custom (foreign) functions to the context for extended functionality.  
   
-| **Parameter** | **Descrip## Instruction Summary Table  
-
-The following table summarizes the instructions, their codes, categories, and symbols.  
-  
-
-| Instruction | Code | Category | Symbol | Description |  
-|-------------|------|----------|--------|-------------|  
-| NOP | 0 | Specialized | None | No operation, placeholder |  
-| CONN | 1 | Specialized | Vertical lines | Connects rungs or branches |  
-| NEG | 2 | Specialized | Circle before contact | Inverts logic state |  
-| NO | 3 | Basic Logic | `--|  |--` | Normally Open contact |  
-| NC | 4 | Basic Logic | `--|/|--` | Normally Closed contact |  
-| RE | 5 | Specialized | Contact with upward arrow | Rising edge detection |  
-| FE | 6 | Specialized | Contact with downward arrow | Falling edge detection |  
-| COIL | 7 | Basic Logic |  `--( )--`  | Output coil |  
-| COILL | 8 | Basic Logic |  `--(L)--`  | Latched coil |  
-| COILU | 9 | Basic Logic |  `--(U)--`  | Unlatched coil |  
-| TON | 10 | Timer | Box labeled "TON" | Timer On Delay |  
-| TOFF | 11 | Timer | Box labeled "TOFF" | Timer Off Delay |  
-| TP | 12 | Timer | Box labeled "TP" | Timer Pulse |  
-| CTU | 13 | Counter | Box labeled "CTU" | Count Up |  
-| CTD | 14 | Counter | Box labeled "CTD" | Count Down |  
-| MOVE | 15 | Specialized | Box labeled "MOVE" | Moves data |  
-| SUB | 16 | Arithmetic | Box labeled "-" | Subtraction |  
-| ADD | 17 | Arithmetic | Box labeled "+" | Addition |  
-| MUL | 18 | Arithmetic | Box labeled "*" | Multiplication |  
-| DIV | 19 | Arithmetic | Box labeled "/" | Division |  
-| MOD | 20 | Arithmetic | Box labeled "%" | Modulus |  
-| SHL | 21 | Bitwise | Box labeled "SHL" | Shift Left |  
-| SHR | 22 | Bitwise | Box labeled "SHR" | Shift Right |  
-| ROL | 23 | Bitwise | Box labeled "ROL" | Rotate Left |  
-| ROR | 24 | Bitwise | Box labeled "ROR" | Rotate Right |  
-| AND | 25 | Bitwise | Box labeled "AND" | Bitwise AND |  
-| OR | 26 | Bitwise | Box labeled "OR" | Bitwise OR |  
-| XOR | 27 | Bitwise | Box labeled "XOR" | Bitwise XOR |  
-| NOT | 28 | Bitwise | Box labeled "NOT" | Bitwise NOT |  
-| EQ | 29 | Comparison | Box labeled "=" | Equal |  
-| GT | 30 | Comparison | Box labeled ">" | Greater Than |  
-| GE | 31 | Comparison | Box labeled ">=" | Greater Than or Equal |  
-| LT | 32 | Comparison | Box labeled "<" | Less Than |  
-| LE | 33 | Comparison | Box labeled "<=" | Less Than or Equal |  
-| NE | 34 | Comparison | Box labeled "<>" | Not Equal |  
-| FOREIGN | 35 | Specialized | Box labeled "FOREIGN" | External function call |  
-| TMOVE | 36 | Specialized | Box labeled "TMOVE" | Table data move |  
-| INV | 37 | Specialized | None | Invalid instruction |tion** |  
+| **Parameter** | **Description**|
 |----------------|------------------------------------------|  
 | `ladder_ctx` | Pointer to `ladder_ctx_s`. |  
 | `fn_init` | Initialization function for foreign functions. |  
