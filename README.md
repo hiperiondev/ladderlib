@@ -32,41 +32,41 @@ The following table summarizes the instructions, their codes, categories, and sy
 |-------------|------|----------|--------|-------------|  
 | NOP | 0 | Specialized | None | No operation, placeholder |  
 | CONN | 1 | Specialized | Vertical lines | Connects rungs or branches |  
-| NEG | 2 | Specialized | Circle before contact | Inverts logic state |  
-| NO | 3 | Basic Logic | `--| |--` | Normally Open contact |  
-| NC | 4 | Basic Logic | `--|/|--` | Normally Closed contact |  
-| RE | 5 | Specialized | Contact with upward arrow | Rising edge detection |  
-| FE | 6 | Specialized | Contact with downward arrow | Falling edge detection |  
-| COIL | 7 | Basic Logic | `--( )--` | Output coil |  
-| COILL | 8 | Basic Logic | `--(L)--` | Latched coil |  
-| COILU | 9 | Basic Logic | `--(U)--` | Unlatched coil |  
-| TON | 10 | Timer | Box labeled "TON" | Timer On Delay |  
-| TOFF | 11 | Timer | Box labeled "TOFF" | Timer Off Delay |  
-| TP | 12 | Timer | Box labeled "TP" | Timer Pulse |  
-| CTU | 13 | Counter | Box labeled "CTU" | Count Up |  
-| CTD | 14 | Counter | Box labeled "CTD" | Count Down |  
-| MOVE | 15 | Specialized | Box labeled "MOVE" | Moves data |  
-| SUB | 16 | Arithmetic | Box labeled "-" | Subtraction |  
-| ADD | 17 | Arithmetic | Box labeled "+" | Addition |  
-| MUL | 18 | Arithmetic | Box labeled "*" | Multiplication |  
-| DIV | 19 | Arithmetic | Box labeled "/" | Division |  
-| MOD | 20 | Arithmetic | Box labeled "%" | Modulus |  
-| SHL | 21 | Bitwise | Box labeled "SHL" | Shift Left |  
-| SHR | 22 | Bitwise | Box labeled "SHR" | Shift Right |  
-| ROL | 23 | Bitwise | Box labeled "ROL" | Rotate Left |  
-| ROR | 24 | Bitwise | Box labeled "ROR" | Rotate Right |  
-| AND | 25 | Bitwise | Box labeled "AND" | Bitwise AND |  
-| OR | 26 | Bitwise | Box labeled "OR" | Bitwise OR |  
-| XOR | 27 | Bitwise | Box labeled "XOR" | Bitwise XOR |  
-| NOT | 28 | Bitwise | Box labeled "NOT" | Bitwise NOT |  
-| EQ | 29 | Comparison | Box labeled "=" | Equal |  
-| GT | 30 | Comparison | Box labeled ">" | Greater Than |  
-| GE | 31 | Comparison | Box labeled ">=" | Greater Than or Equal |  
-| LT | 32 | Comparison | Box labeled "<" | Less Than |  
-| LE | 33 | Comparison | Box labeled "<=" | Less Than or Equal |  
-| NE | 34 | Comparison | Box labeled "<>" | Not Equal |  
+| NEG | 2 | Specialized |  <img src="images/png/NEG.png" alt="Image"> | Inverts logic state |  
+| NO | 3 | Basic Logic | <img src="images/png/NO.png" alt="Image"> | Normally Open contact |  
+| NC | 4 | Basic Logic |  <img src="images/png/NC.png" alt="Image"> | Normally Closed contact |  
+| RE | 5 | Specialized |  <img src="images/png/RE.png" alt="Image"> | Rising edge detection |  
+| FE | 6 | Specialized |  <img src="images/png/FE.png" alt="Image"> | Falling edge detection |  
+| COIL | 7 | Basic Logic |  <img src="images/png/COIL.png" alt="Image"> | Output coil |  
+| COILL | 8 | Basic Logic |  <img src="images/png/COILL.png" alt="Image"> | Latched coil |  
+| COILU | 9 | Basic Logic |  <img src="images/png/COILU.png" alt="Image"> | Unlatched coil |  
+| TON | 10 | Timer |  <img src="images/png/TON.png" alt="Image"> | Timer On Delay |  
+| TOFF | 11 | Timer |  <img src="images/png/TOF.png" alt="Image"> | Timer Off Delay |  
+| TP | 12 | Timer |  <img src="images/png/TP.png" alt="Image"> | Timer Pulse |  
+| CTU | 13 | Counter |  <img src="images/png/CTU.png" alt="Image"> | Count Up |  
+| CTD | 14 | Counter |  <img src="images/png/CTD.png" alt="Image"> | Count Down |  
+| MOVE | 15 | Specialized | <img src="images/png/MOV.png" alt="Image"> | Moves data |  
+| SUB | 16 | Arithmetic |  <img src="images/png/SUB.png" alt="Image"> | Subtraction |  
+| ADD | 17 | Arithmetic | <img src="images/png/ADD.png" alt="Image"> | Addition |  
+| MUL | 18 | Arithmetic | <img src="images/png/MUL.png" alt="Image"> | Multiplication |  
+| DIV | 19 | Arithmetic | <img src="images/png/DIV.png" alt="Image">| Division |  
+| MOD | 20 | Arithmetic | <img src="images/png/MOD.png" alt="Image"> | Modulus |  
+| SHL | 21 | Bitwise | <img src="images/png/SHL.png" alt="Image"> | Shift Left |  
+| SHR | 22 | Bitwise | <img src="images/png/SHR.png" alt="Image"> | Shift Right |  
+| ROL | 23 | Bitwise | <img src="images/png/ROL.png" alt="Image"> | Rotate Left |  
+| ROR | 24 | Bitwise | <img src="images/png/ROR.png" alt="Image"> | Rotate Right |  
+| AND | 25 | Bitwise | <img src="images/png/AND.png" alt="Image"> | Bitwise AND |  
+| OR | 26 | Bitwise | <img src="images/png/OR.png" alt="Image"> | Bitwise OR |  
+| XOR | 27 | Bitwise | <img src="images/png/XOR.png" alt="Image"> | Bitwise XOR |  
+| NOT | 28 | Bitwise | <img src="images/png/NOT.png" alt="Image"> | Bitwise NOT |  
+| EQ | 29 | Comparison | <img src="images/png/EQ.png" alt="Image"> | Equal |  
+| GT | 30 | Comparison | <img src="images/png/GT.png" alt="Image"> | Greater Than |  
+| GE | 31 | Comparison | <img src="images/png/GE.png" alt="Image"> | Greater Than or Equal |  
+| LT | 32 | Comparison | <img src="images/png/LT.png" alt="Image"> | Less Than |  
+| LE | 33 | Comparison | <img src="images/png/LE.png" alt="Image"> | Less Than or Equal |  
+| NE | 34 | Comparison | <img src="images/png/NE.png" alt="Image"> | Not Equal |  
 | FOREIGN | 35 | Specialized | Box labeled "FOREIGN" | External function call |  
-| TMOVE | 36 | Specialized | Box labeled "TMOVE" | Table data move |  
+| TMOVE | 36 | Specialized | <img src="images/png/TMOV.png" alt="Image"> | Table data move |  
 | INV | 37 | Specialized | None | Invalid instruction |
 
 ## Basic Instructions
