@@ -21,8 +21,8 @@ Key features include:
 The library is likely optimized for embedded systems.
  
 ## Introduction to Ladder Logic  
-Ladder logic programs consist of "rungs" connecting two vertical "rails," mimicking electrical relay circuits. Each rung contains conditions (e.g., contacts) and actions (e.g., coils). The instructions in `ladder.h` are defined in the `LADDER_INSTRUCTIONS` enum, which assigns unique codes to each instruction, corresponding to functions executed by the PLC. The following sections detail each instruction, grouped by category, with their instruction codes, descriptions, and symbols.  
-  
+Ladder logic programs consist of "rungs" connecting two vertical "rails," mimicking electrical relay circuits. Each rung contains conditions (e.g., contacts) and actions (e.g., coils)
+
 ## Basic Logic Instructions  
 
 ### Instruction Summary Table  
