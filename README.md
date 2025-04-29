@@ -121,7 +121,6 @@ Counter instructions track the number of events or occurrences.
 ### CTU (Count Up)  
 - **Instruction Code:** `LADDER_INS_CTU` (13)  
 - **Description:** The Count Up counter increments its count each time the input transitions from false to true, up to a preset value. It is used to count items or events.  
-- **Symbol:** A rectangular box labeled "CTU" with input, reset, preset, and output connections.  
 - **Example Use:** Counting the number of boxes on a conveyor belt.  
   
 ### CTD (Count Down)  
