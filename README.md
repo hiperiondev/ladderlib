@@ -283,9 +283,11 @@ These instructions provide additional functionality, some of which may be specif
 ### MULTI (Multi-cell Instruction)  
 - **Instruction Code:** `LADDER_INS_MULTI` (255, 0xff)  
 - **Description:** Indicates that the cell is part of a larger instruction spanning multiple cells, used for complex operations requiring additional data.  
-- **Example Use:** Implementing a multi-step operation like a sequence control.  
+- **Example Use:** Implementing a multi-step operation like a sequence control.
+
+## INTERNALS
   
-## LADDER_STATE  
+### LADDER_STATE  
 Defines 6 possible states for program execution:  
 - `STOPPED`: Program is halted.  
 - `RUNNING`: Program is actively executing.  
@@ -296,7 +298,7 @@ Defines 6 possible states for program execution:
   
 These states manage the lifecycle of the ladder logic program, ensuring proper control and error handling.  
   
-## LADDER_INS_ERROR  
+### LADDER_INS_ERROR  
 Provides 8 error codes for instruction execution:  
 - `OK`: Successful execution.  
 - `GETPREVVAL`: Error retrieving previous value.  
@@ -309,17 +311,17 @@ Provides 8 error codes for instruction execution:
   
 These codes help developers diagnose and handle issues during program execution.  
   
-## LADDER_TYPE  
+### LADDER_TYPE  
 Defines 15 data types and 4 basetime options:  
 - **Types**: `NONE`, `M` (Memory Register), `Q` (Output), `I` (Input), `Cd` (Counter Done), `Cr` (Counter Running), `Td` (Timer Done), `Tr` (Timer Running), `IW` (Input Word), `QW` (Output Word), `C` (Counter), `T` (Timer), `D` (Data Register), `CSTR` (Constant String), `REAL` (Floating Point).  
 - **Basetime Options**: `BASETIME_MS`, `BASETIME_10MS`, `BASETIME_100MS`, `BASETIME_SEC`, `BASETIME_MIN`.  
   
 These types support various data representations, crucial for defining inputs, outputs, and internal variables.  
   
-# Structures  
+### Structures  
 Ladderlib uses structures to organize ladder logic programs, hardware interactions, and execution management. Below is a detailed breakdown of key structures.  
   
-### ladder_cell_s  
+#### ladder_cell_s  
 Represents an individual cell in a ladder logic diagram, akin to a contact or coil in a relay circuit.  
   
 | **Field** | **Description** |  
@@ -330,7 +332,7 @@ Represents an individual cell in a ladder logic diagram, akin to a contact or co
 | `data_qty` | Number of data elements associated. |  
 | `data` | Array of `ladder_value_s` for cell data. |  
   
-### ladder_network_s  
+#### ladder_network_s  
 Represents a network or rung, a horizontal line in the ladder diagram containing multiple cells.  
   
 | **Field** | **Description** |  
@@ -338,7 +340,7 @@ Represents a network or rung, a horizontal line in the ladder diagram containing
 | `enable` | Flag to enable/disable the network. |  
 | `cells` | Array of `ladder_cell_s` for the network. |  
   
-### ladder_timer_s  
+#### ladder_timer_s  
 Manages timer functions for time-based operations.  
   
 | **Field** | **Description** |  
@@ -346,7 +348,7 @@ Manages timer functions for time-based operations.
 | `time_stamp` | Timestamp for timer operations. |  
 | `acc` | Accumulator for timer value. |  
   
-### ladder_s  
+#### ladder_s  
 The main structure for the ladder logic program, encapsulating overall state and configuration.  
   
 | **Field** | **Description** |  
@@ -355,7 +357,7 @@ The main structure for the ladder logic program, encapsulating overall state and
 | `last` | Tracks last executed instruction, network, etc. |  
 | `quantity` | Quantities of memory, inputs, outputs, etc. |  
   
-### ladder_hw_s  
+#### ladder_hw_s  
 Handles hardware interactions, providing function pointers for I/O and timing.  This Functions are external and hardware dependant
   
 | **Field** | **Description** |  
@@ -367,7 +369,7 @@ Handles hardware interactions, providing function pointers for I/O and timing.  
 | `_millis` | Returns current time in milliseconds. |  
 | `_delay` | Delays execution for a specified time. |  
   
-### ladder_manage_s  
+#### ladder_manage_s  
 Manages execution events through callbacks.  This functions are optionals.
   
 | **Field** | **Description** |  
@@ -379,7 +381,7 @@ Manages execution events through callbacks.  This functions are optionals.
 | `_on_panic` | Handles panic situations. |  
 | `_on_end_task` | Called at task completion. |  
   
-### Other Structures  
+#### Other Structures  
 Additional structures include:  
 - `ladder_instructions_ioc_s`: Defines input/output/cell configurations.  
 - `ladder_value_s`: Holds data with type and union (u32, i32, cstr, real).  
@@ -391,10 +393,10 @@ Additional structures include:
 - `ladder_foreign_s`: Manages a collection of foreign functions.  
 - `ladder_ctx_s`: The main context, combining all components for program execution.  
   
-## Functions  
+### Functions  
 The API provides functions for initializing, running, and managing ladder logic programs. Below is a detailed description of each.  
   
-### ladder_ctx_init  
+#### ladder_ctx_init  
 Initializes the ladder context, setting up structures and resources.  
   
 | **Parameter** | **Description** |  
@@ -406,28 +408,28 @@ Initializes the ladder context, setting up structures and resources.
   
 **Returns**: Pointer to `ladder_ctx_s`.  
   
-### ladder_ctx_deinit  
+#### ladder_ctx_deinit  
 Deinitializes the context, freeing allocated resources.  
   
 | **Parameter** | **Description** |  
 |----------------|----------------------------------|  
 | `ladder_ctx` | Pointer to `ladder_ctx_s`. |  
   
-### ladder_task  
+#### ladder_task  
 Executes the ladder logic task, processing networks and cells.  
   
 | **Parameter** | **Description** |  
 |----------------|----------------------------------|  
 | `ladderctx` | Pointer to `ladder_ctx_s`. |  
   
-### ladder_clear_program  
+#### ladder_clear_program  
 Clears the current ladder logic program, resetting the context.  
   
 | **Parameter** | **Description** |  
 |----------------|----------------------------------|  
 | `ladder_ctx` | Pointer to `ladder_ctx_s`. |  
   
-### ladder_add_foreign  
+#### ladder_add_foreign  
 Adds custom (foreign) functions to the context for extended functionality.  
   
 | **Parameter** | **Description**|
@@ -437,7 +439,7 @@ Adds custom (foreign) functions to the context for extended functionality.
 | `init_data` | Data for initialization. |  
 | `qty` | Number of foreign functions to add. |  
   
-### ladder_fn_cell  
+#### ladder_fn_cell  
 Assigns a function to a specific cell in the ladder logic.  
   
 | **Parameter** | **Description** |  
