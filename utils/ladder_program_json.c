@@ -132,11 +132,12 @@ static ladder_type_t get_type_code(const char *type) {
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
-bool ladder_json_to_program(const char *prg, ladder_ctx_t *ladder_ctx) {
+ladder_json_error_t ladder_json_to_program(const char *prg, ladder_ctx_t *ladder_ctx) {
 
     FILE *fp = fopen(prg, "r");
-    if (!fp)
-        return false;
+    if (!fp) {
+        return JSON_ERROR_OPENFILE;
+    }
 
     fseek(fp, 0, SEEK_END);
     long size = ftell(fp);
@@ -144,7 +145,7 @@ bool ladder_json_to_program(const char *prg, ladder_ctx_t *ladder_ctx) {
     char *json_string = malloc(size + 1);
     if (!json_string) {
         fclose(fp);
-        return false;
+        return JSON_ERROR_ALLOC_STRING;
     }
     fread(json_string, 1, size, fp);
     json_string[size] = '\0';
@@ -154,19 +155,20 @@ bool ladder_json_to_program(const char *prg, ladder_ctx_t *ladder_ctx) {
     if (!root) {
         fprintf(stderr, "Error al analizar JSON\n");
         free(json_string);
-        return false;
+        return JSON_ERROR_PARSE;
     }
 
-    int network_count = cJSON_GetArraySize(root);
+    (*ladder_ctx).ladder.quantity.networks = cJSON_GetArraySize(root);
+    ;
 
-    (*ladder_ctx).network = malloc(network_count * sizeof(ladder_network_t));
+    (*ladder_ctx).network = malloc((*ladder_ctx).ladder.quantity.networks * sizeof(ladder_network_t));
     if (!(*ladder_ctx).network) {
         cJSON_Delete(root);
         free(json_string);
-        return false;
+        return JSON_ERROR_ALLOC_NETWORK;
     }
 
-    for (int n = 0; n < network_count; n++) {
+    for (int n = 0; n < (*ladder_ctx).ladder.quantity.networks; n++) {
         cJSON *network_json = cJSON_GetArrayItem(root, n);
         ladder_network_t *network = &((*ladder_ctx).network[n]);
         network->enable = true;
@@ -195,8 +197,8 @@ bool ladder_json_to_program(const char *prg, ladder_ctx_t *ladder_ctx) {
                 cJSON *symbol_json = cJSON_GetObjectItem(cell_json, "symbol");
                 char *symbol = cJSON_GetStringValue(symbol_json);
                 cell->code = get_instruction_code(symbol);
-                if(cell->code == LADDER_INS_INV)
-                    return false;
+                if (cell->code == LADDER_INS_INV)
+                    return JSON_ERROR_INS_INV;
 
                 cJSON *data_json = cJSON_GetObjectItem(cell_json, "data");
                 int data_qty = cJSON_GetArraySize(data_json);
@@ -207,9 +209,10 @@ bool ladder_json_to_program(const char *prg, ladder_ctx_t *ladder_ctx) {
                     cJSON *data_item = cJSON_GetArrayItem(data_json, d);
                     cJSON *type_json = cJSON_GetObjectItem(data_item, "type");
                     char *type_str = cJSON_GetStringValue(type_json);
-                    cell->data[d].type = get_type_code(type_str);;
+                    cell->data[d].type = get_type_code(type_str);
+                    ;
                     if (cell->data[d].type == LADDER_TYPE_INV)
-                        return false;
+                        return JSON_ERROR_TYPE_INV;
 
                     cJSON *value_json = cJSON_GetObjectItem(data_item, "value");
                     char *value_str = cJSON_GetStringValue(value_json);
@@ -228,10 +231,133 @@ bool ladder_json_to_program(const char *prg, ladder_ctx_t *ladder_ctx) {
     cJSON_Delete(root);
     free(json_string);
 
-    return true;
+    return JSON_ERROR_OK;
 }
 
-bool ladder_program_to_json(const char *prg, ladder_ctx_t *ladder_ctx) {
+ladder_json_error_t ladder_program_to_json(const char *prg, ladder_ctx_t *ladder_ctx) {
+    FILE *fp = fopen(prg, "w");
+    if (fp == NULL) {
+        return JSON_ERROR_OPENFILE;
+    }
 
-    return LADDER_INS_ERR_OK;
+    cJSON *root = cJSON_CreateArray();
+    if (root == NULL) {
+        fclose(fp);
+        return JSON_ERROR_CREATEARRAY;
+    }
+
+    for (uint32_t n = 0; n < (*ladder_ctx).ladder.quantity.networks; n++) {
+        //ladder_network_t *net = &(*ladder_ctx).network[n];
+        cJSON *network_obj = cJSON_CreateObject();
+        if (network_obj == NULL) {
+            cJSON_Delete(root);
+            fclose(fp);
+            return JSON_ERROR_CREATENETOBJT;
+        }
+
+        cJSON_AddNumberToObject(network_obj, "id", n);
+        cJSON_AddNumberToObject(network_obj, "rows", (*ladder_ctx).network[n].rows);
+        cJSON_AddNumberToObject(network_obj, "cols", (*ladder_ctx).network[n].cols);
+
+        cJSON *networkData = cJSON_CreateArray();
+        if (networkData == NULL) {
+            cJSON_Delete(network_obj);
+            cJSON_Delete(root);
+            fclose(fp);
+            return JSON_ERROR_CREATENETDATA;
+        }
+
+        for (uint32_t r = 0; r < (*ladder_ctx).network[n].rows; r++) {
+            cJSON *row_array = cJSON_CreateArray();
+            if (row_array == NULL) {
+                cJSON_Delete(networkData);
+                cJSON_Delete(network_obj);
+                cJSON_Delete(root);
+                fclose(fp);
+                return JSON_ERROR_CREATEROWARRAY;
+            }
+
+            for (uint32_t c = 0; c < (*ladder_ctx).network[n].cols; c++) {
+                ladder_cell_t *cell = &((*ladder_ctx).network[n].cells[r][c]);
+                cJSON *cell_obj = cJSON_CreateObject();
+                if (cell_obj == NULL) {
+                    cJSON_Delete(row_array);
+                    cJSON_Delete(networkData);
+                    cJSON_Delete(network_obj);
+                    cJSON_Delete(root);
+                    fclose(fp);
+                    return JSON_ERROR_CREATECELLOBJ;
+                }
+
+                const char *symbol = (cell->code < sizeof(str_symbol) / sizeof(str_symbol[0])) ? str_symbol[cell->code] : "INV";
+                cJSON_AddStringToObject(cell_obj, "symbol", symbol);
+                cJSON_AddBoolToObject(cell_obj, "bar", cell->vertical_bar);
+
+                cJSON *data_array = cJSON_CreateArray();
+                if (data_array == NULL) {
+                    cJSON_Delete(cell_obj);
+                    cJSON_Delete(row_array);
+                    cJSON_Delete(networkData);
+                    cJSON_Delete(network_obj);
+                    cJSON_Delete(root);
+                    fclose(fp);
+                    return JSON_ERROR_CREATEDATAARRAY;
+                }
+
+                for (uint8_t d = 0; d < cell->data_qty; d++) {
+                    ladder_value_t *val = &cell->data[d];
+                    cJSON *data_obj = cJSON_CreateObject();
+                    if (data_obj == NULL) {
+                        cJSON_Delete(data_array);
+                        cJSON_Delete(cell_obj);
+                        cJSON_Delete(row_array);
+                        cJSON_Delete(networkData);
+                        cJSON_Delete(network_obj);
+                        cJSON_Delete(root);
+                        fclose(fp);
+                        return JSON_ERROR_CREATEDATAOBJ;
+                    }
+
+                    uint8_t ttype = val->type > LADDER_TYPE_INV ? val->type - 0xf0 + LADDER_TYPE_INV + 1 : val->type;
+                    const char *type_str = (ttype < sizeof(str_types) / sizeof(str_types[0])) ? str_types[ttype] : "INV";
+                    char val_str[16];
+                    sprintf(val_str, "value%d", d);
+                    cJSON_AddStringToObject(data_obj, "name", val_str);
+                    cJSON_AddStringToObject(data_obj, "type", type_str);
+
+                    char value_str[32];
+                    if (val->type == LADDER_TYPE_CSTR) {
+                        snprintf(value_str, sizeof(value_str), "%s", val->value.cstr ? val->value.cstr : "");
+                    } else if (val->type == LADDER_TYPE_REAL) {
+                        snprintf(value_str, sizeof(value_str), "%f", val->value.real);
+                    } else {
+                        snprintf(value_str, sizeof(value_str), "%u", val->value.u32);
+                    }
+                    cJSON_AddStringToObject(data_obj, "value", value_str);
+                    cJSON_AddItemToArray(data_array, data_obj);
+                }
+
+                cJSON_AddItemToObject(cell_obj, "data", data_array);
+                cJSON_AddItemToArray(row_array, cell_obj);
+            }
+
+            cJSON_AddItemToArray(networkData, row_array);
+        }
+
+        cJSON_AddItemToObject(network_obj, "networkData", networkData);
+        cJSON_AddItemToArray(root, network_obj);
+    }
+
+    char *json_str = cJSON_Print(root);
+    if (json_str == NULL) {
+        cJSON_Delete(root);
+        fclose(fp);
+        return JSON_ERROR_PRINTOBJ;
+    }
+
+    fprintf(fp, "%s", json_str);
+    free(json_str);
+    cJSON_Delete(root);
+    fclose(fp);
+    return JSON_ERROR_OK;
 }

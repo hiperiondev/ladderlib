@@ -35,24 +35,45 @@
 
 #include "ladder.h"
 
-/**
- * @fn bool ladder_json_to_program(const char *prg, ladder_ctx_t* ladder_ctx)
- * @brief
- *
- * @param prg prg file name of JSON program
- * @param ladder_ctx
- * @return Status
- */
-bool ladder_json_to_program(const char *prg, ladder_ctx_t* ladder_ctx);
+typedef enum JSON_ERROR {
+    JSON_ERROR_OK,              //
+    JSON_ERROR_OPENFILE,        //
+    JSON_ERROR_PARSE,           //
+    JSON_ERROR_ALLOC_STRING,    //
+    JSON_ERROR_ALLOC_NETWORK,   //
+    JSON_ERROR_INS_INV,         //
+    JSON_ERROR_TYPE_INV,        //
+    JSON_ERROR_CREATEARRAY,     //
+    JSON_ERROR_CREATENETOBJT,   //
+    JSON_ERROR_CREATENETDATA,   //
+    JSON_ERROR_CREATEROWARRAY,  //
+    JSON_ERROR_CREATECELLOBJ,   //
+    JSON_ERROR_CREATEDATAARRAY, //
+    JSON_ERROR_CREATEDATAOBJ,   //
+    JSON_ERROR_PRINTOBJ,        //
+    //////////////////////////////
+    JSON_ERROR_FAIL             //
+
+} ladder_json_error_t;
 
 /**
- * @fn bool ladder_program_to_json(const char *prg, ladder_ctx_t* ladder_ctx)
+ * @fn ladder_json_error_t ladder_json_to_program(const char *prg, ladder_ctx_t* ladder_ctx)
  * @brief
  *
  * @param prg prg file name of JSON program
  * @param ladder_ctx
  * @return Status
  */
-bool ladder_program_to_json(const char *prg, ladder_ctx_t* ladder_ctx);
+ladder_json_error_t ladder_json_to_program(const char *prg, ladder_ctx_t *ladder_ctx);
+
+/**
+ * @fn ladder_json_error_t ladder_program_to_json(const char *prg, ladder_ctx_t* ladder_ctx)
+ * @brief
+ *
+ * @param prg prg file name of JSON program
+ * @param ladder_ctx
+ * @return Status
+ */
+ladder_json_error_t ladder_program_to_json(const char *prg, ladder_ctx_t *ladder_ctx);
 
 #endif /* LADDER_PROGRAM_PARSER_H */

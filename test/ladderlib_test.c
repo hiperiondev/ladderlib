@@ -52,7 +52,9 @@
 #define QTY_R  8
 
 int main(void) {
-    const char prg[] = "ladder_networks.json";
+    const char prg_load[] = "ladder_networks.json";
+    const char prg_save[] = "ladder_networks_save.json";
+    uint8_t err = 0;
 
     // main context
     ladder_ctx_t ladder_ctx;
@@ -90,11 +92,18 @@ int main(void) {
         exit(1);
     }
 
-    printf("Load demo program: %s\n", prg);
-    if (!ladder_json_to_program(prg, &ladder_ctx)) {
-        printf("ERROR: Load demo program\n");
+    printf("Load demo program: %s\n", prg_load);
+    if ((err = ladder_json_to_program(prg_load, &ladder_ctx)) != JSON_ERROR_OK) {
+        printf("ERROR: Load demo program %d\n", err);
         goto end;
     }
+
+    printf("Save demo program: %s\n", prg_save);
+    if ((err = ladder_program_to_json(prg_save, &ladder_ctx)) != JSON_ERROR_OK) {
+        printf("ERROR: Save demo program\n");
+        goto end;
+    }
+
     printf("\n");
 
     ladder_print(ladder_ctx);
