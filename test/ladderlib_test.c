@@ -38,6 +38,7 @@
 #include "ladder_print.h"
 #include "ladder_instructions.h"
 #include "fn_dummy.h"
+#include "ladder_program_json.h"
 
 // registers quantity
 #define QTY_M  8
@@ -50,174 +51,9 @@
 #define QTY_D  8
 #define QTY_R  8
 
-static bool load_demo1(ladder_ctx_t *ladder_ctx) {
-    bool ret = true;
-
-    printf("blink (2 network, 7 rows, 6 columns)");
-
-    // Network 0
-    (*ladder_ctx).network[0].enable = true;
-    (*ladder_ctx).network[0].rows = 7;
-    (*ladder_ctx).network[0].cols = 6;
-    //                           N  R  C  D
-    ret &= ladder_fn_cell(ladder_ctx, 0, 0, 0, LADDER_INS_NC, 0);
-    ladder_cell_data(ladder_ctx, 0, 0, 0, 0, LADDER_TYPE_M, 3)
-
-    ret &= ladder_fn_cell(ladder_ctx, 0, 0, 1, LADDER_INS_NC, 0);
-    ladder_cell_data(ladder_ctx, 0, 0, 1, 0, LADDER_TYPE_M, 2);
-
-    ret &= ladder_fn_cell(ladder_ctx, 0, 0, 2, LADDER_INS_TON, 0);
-    ladder_cell_data(ladder_ctx, 0, 0, 2, 0, LADDER_TYPE_T, 0);
-    ladder_cell_data(ladder_ctx, 0, 0, 2, 1, LADDER_BASETIME_SEC, 5);
-
-    ret &= ladder_fn_cell(ladder_ctx, 0, 0, 3, LADDER_INS_CONN, 0);
-    ret &= ladder_fn_cell(ladder_ctx, 0, 0, 4, LADDER_INS_CONN, 0);
-
-    ret &= ladder_fn_cell(ladder_ctx, 0, 0, 5, LADDER_INS_COIL, 0);
-    ladder_cell_data(ladder_ctx, 0, 0, 5, 0, LADDER_TYPE_M, 1);
-
-    // ----------------------------- //
-
-    ret &= ladder_fn_cell(ladder_ctx, 0, 2, 0, LADDER_INS_NO, 0);
-    ladder_cell_data(ladder_ctx, 0, 2, 0, 0, LADDER_TYPE_M, 1);
-
-    ret &= ladder_fn_cell(ladder_ctx, 0, 2, 1, LADDER_INS_TON, 0);
-    ladder_cell_data(ladder_ctx, 0, 2, 1, 0, LADDER_TYPE_T, 1);
-    ladder_cell_data(ladder_ctx, 0, 2, 1, 1, LADDER_BASETIME_SEC, 5);
-
-    ret &= ladder_fn_cell(ladder_ctx, 0, 2, 2, LADDER_INS_CONN, 0);
-    ret &= ladder_fn_cell(ladder_ctx, 0, 2, 3, LADDER_INS_CONN, 0);
-    ret &= ladder_fn_cell(ladder_ctx, 0, 2, 4, LADDER_INS_CONN, 0);
-
-    ret &= ladder_fn_cell(ladder_ctx, 0, 2, 5, LADDER_INS_COIL, 0);
-    ladder_cell_data(ladder_ctx, 0, 2, 5, 0, LADDER_TYPE_M, 2);
-
-    // ----------------------------- //
-
-    ret &= ladder_fn_cell(ladder_ctx, 0, 4, 0, LADDER_INS_NO, 0);
-    ladder_cell_data(ladder_ctx, 0, 4, 0, 0, LADDER_TYPE_M, 1);
-
-    ret &= ladder_fn_cell(ladder_ctx, 0, 4, 1, LADDER_INS_CONN, 0);
-    ret &= ladder_fn_cell(ladder_ctx, 0, 4, 2, LADDER_INS_CONN, 0);
-    ret &= ladder_fn_cell(ladder_ctx, 0, 4, 3, LADDER_INS_CONN, 0);
-    ret &= ladder_fn_cell(ladder_ctx, 0, 4, 4, LADDER_INS_CONN, 0);
-
-    ret &= ladder_fn_cell(ladder_ctx, 0, 4, 5, LADDER_INS_COIL, 0);
-    ladder_cell_data(ladder_ctx, 0, 4, 5, 0, LADDER_TYPE_Q, 0);
-
-    // ----------------------------- //
-
-    ret &= ladder_fn_cell(ladder_ctx, 0, 5, 0, LADDER_INS_NO, 0);
-    ladder_cell_data(ladder_ctx, 0, 5, 0, 0, LADDER_TYPE_Q, 0);
-
-    ret &= ladder_fn_cell(ladder_ctx, 0, 5, 1, LADDER_INS_CTU, 0);
-    ladder_cell_data(ladder_ctx, 0, 5, 1, 0, LADDER_TYPE_C, 0);
-    ladder_cell_data(ladder_ctx, 0, 5, 1, 1, LADDER_TYPE_NONE, 5);
-
-    ret &= ladder_fn_cell(ladder_ctx, 0, 5, 2, LADDER_INS_CONN, 0);
-    ret &= ladder_fn_cell(ladder_ctx, 0, 5, 3, LADDER_INS_CONN, 0);
-    ret &= ladder_fn_cell(ladder_ctx, 0, 5, 4, LADDER_INS_CONN, 0);
-
-    ret &= ladder_fn_cell(ladder_ctx, 0, 5, 5, LADDER_INS_COIL, 0);
-    ladder_cell_data(ladder_ctx, 0, 5, 5, 0, LADDER_TYPE_M, 3);
-    //------------------------------------------------------------//
-
-    // Network 1
-    (*ladder_ctx).network[1].enable = true;
-    (*ladder_ctx).network[1].rows = 7;
-    (*ladder_ctx).network[1].cols = 6;
-
-    ret &= ladder_fn_cell(ladder_ctx, 1, 0, 0, LADDER_INS_NO, 0);
-    ladder_cell_data(ladder_ctx, 1, 0, 0, 0, LADDER_TYPE_M, 3)
-
-    ret &= ladder_fn_cell(ladder_ctx, 1, 0, 1, LADDER_INS_NC, 0);
-    ladder_cell_data(ladder_ctx, 1, 0, 1, 0, LADDER_TYPE_M, 4);
-
-    ret &= ladder_fn_cell(ladder_ctx, 1, 0, 2, LADDER_INS_NC, 0);
-    ladder_cell_data(ladder_ctx, 1, 0, 2, 0, LADDER_TYPE_M, 5)
-
-    ret &= ladder_fn_cell(ladder_ctx, 1, 0, 3, LADDER_INS_TON, 0);
-    ladder_cell_data(ladder_ctx, 1, 0, 3, 0, LADDER_TYPE_T, 2);
-    ladder_cell_data(ladder_ctx, 1, 0, 3, 1, LADDER_BASETIME_SEC, 5);
-
-    ret &= ladder_fn_cell(ladder_ctx, 1, 0, 4, LADDER_INS_CONN, 0);
-
-    ret &= ladder_fn_cell(ladder_ctx, 1, 0, 5, LADDER_INS_COIL, 0);
-    ladder_cell_data(ladder_ctx, 1, 0, 5, 0, LADDER_TYPE_M, 6);
-
-    // ----------------------------- //
-
-    ret &= ladder_fn_cell(ladder_ctx, 1, 2, 0, LADDER_INS_NO, 0);
-    ladder_cell_data(ladder_ctx, 1, 2, 0, 0, LADDER_TYPE_M, 6);
-
-    ret &= ladder_fn_cell(ladder_ctx, 1, 2, 1, LADDER_INS_TON, 0);
-    ladder_cell_data(ladder_ctx, 1, 2, 1, 0, LADDER_TYPE_T, 3);
-    ladder_cell_data(ladder_ctx, 1, 2, 1, 1, LADDER_BASETIME_SEC, 5);
-
-    ret &= ladder_fn_cell(ladder_ctx, 1, 2, 2, LADDER_INS_CONN, 0);
-    ret &= ladder_fn_cell(ladder_ctx, 1, 2, 3, LADDER_INS_CONN, 0);
-    ret &= ladder_fn_cell(ladder_ctx, 1, 2, 4, LADDER_INS_CONN, 0);
-
-    ret &= ladder_fn_cell(ladder_ctx, 1, 2, 5, LADDER_INS_COIL, 0);
-    ladder_cell_data(ladder_ctx, 1, 2, 5, 0, LADDER_TYPE_M, 5);
-
-    // ----------------------------- //
-
-    ret &= ladder_fn_cell(ladder_ctx, 1, 4, 0, LADDER_INS_NO, 0);
-    ladder_cell_data(ladder_ctx, 1, 4, 0, 0, LADDER_TYPE_M, 6);
-
-    ret &= ladder_fn_cell(ladder_ctx, 1, 4, 1, LADDER_INS_CONN, 0);
-    ret &= ladder_fn_cell(ladder_ctx, 1, 4, 2, LADDER_INS_CONN, 0);
-    ret &= ladder_fn_cell(ladder_ctx, 1, 4, 3, LADDER_INS_CONN, 0);
-    ret &= ladder_fn_cell(ladder_ctx, 1, 4, 4, LADDER_INS_CONN, 0);
-
-    ret &= ladder_fn_cell(ladder_ctx, 1, 4, 5, LADDER_INS_COIL, 0);
-    ladder_cell_data(ladder_ctx, 1, 4, 5, 0, LADDER_TYPE_Q, 1);
-
-    // ----------------------------- //
-
-    ret &= ladder_fn_cell(ladder_ctx, 1, 5, 0, LADDER_INS_NO, 0);
-    ladder_cell_data(ladder_ctx, 1, 5, 0, 0, LADDER_TYPE_Q, 1);
-
-    ret &= ladder_fn_cell(ladder_ctx, 1, 5, 1, LADDER_INS_CTU, 0);
-    ladder_cell_data(ladder_ctx, 1, 5, 1, 0, LADDER_TYPE_C, 1);
-    ladder_cell_data(ladder_ctx, 1, 5, 1, 1, LADDER_TYPE_NONE, 5);
-
-    ret &= ladder_fn_cell(ladder_ctx, 1, 5, 2, LADDER_INS_CONN, 0);
-    ret &= ladder_fn_cell(ladder_ctx, 1, 5, 3, LADDER_INS_CONN, 0);
-    ret &= ladder_fn_cell(ladder_ctx, 1, 5, 4, LADDER_INS_CONN, 0);
-
-    ret &= ladder_fn_cell(ladder_ctx, 1, 5, 5, LADDER_INS_COIL, 0);
-    ladder_cell_data(ladder_ctx, 1, 5, 5, 0, LADDER_TYPE_M, 4);
-
-    //------------------------------------------------------------//
-
-    // Network 2
-    (*ladder_ctx).network[2].enable = true;
-    (*ladder_ctx).network[2].rows = 7;
-    (*ladder_ctx).network[2].cols = 6;
-
-    ret &= ladder_fn_cell(ladder_ctx, 2, 0, 0, LADDER_INS_NO, 0);
-    ladder_cell_data(ladder_ctx, 2, 0, 0, 0, LADDER_TYPE_I, 7);
-
-    ret &= ladder_fn_cell(ladder_ctx, 2, 0, 1, LADDER_INS_CONN, 0);
-    ret &= ladder_fn_cell(ladder_ctx, 2, 0, 2, LADDER_INS_CONN, 0);
-
-    ret &= ladder_fn_cell(ladder_ctx, 2, 0, 3, LADDER_INS_CONN, 0);
-    ret &= ladder_fn_cell(ladder_ctx, 2, 0, 4, LADDER_INS_CONN, 0);
-
-    ret &= ladder_fn_cell(ladder_ctx, 2, 0, 5, LADDER_INS_COIL, 7);
-    ladder_cell_data(ladder_ctx, 2, 0, 5, 0, LADDER_TYPE_Q, 4);
-
-    LADDER_VERTICAL_BAR(ladder_ctx, 2, 1, 4) = true;
-
-    ret &= ladder_fn_cell(ladder_ctx, 2, 1, 5, LADDER_INS_COIL, 7);
-    ladder_cell_data(ladder_ctx, 2, 1, 5, 0, LADDER_TYPE_Q, 5);
-
-    return ret;
-}
-
 int main(void) {
+    const char prg[] = "ladder_networks.json";
+
     // main context
     ladder_ctx_t ladder_ctx;
 
@@ -225,13 +61,10 @@ int main(void) {
     printf("\e[1;1H\e[2J");
 
     // initialize context
-    if (!ladder_ctx_init(&ladder_ctx, 6, 7, 3, QTY_M, QTY_I, QTY_Q, QTY_IW, QTY_QW, QTY_C, QTY_T, QTY_D, QTY_R)) {
+    if (!ladder_ctx_init(&ladder_ctx, 6, 7, 3, QTY_M, QTY_I, QTY_Q, QTY_IW, QTY_QW, QTY_C, QTY_T, QTY_D, QTY_R, false)) {
         printf("ERROR Initializing\n");
         return 1;
     }
-
-    // clear program
-    ladder_clear_program(&ladder_ctx);
 
     ///////////////////////////////////////////////////////
 
@@ -257,9 +90,9 @@ int main(void) {
         exit(1);
     }
 
-    printf("Load demo program: ");
-    if (!load_demo1(&ladder_ctx)) {
-        printf("ERROR: Load demo program: ");
+    printf("Load demo program: %s\n", prg);
+    if (!ladder_json_to_program(prg, &ladder_ctx)) {
+        printf("ERROR: Load demo program\n");
         goto end;
     }
     printf("\n");

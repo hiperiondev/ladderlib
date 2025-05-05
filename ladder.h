@@ -174,8 +174,8 @@ typedef enum LADDER_INSTRUCTIONS {
     LADDER_INS_FOREIGN, /**< Instruction FOREIGN */
     LADDER_INS_TMOVE,   /**< Instruction TMOVE */
     ///////////////////
-    LADDER_INS_INV,          /**< First invalid */
-    LADDER_INS_MULTI = 0xff, /**< cell is a part of multi cell instruction */
+    LADDER_INS_INV,     /**< First invalid */
+    LADDER_INS_MULTI,   /**< cell is a part of multi cell instruction */
 } ladder_instruction_t;
 
 /**
@@ -328,8 +328,6 @@ typedef struct ladder_s {
         uint32_t d;           /**< Quantity of regular registers */
         uint32_t r;           /**< Quantity of floating point registers */
         uint32_t networks;    /**< Quantity of networks */
-        // uint8_t net_columns; /**< Quantity of columns */
-        // uint8_t net_rows;    /**< Quantity of rows  */
     } quantity;
 } ladder_t;
 
@@ -593,7 +591,7 @@ typedef struct ladder_ctx_s {
 
 /**
  * @fn bool ladder_ctx_init(ladder_ctx_t *ladder_ctx, uint8_t net_columns_qty, uint8_t net_rows_qty, uint32_t networks_qty, uint32_t qty_m, uint32_t qty_i,
- uint32_t qty_q, uint32_t qty_iw, uint32_t qty_qw, uint32_t qty_c, uint32_t qty_t, uint32_t qty_d, uint32_t qty_r);
+ uint32_t qty_q, uint32_t qty_iw, uint32_t qty_qw, uint32_t qty_c, uint32_t qty_t, uint32_t qty_d, uint32_t qty_r, bool init_netwok);
  * @brief Initialize context.
  *
  *
@@ -610,10 +608,11 @@ typedef struct ladder_ctx_s {
  * @param qty_t Memory Areas quantities. Timers.
  * @param qty_d Memory Areas quantities. Regular registers (16 bit signed).
  * @param qty_r Memory Areas quantities. Float or Real registers.
+ * @param init_netwok If false not initialize Networks
  * @return Error
  */
 bool ladder_ctx_init(ladder_ctx_t *ladder_ctx, uint8_t net_columns_qty, uint8_t net_rows_qty, uint32_t networks_qty, uint32_t qty_m, uint32_t qty_i,
-        uint32_t qty_q, uint32_t qty_iw, uint32_t qty_qw, uint32_t qty_c, uint32_t qty_t, uint32_t qty_d, uint32_t qty_r);
+        uint32_t qty_q, uint32_t qty_iw, uint32_t qty_qw, uint32_t qty_c, uint32_t qty_t, uint32_t qty_d, uint32_t qty_r, bool init_netwok);
 
 /**
  * @fn bool ladder_ctx_deinit(ladder_ctx_t *ladder_ctx)

@@ -84,7 +84,7 @@ void ladder_clear_program(ladder_ctx_t *ladder_ctx) {
 }
 
 bool ladder_ctx_init(ladder_ctx_t *ladder_ctx, uint8_t net_columns_qty, uint8_t net_rows_qty, uint32_t networks_qty, uint32_t qty_m, uint32_t qty_i,
-        uint32_t qty_q, uint32_t qty_iw, uint32_t qty_qw, uint32_t qty_c, uint32_t qty_t, uint32_t qty_d, uint32_t qty_r) {
+        uint32_t qty_q, uint32_t qty_iw, uint32_t qty_qw, uint32_t qty_c, uint32_t qty_t, uint32_t qty_d, uint32_t qty_r, bool init_netwok) {
 
     if (net_rows_qty > 32)
         return false;
@@ -108,26 +108,27 @@ bool ladder_ctx_init(ladder_ctx_t *ladder_ctx, uint8_t net_columns_qty, uint8_t 
     (*ladder_ctx).on.panic = NULL;
     (*ladder_ctx).on.end_task = NULL;
 
-    (*ladder_ctx).network = calloc(networks_qty, sizeof(ladder_network_t));
+    if (init_netwok) {
+        (*ladder_ctx).network = calloc(networks_qty, sizeof(ladder_network_t));
 
-    for (uint32_t nt = 0; nt < networks_qty; nt++) {
-        (*ladder_ctx).network[nt].rows = 0;
-        (*ladder_ctx).network[nt].cols = 0;
-        (*ladder_ctx).network[nt].cells = malloc(net_rows_qty * sizeof(ladder_cell_t*));
-        for (uint32_t cl = 0; cl < net_rows_qty; cl++)
-            (*ladder_ctx).network[nt].cells[cl] = calloc(net_columns_qty, sizeof(ladder_cell_t));
+        for (uint32_t nt = 0; nt < networks_qty; nt++) {
+            (*ladder_ctx).network[nt].rows = 0;
+            (*ladder_ctx).network[nt].cols = 0;
+            (*ladder_ctx).network[nt].cells = malloc(net_rows_qty * sizeof(ladder_cell_t*));
+            for (uint32_t cl = 0; cl < net_rows_qty; cl++)
+                (*ladder_ctx).network[nt].cells[cl] = calloc(net_columns_qty, sizeof(ladder_cell_t));
 
-        for (uint32_t column = 0; column < net_columns_qty; column++) {
-            for (uint32_t row = 0; row < net_rows_qty; row++) {
-                (*ladder_ctx).network[nt].cells[row][column].code = LADDER_INS_NOP;
-                (*ladder_ctx).network[nt].cells[row][column].data_qty = 0;
-                (*ladder_ctx).network[nt].cells[row][column].data = NULL;
-                (*ladder_ctx).network[nt].cells[row][column].state = false;
-                (*ladder_ctx).network[nt].cells[row][column].vertical_bar = false;
+            for (uint32_t column = 0; column < net_columns_qty; column++) {
+                for (uint32_t row = 0; row < net_rows_qty; row++) {
+                    (*ladder_ctx).network[nt].cells[row][column].code = LADDER_INS_NOP;
+                    (*ladder_ctx).network[nt].cells[row][column].data_qty = 0;
+                    (*ladder_ctx).network[nt].cells[row][column].data = NULL;
+                    (*ladder_ctx).network[nt].cells[row][column].state = false;
+                    (*ladder_ctx).network[nt].cells[row][column].vertical_bar = false;
+                }
             }
         }
     }
-
     (*ladder_ctx).memory.M = calloc(qty_m, sizeof(uint8_t));
     (*ladder_ctx).memory.I = calloc(qty_i, sizeof(uint8_t));
     (*ladder_ctx).memory.Q = calloc(qty_q, sizeof(uint8_t));
