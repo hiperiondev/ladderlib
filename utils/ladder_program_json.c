@@ -184,9 +184,8 @@ ladder_json_error_t ladder_json_to_program(const char *prg, ladder_ctx_t *ladder
     }
 
     (*ladder_ctx).ladder.quantity.networks = cJSON_GetArraySize(root);
-    ;
 
-    (*ladder_ctx).network = malloc((*ladder_ctx).ladder.quantity.networks * sizeof(ladder_network_t));
+    (*ladder_ctx).network = calloc((*ladder_ctx).ladder.quantity.networks, sizeof(ladder_network_t));
     if (!(*ladder_ctx).network) {
         cJSON_Delete(root);
         free(json_string);
@@ -203,9 +202,9 @@ ladder_json_error_t ladder_json_to_program(const char *prg, ladder_ctx_t *ladder
         cJSON *cols_json = cJSON_GetObjectItem(network_json, "cols");
         network->cols = (int) cJSON_GetNumberValue(cols_json);
 
-        network->cells = malloc(network->rows * sizeof(ladder_cell_t*));
+        network->cells = calloc(network->rows, sizeof(ladder_cell_t*));
         for (int r = 0; r < network->rows; r++) {
-            network->cells[r] = malloc(network->cols * sizeof(ladder_cell_t));
+            network->cells[r] = calloc(network->cols, sizeof(ladder_cell_t));
         }
 
         cJSON *networkData = cJSON_GetObjectItem(network_json, "networkData");
@@ -228,7 +227,7 @@ ladder_json_error_t ladder_json_to_program(const char *prg, ladder_ctx_t *ladder
                 cJSON *data_json = cJSON_GetObjectItem(cell_json, "data");
                 int data_qty = cJSON_GetArraySize(data_json);
                 cell->data_qty = data_qty;
-                cell->data = malloc(data_qty * sizeof(ladder_value_t));
+                cell->data = calloc(data_qty, sizeof(ladder_value_t));
 
                 for (int d = 0; d < data_qty; d++) {
                     cJSON *data_item = cJSON_GetArrayItem(data_json, d);

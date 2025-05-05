@@ -183,10 +183,11 @@ static void fn_to_str(ladder_ctx_t ladder_ctx, uint32_t net, char (*cells)[6][32
 
     switch (actual_ioc.cells) {
         case 1:
-            if (ladder_ctx.network[net].cells[row][column].data != NULL) {
+            if (ladder_ctx.network[net].cells[row][column].data_qty > 0) {
                 switch (ladder_ctx.network[net].cells[row][column].data[0].type) {
                     case LADDER_TYPE_CSTR:
-                        sprintf((*cells)[1], "     %.10s   %s", ladder_ctx.network[net].cells[row][column].data[0].value.cstr, SPACE_BAR(ladder_ctx, net, row, column));
+                        sprintf((*cells)[1], "     %.10s   %s", ladder_ctx.network[net].cells[row][column].data[0].value.cstr,
+                                SPACE_BAR(ladder_ctx, net, row, column));
                         break;
                     case LADDER_TYPE_REAL:
                         ftos(ladder_ctx.network[net].cells[row][column].data[0].value.real, strtmp, 8, 2);
@@ -204,7 +205,7 @@ static void fn_to_str(ladder_ctx_t ladder_ctx, uint32_t net, char (*cells)[6][32
         case 2:
             if (row > ladder_ctx.network[net].rows - 1)
                 break;
-            if (ladder_ctx.network[net].cells[row][column].data != NULL) {
+            if (ladder_ctx.network[net].cells[row][column].data_qty > 0) {
                 switch (ladder_ctx.network[net].cells[row][column].data[0].type) {
                     case LADDER_TYPE_CSTR:
                         sprintf((*cells)[1], "   | %.10s |  ", ladder_ctx.network[net].cells[row][column].data[0].value.cstr);
@@ -254,7 +255,7 @@ static void fn_to_str(ladder_ctx_t ladder_ctx, uint32_t net, char (*cells)[6][32
         case 3:
             if (row > ladder_ctx.network[net].rows - 3)
                 break;
-            if (ladder_ctx.network[net].cells[row][column].data != NULL) {
+            if (ladder_ctx.network[net].cells[row][column].data_qty > 0) {
                 switch (ladder_ctx.network[net].cells[row][column].data[0].type) {
                     case LADDER_TYPE_CSTR:
                         sprintf((*cells)[1], "   | %.10s |  ", ladder_ctx.network[net].cells[row][column].data[0].value.cstr);
