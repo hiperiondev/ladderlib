@@ -130,6 +130,31 @@ static ladder_type_t get_type_code(const char *type) {
     return LADDER_TYPE_INV;
 }
 
+static char* read_file(const char *path) {
+    FILE *file = fopen(path, "r");
+    if (!file)
+        return NULL;
+    fseek(file, 0, SEEK_END);
+    long length = ftell(file);
+    fseek(file, 0, SEEK_SET);
+    char *content = (char*) malloc(length + 1);
+    if (content) {
+        fread(content, 1, length, file);
+        content[length] = '\0';
+    }
+    fclose(file);
+    return content;
+}
+
+static int write_file(const char *path, const char *content) {
+    FILE *file = fopen(path, "w");
+    if (!file)
+        return 0;
+    fprintf(file, "%s", content);
+    fclose(file);
+    return 1;
+}
+
 //////////////////////////////////////////////////////////////////////////////////////////
 
 ladder_json_error_t ladder_json_to_program(const char *prg, ladder_ctx_t *ladder_ctx) {
@@ -359,5 +384,35 @@ ladder_json_error_t ladder_program_to_json(const char *prg, ladder_ctx_t *ladder
     free(json_str);
     cJSON_Delete(root);
     fclose(fp);
+    return JSON_ERROR_OK;
+}
+
+ladder_json_error_t ladder_compact_json_file(const char *input_path, const char *output_path) {
+    char *json_str = read_file(input_path);
+    if (!json_str) {
+        return JSON_ERROR_OPENFILE;
+    }
+    cJSON *root = cJSON_Parse(json_str);
+    if (!root) {
+        free(json_str);
+        return JSON_ERROR_PARSE;
+    }
+    char *compact_json = cJSON_PrintUnformatted(root);
+    if (!compact_json) {
+        cJSON_Delete(root);
+        free(json_str);
+        return JSON_ERROR_COMPACTFILE;
+    }
+    if (!write_file(output_path, compact_json)) {
+        free(compact_json);
+        cJSON_Delete(root);
+        free(json_str);
+        return JSON_ERROR_WRITEFILE;
+    }
+
+    free(compact_json);
+    cJSON_Delete(root);
+    free(json_str);
+
     return JSON_ERROR_OK;
 }

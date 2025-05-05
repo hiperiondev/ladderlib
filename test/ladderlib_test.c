@@ -104,6 +104,12 @@ int main(void) {
         goto end;
     }
 
+    printf("Compact saved program: %s\n", prg_save);
+    if ((err = ladder_compact_json_file(prg_save, "compact.json")) != JSON_ERROR_OK) {
+        printf("ERROR: Compact saved program\n");
+        goto end;
+    }
+
     printf("\n");
 
     ladder_print(ladder_ctx);

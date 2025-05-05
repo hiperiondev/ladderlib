@@ -51,6 +51,8 @@ typedef enum JSON_ERROR {
     JSON_ERROR_CREATEDATAARRAY, //
     JSON_ERROR_CREATEDATAOBJ,   //
     JSON_ERROR_PRINTOBJ,        //
+    JSON_ERROR_COMPACTFILE,     //
+    JSON_ERROR_WRITEFILE,       //
     //////////////////////////////
     JSON_ERROR_FAIL             //
 
@@ -75,5 +77,16 @@ ladder_json_error_t ladder_json_to_program(const char *prg, ladder_ctx_t *ladder
  * @return Status
  */
 ladder_json_error_t ladder_program_to_json(const char *prg, ladder_ctx_t *ladder_ctx);
+
+/**
+ * @fn ladder_json_error_t ladder_compact_json_file(const char *input_path, const char *output_path)
+ * @brief
+ *
+ * @param input_path Input file
+ * @param output_path Output_file
+ * @return Status
+ */
+ladder_json_error_t ladder_compact_json_file(const char *input_path, const char *output_path);
+
 
 #endif /* LADDER_PROGRAM_PARSER_H */
