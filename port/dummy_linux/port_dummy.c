@@ -207,9 +207,9 @@ void dummy_write_outputs_local(ladder_ctx_t *ladder_ctx) {
     for (uint32_t nt = 0; nt < (*ladder_ctx).ladder.quantity.networks; nt++) {
         printf("network %d:\n", nt);
         ++rets;
-        for (uint32_t r = 0; r < (*ladder_ctx).ladder.quantity.net_rows - 1; r++) {
+        for (uint32_t r = 0; r < (*ladder_ctx).network[nt].rows - 1; r++) {
             printf("|");
-            for (uint32_t c = 0; c < (*ladder_ctx).ladder.quantity.net_columns; c++) {
+            for (uint32_t c = 0; c < (*ladder_ctx).network[nt].cols; c++) {
                 printf("%s|", (*ladder_ctx).network[nt].cells[r][c].state == 1 ? "#" : "-");
             }
             printf("\n");

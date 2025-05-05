@@ -80,7 +80,7 @@ const ladder_instructions_iocd_t ladder_fn_iocd[] = {
         { 1, 1, 3, 3 }, // TMOVE
         { 1, 1, 1, 0 }, // INV
         };
-#include <stdio.h>
+
 ladder_ins_err_t fn_NOP(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row) {
     return LADDER_INS_ERR_OK;
 }

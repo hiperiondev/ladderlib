@@ -30,6 +30,9 @@
  *
  */
 
+#include <stdbool.h>
+#include <stdint.h>
+
 #include "ladder.h"
 #include "ladder_internals.h"
 

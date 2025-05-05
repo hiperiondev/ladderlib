@@ -286,6 +286,8 @@ typedef struct ladder_cell_s {
  */
 typedef struct ladder_network_s {
              bool enable;  /**< Enabled for execution */
+         uint32_t rows;    /**< Rows qty */
+         uint32_t cols;    /**< Columns qty */
     ladder_cell_t **cells; /**< Cells */
 } ladder_network_t;
 
@@ -326,8 +328,8 @@ typedef struct ladder_s {
         uint32_t d;           /**< Quantity of regular registers */
         uint32_t r;           /**< Quantity of floating point registers */
         uint32_t networks;    /**< Quantity of networks */
-         uint8_t net_columns; /**< Quantity of columns */
-         uint8_t net_rows;    /**< Quantity of rows  */
+        // uint8_t net_columns; /**< Quantity of columns */
+        // uint8_t net_rows;    /**< Quantity of rows  */
     } quantity;
 } ladder_t;
 

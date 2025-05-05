@@ -34,6 +34,8 @@
 #include <string.h>
 #include <stdlib.h>
 #include <math.h>
+#include <stdbool.h>
+#include <stdint.h>
 
 #include "ladder.h"
 #include "ladder_internals.h"
@@ -41,9 +43,9 @@
 #include "ladder_instructions.h"
 
 #define PIN_OUT(lctx,n,r,c) \
-                        (LADDER_VERTICAL_BAR(&lctx,n,r,c) || ((r > lctx.ladder.quantity.net_rows - 2) ? 0 : LADDER_VERTICAL_BAR(&lctx,n,r + 1,c)) ? "-+" : "--")
+                        (LADDER_VERTICAL_BAR(&lctx,n,r,c) || ((r > lctx.network[n].rows - 2) ? 0 : LADDER_VERTICAL_BAR(&lctx,n,r + 1,c)) ? "-+" : "--")
 
-#define SPACE_BAR(lctx,n,r,c)  (((r > lctx.ladder.quantity.net_rows - 2) ? 0 : LADDER_VERTICAL_BAR(&lctx,n,r + 1,c)) ? "|" : " ")
+#define SPACE_BAR(lctx,n,r,c)  (((r > lctx.network[n].rows - 2) ? 0 : LADDER_VERTICAL_BAR(&lctx,n,r + 1,c)) ? "|" : " ")
 
 static const char *fn_symbol[] = { //
         "   ", // 1
@@ -200,7 +202,7 @@ static void fn_to_str(ladder_ctx_t ladder_ctx, uint32_t net, char (*cells)[6][32
 
             break;
         case 2:
-            if (row > ladder_ctx.ladder.quantity.net_rows - 1)
+            if (row > ladder_ctx.network[net].rows - 1)
                 break;
             if (ladder_ctx.network[net].cells[row][column].data != NULL) {
                 switch (ladder_ctx.network[net].cells[row][column].data[0].type) {
@@ -250,7 +252,7 @@ static void fn_to_str(ladder_ctx_t ladder_ctx, uint32_t net, char (*cells)[6][32
 
             break;
         case 3:
-            if (row > ladder_ctx.ladder.quantity.net_rows - 3)
+            if (row > ladder_ctx.network[net].rows - 3)
                 break;
             if (ladder_ctx.network[net].cells[row][column].data != NULL) {
                 switch (ladder_ctx.network[net].cells[row][column].data[0].type) {
@@ -326,16 +328,17 @@ static void fn_to_str(ladder_ctx_t ladder_ctx, uint32_t net, char (*cells)[6][32
 }
 
 void ladder_print(ladder_ctx_t ladder_ctx) {
-    char network_str[ladder_ctx.ladder.quantity.net_rows + 3][ladder_ctx.ladder.quantity.net_columns + 3][2][32];
     char fn_str[6][32];
     char (*fn_str_ptr)[6][32] = &fn_str;
 
     for (uint32_t n = 0; n < ladder_ctx.ladder.quantity.networks; n++) {
-        memset(network_str, 0, ladder_ctx.ladder.quantity.net_rows * ladder_ctx.ladder.quantity.net_columns * 2 * 32 * sizeof(char));
+        char network_str[ladder_ctx.network[n].rows + 3][ladder_ctx.network[n].cols + 3][2][32];
+        memset(network_str, 0, ladder_ctx.network[n].rows * ladder_ctx.network[n].cols * 2 * 32 * sizeof(char));
+
         printf("[Network %d (%s)]\n\n", (int) n, ladder_ctx.network[n].enable ? "enabled" : "disabled");
 
-        for (uint32_t r = 0; r < ladder_ctx.ladder.quantity.net_rows; r++) {
-            for (uint32_t c = 0; c < ladder_ctx.ladder.quantity.net_columns; c++) {
+        for (uint32_t r = 0; r < ladder_ctx.network[n].rows; r++) {
+            for (uint32_t c = 0; c < ladder_ctx.network[n].cols; c++) {
                 if (network_str[r][c][0][0] == '\0') {
                     fn_to_str(ladder_ctx, n, fn_str_ptr, r, c);
                     strcpy(network_str[r][c][0], fn_str[0]);
@@ -348,15 +351,15 @@ void ladder_print(ladder_ctx_t ladder_ctx) {
             }
         }
 
-        for (uint32_t r = 0; r < ladder_ctx.ladder.quantity.net_rows; r++) {
+        for (uint32_t r = 0; r < ladder_ctx.network[n].rows; r++) {
             printf("    |");
-            for (uint32_t c = 0; c < ladder_ctx.ladder.quantity.net_columns; c++) {
+            for (uint32_t c = 0; c < ladder_ctx.network[n].cols; c++) {
                 if (network_str[r][c][0][0] == '\0')
                     printf("                   ");
                 else printf("%s", network_str[r][c][0]);
             }
             printf("|\n    |");
-            for (uint32_t c = 0; c < ladder_ctx.ladder.quantity.net_columns; c++) {
+            for (uint32_t c = 0; c < ladder_ctx.network[n].cols; c++) {
                 if (network_str[r][c][0][0] == '\0')
                     printf("                   ");
                 else printf("%s", network_str[r][c][1]);

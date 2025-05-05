@@ -31,6 +31,7 @@
  */
 
 #include <stdint.h>
+#include <stdbool.h>
 
 #include "ladder.h"
 #include "ladder_instructions.h"
@@ -89,8 +90,8 @@ void ladder_scan(ladder_ctx_t *ladder_ctx) {
         (*ladder_ctx).exec_network = &((*ladder_ctx).network[network]);
 
         // call ladder instructions
-        for (uint32_t column = 0; column < (*ladder_ctx).ladder.quantity.net_columns; column++) {
-            for (uint32_t row = 0; row < (*ladder_ctx).ladder.quantity.net_rows; row++) {
+        for (uint32_t column = 0; column < (*ladder_ctx).exec_network->cols; column++) {
+            for (uint32_t row = 0; row < (*ladder_ctx).exec_network->rows; row++) {
 
                 // save this execution
                 (*ladder_ctx).ladder.last.instr = (*(*ladder_ctx).exec_network).cells[row][column].code;

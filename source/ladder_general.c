@@ -33,6 +33,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 
 #include "ladder.h"
 #include "ladder_internals.h"
@@ -72,8 +73,8 @@ void ladder_clear_memory(ladder_ctx_t *ladder_ctx) {
 
 void ladder_clear_program(ladder_ctx_t *ladder_ctx) {
     for (uint32_t nt = 0; nt < (*ladder_ctx).ladder.quantity.networks; nt++) {
-        for (uint32_t c = 0; c < (*ladder_ctx).ladder.quantity.net_columns; c++) {
-            for (uint32_t r = 0; r < (*ladder_ctx).ladder.quantity.net_rows - 1; r++) {
+        for (uint32_t c = 0; c < (*ladder_ctx).network[nt].cols; c++) {
+            for (uint32_t r = 0; r < (*ladder_ctx).network[nt].cols - 1; r++) {
                 (*ladder_ctx).network[nt].cells[r][c].code = 0;
                 free((*ladder_ctx).network[nt].cells[r][c].data);
                 (*ladder_ctx).network[nt].cells[r][c].data = NULL;
@@ -110,6 +111,8 @@ bool ladder_ctx_init(ladder_ctx_t *ladder_ctx, uint8_t net_columns_qty, uint8_t 
     (*ladder_ctx).network = calloc(networks_qty, sizeof(ladder_network_t));
 
     for (uint32_t nt = 0; nt < networks_qty; nt++) {
+        (*ladder_ctx).network[nt].rows = 0;
+        (*ladder_ctx).network[nt].cols = 0;
         (*ladder_ctx).network[nt].cells = malloc(net_rows_qty * sizeof(ladder_cell_t*));
         for (uint32_t cl = 0; cl < net_rows_qty; cl++)
             (*ladder_ctx).network[nt].cells[cl] = calloc(net_columns_qty, sizeof(ladder_cell_t));
@@ -149,8 +152,6 @@ bool ladder_ctx_init(ladder_ctx_t *ladder_ctx, uint8_t net_columns_qty, uint8_t 
 
     (*ladder_ctx).timers = calloc(qty_t, sizeof(ladder_timer_t));
 
-    (*ladder_ctx).ladder.quantity.net_columns = net_columns_qty;
-    (*ladder_ctx).ladder.quantity.net_rows = net_rows_qty;
     (*ladder_ctx).ladder.quantity.m = qty_m;
     (*ladder_ctx).ladder.quantity.i = qty_i;
     (*ladder_ctx).ladder.quantity.q = qty_q;
@@ -167,11 +168,11 @@ bool ladder_ctx_init(ladder_ctx_t *ladder_ctx, uint8_t net_columns_qty, uint8_t 
 
 bool ladder_ctx_deinit(ladder_ctx_t *ladder_ctx) {
     for (uint32_t nt = 0; nt < (*ladder_ctx).ladder.quantity.networks; nt++) {
-        for (uint32_t column = 0; column < (*ladder_ctx).ladder.quantity.net_columns; column++)
-            for (uint32_t row = 0; row < (*ladder_ctx).ladder.quantity.net_rows; row++)
+        for (uint32_t column = 0; column < (*ladder_ctx).network[nt].cols; column++)
+            for (uint32_t row = 0; row < (*ladder_ctx).network[nt].rows; row++)
                 free((*ladder_ctx).network[nt].cells[row][column].data);
 
-        for (uint32_t cl = 0; cl < (*ladder_ctx).ladder.quantity.net_rows; cl++)
+        for (uint32_t cl = 0; cl < (*ladder_ctx).network[nt].rows; cl++)
             free((*ladder_ctx).network[nt].cells[cl]);
 
         free((*ladder_ctx).network[nt].cells);
@@ -242,7 +243,7 @@ bool ladder_fn_cell(ladder_ctx_t *ladder_ctx, uint32_t network, uint32_t row, ui
     } else memcpy(&actual_ioc, &(ladder_fn_iocd[function]), sizeof(ladder_instructions_iocd_t));
 
     // not available rows for function
-    if ((*ladder_ctx).ladder.quantity.net_rows < actual_ioc.cells + row)
+    if ((*ladder_ctx).network[network].rows < actual_ioc.cells + row)
         return false;
 
     if ((*ladder_ctx).network[network].cells[row][column].data != NULL)

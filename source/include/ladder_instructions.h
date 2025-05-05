@@ -106,14 +106,14 @@
  * @brief
  *
  */
-#define ladder_table_pos_row(lctx, pos)  ((pos) / (*lctx).ladder.quantity.net_columns)
+#define ladder_table_pos_row(lctx, pos)  ((pos) / (*lctx).network[(*lctx).ladder.last.network].cols)
 
 /**
  * @def ladder_table_pos_column
  * @brief
  *
  */
-#define ladder_table_pos_column(lctx, pos)  ((pos) - (ladder_table_pos_row(lctx, pos) * (*lctx).ladder.quantity.net_columns))
+#define ladder_table_pos_column(lctx, pos)  ((pos) - (ladder_table_pos_row(lctx, pos) * (*lctx).network[(*lctx).ladder.last.network].cols))
 
 /**
  * @def ladder_get_table_i32
@@ -123,7 +123,7 @@
 #define ladder_get_table_i32(lctx, t, pos)                                                                                    \
     (                                                                                                                         \
         ((table) > (*lctx).ladder.quantity.networks || (*lctx).exec_network[(table)].enable) ? 0                            : \
-        ((pos) > (*lctx).ladder.quantity.net_rows * (*lctx).ladder.quantity.net_columns)     ? 0                            : \
+        ((pos) > (*lctx).network[(*lctx).ladder.last.network].rows * (*lctx).network[(*lctx).ladder.last.network].cols)     ? 0                            : \
         (*lctx).network[table].cells[ladder_table_pos_row(lctx, pos)][ladder_table_pos_column(lctx, pos)].data[0].value.i32   \
     )
 

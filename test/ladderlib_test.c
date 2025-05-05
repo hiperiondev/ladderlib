@@ -57,6 +57,8 @@ static bool load_demo1(ladder_ctx_t *ladder_ctx) {
 
     // Network 0
     (*ladder_ctx).network[0].enable = true;
+    (*ladder_ctx).network[0].rows = 7;
+    (*ladder_ctx).network[0].cols = 6;
     //                           N  R  C  D
     ret &= ladder_fn_cell(ladder_ctx, 0, 0, 0, LADDER_INS_NC, 0);
     ladder_cell_data(ladder_ctx, 0, 0, 0, 0, LADDER_TYPE_M, 3)
@@ -122,6 +124,8 @@ static bool load_demo1(ladder_ctx_t *ladder_ctx) {
 
     // Network 1
     (*ladder_ctx).network[1].enable = true;
+    (*ladder_ctx).network[1].rows = 7;
+    (*ladder_ctx).network[1].cols = 6;
 
     ret &= ladder_fn_cell(ladder_ctx, 1, 0, 0, LADDER_INS_NO, 0);
     ladder_cell_data(ladder_ctx, 1, 0, 0, 0, LADDER_TYPE_M, 3)
@@ -190,6 +194,8 @@ static bool load_demo1(ladder_ctx_t *ladder_ctx) {
 
     // Network 2
     (*ladder_ctx).network[2].enable = true;
+    (*ladder_ctx).network[2].rows = 7;
+    (*ladder_ctx).network[2].cols = 6;
 
     ret &= ladder_fn_cell(ladder_ctx, 2, 0, 0, LADDER_INS_NO, 0);
     ladder_cell_data(ladder_ctx, 2, 0, 0, 0, LADDER_TYPE_I, 7);

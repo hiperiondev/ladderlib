@@ -33,6 +33,9 @@
 #ifndef INCLUDE_LADDER_UTILS_H_
 #define INCLUDE_LADDER_UTILS_H_
 
+#include <stdbool.h>
+#include <stdint.h>
+
 #include "ladder.h"
 
 /**

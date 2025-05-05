@@ -1,0 +1,788 @@
+[
+  {
+    "id": 0,
+    "rows": 7,
+    "cols": 5,
+    "networkData": [
+      [
+        {
+          "symbol": "NC",
+          "bar": false,
+          "data": [
+            {
+              "name": "value1",
+              "type": "M",
+              "value": "3"
+            }
+          ]
+        },
+        {
+          "symbol": "NC",
+          "bar": false,
+          "data": [
+            {
+              "name": "value1",
+              "type": "M",
+              "value": "2"
+            }
+          ]
+        },
+        {
+          "symbol": "TON",
+          "bar": false,
+          "data": [
+            {
+              "name": "value1",
+              "type": "T",
+              "value": "0"
+            },
+            {
+              "name": "value2",
+              "type": "SEC",
+              "value": "5"
+            }
+          ]
+        },
+        {
+          "symbol": "CONN",
+          "bar": false,
+          "data": []
+        },
+        {
+          "symbol": "COIL",
+          "bar": false,
+          "data": [
+            {
+              "name": "value1",
+              "type": "M",
+              "value": "1"
+            }
+          ]
+        }
+      ],
+      [
+        {
+          "symbol": "NOP",
+          "bar": false,
+          "data": []
+        },
+        {
+          "symbol": "NOP",
+          "bar": false,
+          "data": []
+        },
+        {
+          "symbol": "occupied",
+          "bar": false,
+          "data": []
+        },
+        {
+          "symbol": "NOP",
+          "bar": false,
+          "data": []
+        },
+        {
+          "symbol": "NOP",
+          "bar": false,
+          "data": []
+        }
+      ],
+      [
+        {
+          "symbol": "NO",
+          "bar": false,
+          "data": [
+            {
+              "name": "value1",
+              "type": "M",
+              "value": "1"
+            }
+          ]
+        },
+        {
+          "symbol": "CONN",
+          "bar": false,
+          "data": []
+        },
+        {
+          "symbol": "TON",
+          "bar": false,
+          "data": [
+            {
+              "name": "value1",
+              "type": "T",
+              "value": "1"
+            },
+            {
+              "name": "value2",
+              "type": "SEC",
+              "value": "5"
+            }
+          ]
+        },
+        {
+          "symbol": "CONN",
+          "bar": false,
+          "data": []
+        },
+        {
+          "symbol": "COIL",
+          "bar": false,
+          "data": [
+            {
+              "name": "value1",
+              "type": "M",
+              "value": "2"
+            }
+          ]
+        }
+      ],
+      [
+        {
+          "symbol": "NOP",
+          "bar": false,
+          "data": []
+        },
+        {
+          "symbol": "NOP",
+          "bar": false,
+          "data": []
+        },
+        {
+          "symbol": "occupied",
+          "bar": false,
+          "data": []
+        },
+        {
+          "symbol": "NOP",
+          "bar": false,
+          "data": []
+        },
+        {
+          "symbol": "NOP",
+          "bar": false,
+          "data": []
+        }
+      ],
+      [
+        {
+          "symbol": "NO",
+          "bar": false,
+          "data": [
+            {
+              "name": "value1",
+              "type": "M",
+              "value": "1"
+            }
+          ]
+        },
+        {
+          "symbol": "CONN",
+          "bar": false,
+          "data": []
+        },
+        {
+          "symbol": "CONN",
+          "bar": false,
+          "data": []
+        },
+        {
+          "symbol": "CONN",
+          "bar": false,
+          "data": []
+        },
+        {
+          "symbol": "COIL",
+          "bar": false,
+          "data": [
+            {
+              "name": "value1",
+              "type": "Q",
+              "value": "0"
+            }
+          ]
+        }
+      ],
+      [
+        {
+          "symbol": "NO",
+          "bar": false,
+          "data": [
+            {
+              "name": "value1",
+              "type": "Q",
+              "value": "0"
+            }
+          ]
+        },
+        {
+          "symbol": "CONN",
+          "bar": false,
+          "data": []
+        },
+        {
+          "symbol": "CTU",
+          "bar": false,
+          "data": [
+            {
+              "name": "value1",
+              "type": "C",
+              "value": "0"
+            },
+            {
+              "name": "value2",
+              "type": "NONE",
+              "value": "5"
+            }
+          ]
+        },
+        {
+          "symbol": "CONN",
+          "bar": false,
+          "data": []
+        },
+        {
+          "symbol": "COIL",
+          "bar": false,
+          "data": [
+            {
+              "name": "value1",
+              "type": "M",
+              "value": "3"
+            }
+          ]
+        }
+      ],
+      [
+        {
+          "symbol": "NOP",
+          "bar": false,
+          "data": []
+        },
+        {
+          "symbol": "NOP",
+          "bar": false,
+          "data": []
+        },
+        {
+          "symbol": "occupied",
+          "bar": false,
+          "data": []
+        },
+        {
+          "symbol": "NOP",
+          "bar": false,
+          "data": []
+        },
+        {
+          "symbol": "NOP",
+          "bar": false,
+          "data": []
+        }
+      ]
+    ]
+  },
+  {
+    "id": 1,
+    "rows": 7,
+    "cols": 5,
+    "networkData": [
+      [
+        {
+          "symbol": "NO",
+          "bar": false,
+          "data": [
+            {
+              "name": "value1",
+              "type": "M",
+              "value": "3"
+            }
+          ]
+        },
+        {
+          "symbol": "NC",
+          "bar": false,
+          "data": [
+            {
+              "name": "value1",
+              "type": "M",
+              "value": "4"
+            }
+          ]
+        },
+        {
+          "symbol": "NC",
+          "bar": false,
+          "data": [
+            {
+              "name": "value1",
+              "type": "M",
+              "value": "5"
+            }
+          ]
+        },
+        {
+          "symbol": "TON",
+          "bar": false,
+          "data": [
+            {
+              "name": "value1",
+              "type": "T",
+              "value": "2"
+            },
+            {
+              "name": "value2",
+              "type": "SEC",
+              "value": "5"
+            }
+          ]
+        },
+        {
+          "symbol": "COIL",
+          "bar": false,
+          "data": [
+            {
+              "name": "value1",
+              "type": "M",
+              "value": "6"
+            }
+          ]
+        }
+      ],
+      [
+        {
+          "symbol": "NOP",
+          "bar": false,
+          "data": []
+        },
+        {
+          "symbol": "NOP",
+          "bar": false,
+          "data": []
+        },
+        {
+          "symbol": "NOP",
+          "bar": false,
+          "data": []
+        },
+        {
+          "symbol": "occupied",
+          "bar": false,
+          "data": []
+        },
+        {
+          "symbol": "CONN",
+          "bar": false,
+          "data": []
+        }
+      ],
+      [
+        {
+          "symbol": "NO",
+          "bar": false,
+          "data": [
+            {
+              "name": "value1",
+              "type": "M",
+              "value": "6"
+            }
+          ]
+        },
+        {
+          "symbol": "CONN",
+          "bar": false,
+          "data": []
+        },
+        {
+          "symbol": "CONN",
+          "bar": false,
+          "data": []
+        },
+        {
+          "symbol": "TON",
+          "bar": false,
+          "data": [
+            {
+              "name": "value1",
+              "type": "T",
+              "value": "3"
+            },
+            {
+              "name": "value2",
+              "type": "SEC",
+              "value": "5"
+            }
+          ]
+        },
+        {
+          "symbol": "COIL",
+          "bar": false,
+          "data": [
+            {
+              "name": "value1",
+              "type": "M",
+              "value": "5"
+            }
+          ]
+        }
+      ],
+      [
+        {
+          "symbol": "NOP",
+          "bar": false,
+          "data": []
+        },
+        {
+          "symbol": "NOP",
+          "bar": false,
+          "data": []
+        },
+        {
+          "symbol": "NOP",
+          "bar": false,
+          "data": []
+        },
+        {
+          "symbol": "occupied",
+          "bar": false,
+          "data": []
+        },
+        {
+          "symbol": "NOP",
+          "bar": false,
+          "data": []
+        }
+      ],
+      [
+        {
+          "symbol": "NO",
+          "bar": false,
+          "data": [
+            {
+              "name": "value1",
+              "type": "M",
+              "value": "6"
+            }
+          ]
+        },
+        {
+          "symbol": "CONN",
+          "bar": false,
+          "data": []
+        },
+        {
+          "symbol": "CONN",
+          "bar": false,
+          "data": []
+        },
+        {
+          "symbol": "CONN",
+          "bar": false,
+          "data": []
+        },
+        {
+          "symbol": "COIL",
+          "bar": false,
+          "data": [
+            {
+              "name": "value1",
+              "type": "Q",
+              "value": "1"
+            }
+          ]
+        }
+      ],
+      [
+        {
+          "symbol": "NO",
+          "bar": false,
+          "data": [
+            {
+              "name": "value1",
+              "type": "Q",
+              "value": "1"
+            }
+          ]
+        },
+        {
+          "symbol": "CONN",
+          "bar": false,
+          "data": []
+        },
+        {
+          "symbol": "CONN",
+          "bar": false,
+          "data": []
+        },
+        {
+          "symbol": "CTU",
+          "bar": false,
+          "data": [
+            {
+              "name": "value1",
+              "type": "C",
+              "value": "1"
+            },
+            {
+              "name": "value2",
+              "type": "NONE",
+              "value": "5"
+            }
+          ]
+        },
+        {
+          "symbol": "COIL",
+          "bar": false,
+          "data": [
+            {
+              "name": "value1",
+              "type": "M",
+              "value": "4"
+            }
+          ]
+        }
+      ],
+      [
+        {
+          "symbol": "NOP",
+          "bar": false,
+          "data": []
+        },
+        {
+          "symbol": "NOP",
+          "bar": false,
+          "data": []
+        },
+        {
+          "symbol": "NOP",
+          "bar": false,
+          "data": []
+        },
+        {
+          "symbol": "occupied",
+          "bar": false,
+          "data": []
+        },
+        {
+          "symbol": "NOP",
+          "bar": false,
+          "data": []
+        }
+      ]
+    ]
+  },
+  {
+    "id": 2,
+    "rows": 7,
+    "cols": 5,
+    "networkData": [
+      [
+        {
+          "symbol": "NO",
+          "bar": false,
+          "data": [
+            {
+              "name": "value1",
+              "type": "I",
+              "value": "4"
+            }
+          ]
+        },
+        {
+          "symbol": "CONN",
+          "bar": false,
+          "data": []
+        },
+        {
+          "symbol": "CONN",
+          "bar": false,
+          "data": []
+        },
+        {
+          "symbol": "CONN",
+          "bar": false,
+          "data": []
+        },
+        {
+          "symbol": "COIL",
+          "bar": false,
+          "data": [
+            {
+              "name": "value1",
+              "type": "Q",
+              "value": "3"
+            }
+          ]
+        }
+      ],
+      [
+        {
+          "symbol": "NOP",
+          "bar": false,
+          "data": []
+        },
+        {
+          "symbol": "NOP",
+          "bar": false,
+          "data": []
+        },
+        {
+          "symbol": "NOP",
+          "bar": false,
+          "data": []
+        },
+        {
+          "symbol": "NOP",
+          "bar": true,
+          "data": []
+        },
+        {
+          "symbol": "COIL",
+          "bar": false,
+          "data": [
+            {
+              "name": "value1",
+              "type": "Q",
+              "value": "4"
+            }
+          ]
+        }
+      ],
+      [
+        {
+          "symbol": "NOP",
+          "bar": false,
+          "data": []
+        },
+        {
+          "symbol": "NOP",
+          "bar": false,
+          "data": []
+        },
+        {
+          "symbol": "NOP",
+          "bar": false,
+          "data": []
+        },
+        {
+          "symbol": "NOP",
+          "bar": false,
+          "data": []
+        },
+        {
+          "symbol": "NOP",
+          "bar": false,
+          "data": []
+        }
+      ],
+      [
+        {
+          "symbol": "NOP",
+          "bar": false,
+          "data": []
+        },
+        {
+          "symbol": "NOP",
+          "bar": false,
+          "data": []
+        },
+        {
+          "symbol": "NOP",
+          "bar": false,
+          "data": []
+        },
+        {
+          "symbol": "NOP",
+          "bar": false,
+          "data": []
+        },
+        {
+          "symbol": "NOP",
+          "bar": false,
+          "data": []
+        }
+      ],
+      [
+        {
+          "symbol": "NOP",
+          "bar": false,
+          "data": []
+        },
+        {
+          "symbol": "NOP",
+          "bar": false,
+          "data": []
+        },
+        {
+          "symbol": "NOP",
+          "bar": false,
+          "data": []
+        },
+        {
+          "symbol": "NOP",
+          "bar": false,
+          "data": []
+        },
+        {
+          "symbol": "NOP",
+          "bar": false,
+          "data": []
+        }
+      ],
+      [
+        {
+          "symbol": "NOP",
+          "bar": false,
+          "data": []
+        },
+        {
+          "symbol": "NOP",
+          "bar": false,
+          "data": []
+        },
+        {
+          "symbol": "NOP",
+          "bar": false,
+          "data": []
+        },
+        {
+          "symbol": "NOP",
+          "bar": false,
+          "data": []
+        },
+        {
+          "symbol": "NOP",
+          "bar": false,
+          "data": []
+        }
+      ],
+      [
+        {
+          "symbol": "NOP",
+          "bar": false,
+          "data": []
+        },
+        {
+          "symbol": "NOP",
+          "bar": false,
+          "data": []
+        },
+        {
+          "symbol": "NOP",
+          "bar": false,
+          "data": []
+        },
+        {
+          "symbol": "NOP",
+          "bar": false,
+          "data": []
+        },
+        {
+          "symbol": "NOP",
+          "bar": false,
+          "data": []
+        }
+      ]
+    ]
+  }
+]
