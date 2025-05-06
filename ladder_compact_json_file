@@ -1,0 +1,66 @@
+#!/usr/bin/env python
+import json
+import argparse
+
+# Error codes
+JSON_ERROR_OK = 0
+JSON_ERROR_OPENFILE = 1
+JSON_ERROR_PARSE = 2
+JSON_ERROR_COMPACTFILE = 3
+JSON_ERROR_WRITEFILE = 4
+
+# Error messages
+error_messages = {
+    JSON_ERROR_OK: "Success",
+    JSON_ERROR_OPENFILE: "Failed to open input file",
+    JSON_ERROR_PARSE: "Failed to parse JSON",
+    JSON_ERROR_COMPACTFILE: "Failed to compact JSON",
+    JSON_ERROR_WRITEFILE: "Failed to write output file"
+}
+
+def ladder_compact_json_file(input_path, output_path):
+    """
+    Compact a JSON file by removing unnecessary whitespace.
+    
+    Args:
+        input_path (str): Path to the input JSON file.
+        output_path (str): Path to the output compacted JSON file.
+    
+    Returns:
+        int: Error code indicating success or type of failure.
+    """
+    try:
+        with open(input_path, 'r') as f:
+            data = json.load(f)
+    except FileNotFoundError:
+        return JSON_ERROR_OPENFILE
+    except json.JSONDecodeError:
+        return JSON_ERROR_PARSE
+    
+    try:
+        compact_json = json.dumps(data, separators=(',', ':'))
+    except Exception:
+        return JSON_ERROR_COMPACTFILE
+    
+    try:
+        with open(output_path, 'w') as f:
+            f.write(compact_json)
+    except Exception:
+        return JSON_ERROR_WRITEFILE
+    
+    return JSON_ERROR_OK
+
+def main():
+    parser = argparse.ArgumentParser(description="Compact a JSON file by removing unnecessary whitespace.")
+    parser.add_argument("input", help="Path to the input JSON file")
+    parser.add_argument("output", help="Path to the output compacted JSON file")
+    args = parser.parse_args()
+
+    result = ladder_compact_json_file(args.input, args.output)
+    if result == JSON_ERROR_OK:
+        print("JSON compacted successfully.")
+    else:
+        print(f"Error: {error_messages.get(result, 'Unknown error')}")
+
+if __name__ == "__main__":
+    main()
