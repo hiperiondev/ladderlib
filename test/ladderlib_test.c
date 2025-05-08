@@ -39,6 +39,7 @@
 #include "ladder_instructions.h"
 #include "fn_dummy.h"
 #include "ladder_program_json.h"
+#include "ladder_program_check.h"
 
 // registers quantity
 #define QTY_M  8
@@ -113,6 +114,11 @@ int main(void) {
     }
 
     printf("\n");
+
+    if((err = ladder_program_check(ladder_ctx)) != LADDER_ERR_PRG_CHECK_OK) {
+        printf("ERROR: Program not valid (%d)\n", err);
+        goto end;
+    }
 
     ladder_print(ladder_ctx);
 

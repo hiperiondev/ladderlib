@@ -64,7 +64,7 @@ typedef enum JSON_ERROR {
  * @brief
  *
  * @param prg prg file name of JSON program
- * @param ladder_ctx
+ * @param ladder_ctx Ladder context
  * @return Status
  */
 ladder_json_error_t ladder_json_to_program(const char *prg, ladder_ctx_t *ladder_ctx);
@@ -74,7 +74,7 @@ ladder_json_error_t ladder_json_to_program(const char *prg, ladder_ctx_t *ladder
  * @brief
  *
  * @param prg prg file name of JSON program
- * @param ladder_ctx
+ * @param ladder_ctx Ladder context
  * @return Status
  */
 ladder_json_error_t ladder_program_to_json(const char *prg, ladder_ctx_t *ladder_ctx);

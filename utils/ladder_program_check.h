@@ -30,20 +30,40 @@
  *
  */
 
-#ifndef INCLUDE_LADDER_UTILS_H_
-#define INCLUDE_LADDER_UTILS_H_
-
-#include <stdbool.h>
-#include <stdint.h>
+#ifndef LADDER_PROGRAM_CHECK_H_
+#define LADDER_PROGRAM_CHECK_H_
 
 #include "ladder.h"
+#include "ladder_internals.h"
 
 /**
- * @fn void ladder_print(ladder_ctx_t *ladder_ctx)
- * @brief Print networks in ascii graphical format
+ * @enum LADDER_ERR_PRG_CHECK
+ * @brief Ladder program check errors
+ *
+ */
+typedef enum LADDER_ERR_PRG_CHECK {
+    LADDER_ERR_PRG_CHECK_OK,                //
+    LADDER_ERR_PRG_CHECK_I_INV_MODULE,      //
+    LADDER_ERR_PRG_CHECK_I_INV_PORT,        //
+    LADDER_ERR_PRG_CHECK_Q_INV_MODULE,      //
+    LADDER_ERR_PRG_CHECK_Q_INV_PORT,        //
+    LADDER_ERR_PRG_CHECK_IW_INV_MODULE,     //
+    LADDER_ERR_PRG_CHECK_IW_INV_PORT,       //
+    LADDER_ERR_PRG_CHECK_QW_INV_MODULE,     //
+    LADDER_ERR_PRG_CHECK_QW_INV_PORT,       //
+    LADDER_ERR_PRG_CHECK_NO_INPUT_MODULES,  //
+    LADDER_ERR_PRG_CHECK_NO_OUTPUT_MODULES, //
+    //////////////////////////////////////////
+    LADDER_ERR_PRG_CHECK_FAIL               //
+} ladder_err_prg_check_t;
+
+/**
+ * @fn ladder_err_prg_check_t ladder_program_check(ladder_ctx_t*)
+ * @brief Check if program is valid
  *
  * @param ladder_ctx Ladder context
+ * @return
  */
-void ladder_print(ladder_ctx_t ladder_ctx);
+ladder_err_prg_check_t ladder_program_check(ladder_ctx_t ladder_ctx);
 
-#endif /* INCLUDE_LADDER_UTILS_H_ */
+#endif /* LADDER_PROGRAM_CHECK_H_ */
