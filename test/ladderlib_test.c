@@ -89,6 +89,7 @@ int main(void) {
 
     ladder_ctx.ladder.state = LADDER_ST_RUNNING;
 
+    printf("--[ laderlib version: %d.%d.%d ]--\n\n", LADDERLIB_VERSION_MAYOR, LADDERLIB_VERSION_MINOR, LADDERLIB_VERSION_PATCH);
     // add foreign
     if (!ladder_add_foreign(&ladder_ctx, dummy_init, NULL, 5)) {
         printf("ERROR Load foreign\n");
