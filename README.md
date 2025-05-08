@@ -285,171 +285,675 @@ These instructions provide additional functionality, some of which may be specif
 - **Description:** Indicates that the cell is part of a larger instruction spanning multiple cells, used for complex operations requiring additional data.  
 - **Example Use:** Implementing a multi-step operation like a sequence control.
 
-## INTERNALS
+## API Documentation  
   
-### LADDER_STATE  
-Defines 6 possible states for program execution:  
-- `STOPPED`: Program is halted.  
-- `RUNNING`: Program is actively executing.  
-- `ERROR`: An error has occurred.  
-- `EXIT_TSK`: Task is exiting.  
-- `NULLFN`: Null function encountered.  
-- `INV`: Invalid state.  
+This section provides detailed documentation for the core API functions of LadderLib, extracted from the header files `ladder.h`, `ladder_instructions.h`, and `ladder_internals.h`.  
   
-These states manage the lifecycle of the ladder logic program, ensuring proper control and error handling.  
+### ladder_init  
   
-### LADDER_INS_ERROR  
-Provides 8 error codes for instruction execution:  
-- `OK`: Successful execution.  
-- `GETPREVVAL`: Error retrieving previous value.  
-- `GETDATAVAL`: Error getting data value.  
-- `SETDATAVAL`: Error setting data value.  
-- `NOFOREIGN`: No foreign function found.  
-- `NOTABLE`: Table not found.  
-- `OUTOFRANGE`: Value out of range.  
-- `FAIL`: General failure.  
+Initializes the ladder context with specified parameters for networks, memory, inputs, outputs, timers, counters, and blocks.  
   
-These codes help developers diagnose and handle issues during program execution.  
+```c  
+ladder_ctx_t* ladder_init(uint32_t net_columns_qty, uint32_t net_rows_qty, uint32_t networks_qty, uint32_t qty_m, uint32_t qty_i, uint32_t qty_q, uint32_t qty_t, uint32_t qty_c, uint32_t qty_b)  
+```  
   
-### LADDER_TYPE  
-Defines 15 data types and 4 basetime options:  
-- **Types**: `NONE`, `M` (Memory Register), `Q` (Output), `I` (Input), `Cd` (Counter Done), `Cr` (Counter Running), `Td` (Timer Done), `Tr` (Timer Running), `IW` (Input Word), `QW` (Output Word), `C` (Counter), `T` (Timer), `D` (Data Register), `CSTR` (Constant String), `REAL` (Floating Point).  
-- **Basetime Options**: `BASETIME_MS`, `BASETIME_10MS`, `BASETIME_100MS`, `BASETIME_SEC`, `BASETIME_MIN`.  
+**Parameters:**  
   
-These types support various data representations, crucial for defining inputs, outputs, and internal variables.  
+| **Parameter** | **Description** |  
+|---------------|-----------------|  
+| `net_columns_qty` | Number of columns in networks (max 32). Defines the width of each network grid. |  
+| `net_rows_qty` | Number of rows in networks. Defines the height of each network grid. |  
+| `networks_qty` | Number of networks. Specifies how many ladder networks the context will manage. |  
+| `qty_m` | Quantity of memory bits. Number of general-purpose memory bits available. |  
+| `qty_i` | Quantity of input bits. Number of input bits for interfacing with external inputs. |  
+| `qty_q` | Quantity of output bits. Number of output bits for controlling external devices. |  
+| `qty_t` | Quantity of timers. Number of timer instances available for timing operations. |  
+| `qty_c` | Quantity of counters. Number of counter instances available for counting events. |  
+| `qty_b` | Quantity of blocks. Number of functional blocks available for advanced operations. |  
+  
+**Returns**: Pointer to the initialized `ladder_ctx_t` structure, or `NULL` if initialization fails.  
+  
+### ladder_deinit  
+  
+Deinitializes the ladder context, freeing all associated resources.  
+  
+```c  
+void ladder_deinit(ladder_ctx_t* ladder_ctx)  
+```  
+  
+**Parameters:**  
+  
+| **Parameter** | **Description** |  
+|---------------|-----------------|  
+| `ladder_ctx` | Pointer to the ladder context to be deinitialized. |  
+  
+**Returns**: None.  
+  
+### ladder_add_network  
+  
+Adds a new network to the ladder context with a specified ID.  
+  
+```c  
+ladder_network_t* ladder_add_network(ladder_ctx_t* ladder_ctx, uint32_t id)  
+```  
+  
+**Parameters:**  
+  
+| **Parameter** | **Description** |  
+|---------------|-----------------|  
+| `ladder_ctx` | Pointer to the ladder context. |  
+| `id` | Unique identifier for the network. |  
+  
+**Returns**: Pointer to the newly created `ladder_network_t` structure, or `NULL` if the operation fails.  
+  
+### ladder_execute  
+  
+Executes the ladder program, processing all networks and instructions.  
+  
+```c  
+void ladder_execute(ladder_ctx_t* ladder_ctx)  
+```  
+  
+**Parameters:**  
+  
+| **Parameter** | **Description** |  
+|---------------|-----------------|  
+| `ladder_ctx` | Pointer to the ladder context to execute. |  
+  
+**Returns**: None.  
+  
+### ladder_add_read_fn  
+  
+Registers a callback function for reading input values from hardware.  
+  
+```c  
+void ladder_add_read_fn(ladder_ctx_t* ladder_ctx, _io_read read_fn)  
+```  
+  
+**Parameters:**  
+  
+| **Parameter** | **Description** |  
+|---------------|-----------------|  
+| `ladder_ctx` | Pointer to the ladder context. |  
+| `read_fn` | Pointer to the read callback function. |  
+  
+**Returns**: None.  
+  
+### ladder_add_write_fn  
+  
+Registers a callback function for writing output values to hardware.  
+  
+```c  
+void ladder_add_write_fn(ladder_ctx_t* ladder_ctx, _io_write write_fn)  
+```  
+  
+**Parameters:**  
+  
+| **Parameter** | **Description** |  
+|---------------|-----------------|  
+| `ladder_ctx` | Pointer to the ladder context. |  
+| `write_fn` | Pointer to the write callback function. |  
+  
+**Returns**: None.  
+  
+### ladder_add_instruction  
+  
+Adds an instruction to a specific position in a network.  
+  
+```c  
+bool ladder_add_instruction(ladder_network_t* network, uint32_t row, uint32_t column, ladder_instruction_e instruction, uint32_t id)  
+```  
+  
+**Parameters:**  
+  
+| **Parameter** | **Description** |  
+|---------------|-----------------|  
+| `network` | Pointer to the network where the instruction will be added. |  
+| `row` | Row index in the network grid (0-based). |  
+| `column` | Column index in the network grid (0-based). |  
+| `instruction` | Type of instruction (e.g., `LADDER_INSTRUCTION_LD`). See `ladder_instruction_e` enum. |  
+| `id` | Identifier for the instruction operand (e.g., input, output, timer ID). |  
+  
+**Returns**: `true` if the instruction was added successfully, `false` otherwise.  
+  
+### ladder_add_init_fn  
+  
+Registers a callback function for initializing or deinitializing I/O operations.  
+  
+```c  
+void ladder_add_init_fn(ladder_ctx_t* ladder_ctx, _io_init init_fn)  
+```  
+  
+**Parameters:**  
+  
+| **Parameter** | **Description** |  
+|---------------|-----------------|  
+| `ladder_ctx` | Pointer to the ladder context. |  
+| `init_fn` | Pointer to the init/deinit callback function. |  
+  
+**Returns**: None.  
+  
+### ladder_add_scan_end_fn  
+  
+Registers a callback function to be called at the end of each scan cycle.  
+  
+```c  
+void ladder_add_scan_end_fn(ladder_ctx_t* ladder_ctx, _on_scan_end scan_end_fn)  
+```  
+  
+**Parameters:**  
+  
+| **Parameter** | **Description** |  
+|---------------|-----------------|  
+| `ladder_ctx` | Pointer to the ladder context. |  
+| `scan_end_fn` | Pointer to the scan end callback function. |  
+  
+**Returns**: None.  
+  
+### ladder_add_instruction_fn  
+  
+Registers a callback function to be called for each instruction execution.  
+  
+```c  
+void ladder_add_instruction_fn(ladder_ctx_t* ladder_ctx, _on_instruction instruction_fn)  
+```  
+  
+**Parameters:**  
+  
+| **Parameter** | **Description** |  
+|---------------|-----------------|  
+| `ladder_ctx` | Pointer to the ladder context. |  
+| `instruction_fn` | Pointer to the instruction callback function. |  
+  
+**Returns**: None.  
+  
+### ladder_add_task_before_fn  
+  
+Registers a callback function to be called before each task cycle scan.  
+  
+```c  
+void ladder_add_task_before_fn(ladder_ctx_t* ladder_ctx, _on_task_before task_before_fn)  
+```  
+  
+**Parameters:**  
+  
+| **Parameter** | **Description** |  
+|---------------|-----------------|  
+| `ladder_ctx` | Pointer to the ladder context. |  
+| `task_before_fn` | Pointer to the task before callback function. |  
+  
+**Returns**: None.  
+  
+### ladder_add_task_after_fn  
+  
+Registers a callback function to be called after each task cycle scan.  
+  
+```c  
+void ladder_add_task_after_fn(ladder_ctx_t* ladder_ctx, _on_task_after task_after_fn)  
+```  
+  
+**Parameters:**  
+  
+| **Parameter** | **Description** |  
+|---------------|-----------------|  
+| `ladder_ctx` | Pointer to the ladder context. |  
+| `task_after_fn` | Pointer to the task after callback function. |  
+  
+**Returns**: None.  
+  
+### ladder_add_panic_fn  
+  
+Registers a callback function for panic situations.  
+  
+```c  
+void ladder_add_panic_fn(ladder_ctx_t* ladder_ctx, _on_panic panic_fn)  
+```  
+  
+**Parameters:**  
+  
+| **Parameter** | **Description** |  
+|---------------|-----------------|  
+| `ladder_ctx` | Pointer to the ladder context. |  
+| `panic_fn` | Pointer to the panic callback function. |  
+  
+**Returns**: None.  
+  
+### ladder_add_end_task_fn  
+  
+Registers a callback function to be called when a task ends.  
+  
+```c  
+void ladder_add_end_task_fn(ladder_ctx_t* ladder_ctx, _on_end_task end_task_fn)  
+```  
+  
+**Parameters:**  
+  
+| **Parameter** | **Description** |  
+|---------------|-----------------|  
+| `ladder_ctx` | Pointer to the ladder context. |  
+| `end_task_fn` | Pointer to the end task callback function. |  
+  
+**Returns**: None.  
+  
+### ladder_add_delay_fn  
+  
+Registers a callback function for implementing delays.  
+  
+```c  
+void ladder_add_delay_fn(ladder_ctx_t* ladder_ctx, _delay delay_fn)  
+```  
+  
+**Parameters:**  
+  
+| **Parameter** | **Description** |  
+|---------------|-----------------|  
+| `ladder_ctx` | Pointer to the ladder context. |  
+| `delay_fn` | Pointer to the delay callback function. |  
+  
+**Returns**: None.  
+  
+### ladder_add_millis_fn  
+  
+Registers a callback function for retrieving the current time in milliseconds.  
+  
+```c  
+void ladder_add_millis_fn(ladder_ctx_t* ladder_ctx, _millis millis_fn)  
+```  
+  
+**Parameters:**  
+  
+| **Parameter** | **Description** |  
+|---------------|-----------------|  
+| `ladder_ctx` | Pointer to the ladder context. |  
+| `millis_fn` | Pointer to the millis callback function. |  
+  
+**Returns**: None.  
+  
+## Utility Functions  
+  
+This section documents utility functions from the header files `ladder_print.h`, `ladder_program_json.h`, and `ladder_program_check.h`.  
+  
+### ladder_print_program  
+  
+Prints the entire ladder program to the console for debugging purposes.  
+  
+```c  
+void ladder_print_program(ladder_ctx_t* ladder_ctx)  
+```  
+  
+**Parameters:**  
+  
+| **Parameter** | **Description** |  
+|---------------|-----------------|  
+| `ladder_ctx` | Pointer to the ladder context. |  
+  
+**Returns**: None.  
+  
+### ladder_print_network  
+  
+Prints a specific network within the ladder program.  
+  
+```c  
+void ladder_print_network(ladder_network_t* network)  
+```  
+  
+**Parameters:**  
+  
+| **Parameter** | **Description** |  
+|---------------|-----------------|  
+| `network` | Pointer to the network to print. |  
+  
+**Returns**: None.  
+  
+### ladder_program_to_json  
+  
+Serializes the ladder program to a JSON string.  
+  
+```c  
+char* ladder_program_to_json(ladder_ctx_t* ladder_ctx)  
+```  
+  
+**Parameters:**  
+  
+| **Parameter** | **Description** |  
+|---------------|-----------------|  
+| `ladder_ctx` | Pointer to the ladder context. |  
+  
+**Returns**: Pointer to a dynamically allocated JSON string representing the ladder program. Caller must free this memory.  
+  
+### ladder_program_check  
+  
+Checks the integrity and validity of the ladder program.  
+  
+```c  
+bool ladder_program_check(ladder_ctx_t* ladder_ctx)  
+```  
+  
+**Parameters:**  
+  
+| **Parameter** | **Description** |  
+|---------------|-----------------|  
+| `ladder_ctx` | Pointer to the ladder context. |  
+  
+**Returns**: `true` if the program is valid, `false` otherwise.  
+
+## Enums and Structures  
+  
+This section documents all enums and structures from the header files.  
+  
+### Enums  
+  
+#### ladder_instruction_e  
+  
+Defines the types of instructions supported by LadderLib.  
+  
+```c  
+typedef enum {  
+LADDER_INSTRUCTION_NOP, // No operation  
+LADDER_INSTRUCTION_LD, // Load  
+LADDER_INSTRUCTION_ST, // Store  
+LADDER_INSTRUCTION_AND, // Logical AND  
+LADDER_INSTRUCTION_OR, // Logical OR  
+LADDER_INSTRUCTION_NOT, // Logical NOT  
+LADDER_INSTRUCTION_TON, // Timer On Delay  
+LADDER_INSTRUCTION_TOF, // Timer Off Delay  
+LADDER_INSTRUCTION_CTU, // Counter Up  
+LADDER_INSTRUCTION_CTD, // Counter Down  
+LADDER_INSTRUCTION_END_NETWORK // End of network  
+} ladder_instruction_e;  
+```  
+  
+- **LADDER_INSTRUCTION_NOP**: Performs no operation, used as a placeholder.  
+- **LADDER_INSTRUCTION_LD**: Loads a value from an input, memory, or other source.  
+- **LADDER_INSTRUCTION_ST**: Stores a value to an output or memory.  
+- **LADDER_INSTRUCTION_AND**: Performs a logical AND operation between operands.  
+- **LADDER_INSTRUCTION_OR**: Performs a logical OR operation between operands.  
+- **LADDER_INSTRUCTION_NOT**: Inverts the logical state of an operand.  
+- **LADDER_INSTRUCTION_TON**: Implements a timer that activates after a delay.  
+- **LADDER_INSTRUCTION_TOF**: Implements a timer that deactivates after a delay.  
+- **LADDER_INSTRUCTION_CTU**: Increments a counter on each activation.  
+- **LADDER_INSTRUCTION_CTD**: Decrements a counter on each activation.  
+- **LADDER_INSTRUCTION_END_NETWORK**: Marks the end of a network’s instruction set.  
   
 ### Structures  
-Ladderlib uses structures to organize ladder logic programs, hardware interactions, and execution management. Below is a detailed breakdown of key structures.  
   
-#### ladder_cell_s  
-Represents an individual cell in a ladder logic diagram, akin to a contact or coil in a relay circuit.  
+#### ladder_instruction_s  
   
-| **Field** | **Description** |  
-|-----------------|----------------------------------------------|  
-| `state` | Current state of the cell (e.g., on/off). |  
-| `vertical_bar` | Indicates vertical connection presence. |  
-| `code` | Instruction code from `LADDER_INSTRUCTIONS`. |  
-| `data_qty` | Number of data elements associated. |  
-| `data` | Array of `ladder_value_s` for cell data. |  
+Represents a single instruction within a network.  
+  
+```c  
+typedef struct {  
+ladder_instruction_e instruction;  
+uint32_t id;  
+bool value;  
+} ladder_instruction_s;  
+```  
+  
+- **instruction**: Type of instruction (e.g., `LADDER_INSTRUCTION_LD`).  
+- **id**: Identifier for the operand (e.g., input, output, timer ID).  
+- **value**: Current value of the instruction (true/false).  
   
 #### ladder_network_s  
-Represents a network or rung, a horizontal line in the ladder diagram containing multiple cells.  
   
-| **Field** | **Description** |  
-|------------|------------------------------------------|  
-| `enable` | Flag to enable/disable the network. |  
-| `cells` | Array of `ladder_cell_s` for the network. |  
+Represents a ladder network, which is a grid of instructions.  
   
-#### ladder_timer_s  
-Manages timer functions for time-based operations.  
+```c  
+typedef struct {  
+uint32_t id;  
+uint32_t rows_qty;  
+uint32_t columns_qty;  
+ladder_instruction_s** instructions;  
+} ladder_network_s;  
+```  
   
-| **Field** | **Description** |  
-|-----------------|-------------------------------------|  
-| `time_stamp` | Timestamp for timer operations. |  
-| `acc` | Accumulator for timer value. |  
+- **id**: Unique identifier for the network.  
+- **rows_qty**: Number of rows in the network grid.  
+- **columns_qty**: Number of columns in the network grid.  
+- **instructions**: 2D array of pointers to `ladder_instruction_s` structures.  
   
-#### ladder_s  
-The main structure for the ladder logic program, encapsulating overall state and configuration.  
+#### ladder_ctx_s  
   
-| **Field** | **Description** |  
-|-------------|----------------------------------------------|  
-| `state` | Current state from `LADDER_STATE`. |  
-| `last` | Tracks last executed instruction, network, etc. |  
-| `quantity` | Quantities of memory, inputs, outputs, etc. |  
+Represents the main ladder context, managing all networks and resources.  
   
-#### ladder_hw_s  
-Handles hardware interactions, providing function pointers for I/O and timing.  This Functions are external and hardware dependant
+```c  
+typedef struct {  
+uint32_t net_columns_qty;  
+uint32_t net_rows_qty;  
+uint32_t networks_qty;  
+ladder_network_s** networks;  
+uint32_t qty_m;  
+uint32_t qty_i;  
+uint32_t qty_q;  
+uint32_t qty_t;  
+uint32_t qty_c;  
+uint32_t qty_b;  
+bool* m;  
+bool* i;  
+bool* q;  
+void* t;  
+void* c;  
+void* b;  
+_io_read read_fn;  
+_io_write write_fn;  
+_io_init init_fn;  
+_on_scan_end scan_end_fn;  
+_on_instruction instruction_fn;  
+_on_task_before task_before_fn;  
+_on_task_after task_after_fn;  
+_on_panic panic_fn;  
+_on_end_task end_task_fn;  
+_delay delay_fn;  
+_millis millis_fn;  
+} ladder_ctx_s;  
+```  
   
-| **Field** | **Description** |  
-|-----------------------------|------------------------------------------|  
-| `_read_inputs_local` | Reads local hardware inputs. |  
-| `_write_outputs_local` | Writes to local outputs. |  
-| `_read_inputs_remote` | Reads remote inputs. |  
-| `_write_outputs_remote` | Writes to remote outputs. |  
-| `_millis` | Returns current time in milliseconds. |  
-| `_delay` | Delays execution for a specified time. |  
+- **net_columns_qty**: Number of columns in each network (max 32).  
+- **net_rows_qty**: Number of rows in each network.  
+- **networks_qty**: Total number of networks.  
+- **networks**: Array of pointers to `ladder_network_s` structures.  
+- **qty_m**: Number of memory bits.  
+- **qty_i**: Number of input bits.  
+- **qty_q**: Number of output bits.  
+- **qty_t**: Number of timers.  
+- **qty_c**: Number of counters.  
+- **qty_b**: Number of blocks.  
+- **m**: Array of memory bits.  
+- **i**: Array of input bits.  
+- **q**: Array of output bits.  
+- **t**: Array of timer instances (opaque type).  
+- **c**: Array of counter instances (opaque type).  
+- **b**: Array of block instances (opaque type).  
+- **read_fn**: Callback for reading inputs.  
+- **write_fn**: Callback for writing outputs.  
+- **init_fn**: Callback for I/O initialization/deinitialization.  
+- **scan_end_fn**: Callback for end of scan cycle.  
+- **instruction_fn**: Callback for each instruction.  
+- **task_before_fn**: Callback before task cycle.  
+- **task_after_fn**: Callback after task cycle.  
+- **panic_fn**: Callback for panic situations.  
+- **end_task_fn**: Callback for task completion.  
+- **delay_fn**: Callback for delays.  
+- **millis_fn**: Callback for current time.  
   
-#### ladder_manage_s  
-Manages execution events through callbacks.  This functions are optionals.
+## Callback Prototypes  
   
-| **Field** | **Description** |  
-|----------------------|------------------------------------------|  
-| `_on_scan_end` | Called at the end of a scan cycle. |  
-| `_on_instruction` | Called per instruction execution. |  
-| `_on_task_before` | Called before task execution. |  
-| `_on_task_after` | Called after task execution. |  
-| `_on_panic` | Handles panic situations. |  
-| `_on_end_task` | Called at task completion. |  
+This section lists all callback prototypes used by LadderLib, with their exact function signatures and purposes.  
   
-#### Other Structures  
-Additional structures include:  
-- `ladder_instructions_ioc_s`: Defines input/output/cell configurations.  
-- `ladder_value_s`: Holds data with type and union (u32, i32, cstr, real).  
-- `ladder_memory_s`: Manages memory areas (M, I, Q, etc.).  
-- `ladder_prev_scan_vals_s`: Stores previous scan values.  
-- `ladder_registers_s`: Manages registers (IW, QW, C, D, R).  
-- `ladder_scan_internals_s`: Tracks scan timing information.  
-- `ladder_foreign_function_s`: Defines custom functions with ID, name, and execution logic.  
-- `ladder_foreign_s`: Manages a collection of foreign functions.  
-- `ladder_ctx_s`: The main context, combining all components for program execution.  
+### _io_read  
   
-### Functions  
-The API provides functions for initializing, running, and managing ladder logic programs. Below is a detailed description of each.  
+```c  
+void (*_io_read)(ladder_ctx_t* ladder_ctx, uint32_t id)  
+```  
   
-#### ladder_ctx_init  
-Initializes the ladder context, setting up structures and resources.  
+**Description**: Reads hardware values and updates the input bits in the ladder context.  
   
-| **Parameter** | **Description** |  
-|---------------------|----------------------------------------------|  
-| `net_columns_qty` | Number of columns in networks (max 32). |  
-| `net_rows_qty` | Number of rows in networks. |  
-| `networks_qty` | Number of networks. |  
-| `qty_m`, `qty_i`, etc. | Quantities for memory, inputs, outputs, etc. |  
-  
-**Returns**: Pointer to `ladder_ctx_s`.  
-  
-#### ladder_ctx_deinit  
-Deinitializes the context, freeing allocated resources.  
-  
-| **Parameter** | **Description** |  
-|----------------|----------------------------------|  
-| `ladder_ctx` | Pointer to `ladder_ctx_s`. |  
-  
-#### ladder_task  
-Executes the ladder logic task, processing networks and cells.  
-  
-| **Parameter** | **Description** |  
-|----------------|----------------------------------|  
-| `ladderctx` | Pointer to `ladder_ctx_s`. |  
-  
-#### ladder_clear_program  
-Clears the current ladder logic program, resetting the context.  
-  
-| **Parameter** | **Description** |  
-|----------------|----------------------------------|  
-| `ladder_ctx` | Pointer to `ladder_ctx_s`. |  
-  
-#### ladder_add_foreign  
-Adds custom (foreign) functions to the context for extended functionality.  
-  
-| **Parameter** | **Description**|
-|----------------|------------------------------------------|  
-| `ladder_ctx` | Pointer to `ladder_ctx_s`. |  
-| `fn_init` | Initialization function for foreign functions. |  
-| `init_data` | Data for initialization. |  
-| `qty` | Number of foreign functions to add. |  
-  
-#### ladder_fn_cell  
-Assigns a function to a specific cell in the ladder logic.  
+**Parameters:**  
   
 | **Parameter** | **Description** |  
-|----------------|------------------------------------------|  
-| `ladder_ctx` | Pointer to `ladder_ctx_s`. |  
-| `network` | Network index. |  
-| `row` | Row index within the network. |  
-| `column` | Column index within the network. |  
-| `function` | Function code to assign. |  
-| `foreign_id` | ID of foreign function, if applicable. |  
+|---------------|-----------------|  
+| `ladder_ctx` | Pointer to the ladder context. |  
+| `id` | Identifier of the input to read. |  
+  
+**Returns**: None.  
+  
+### _io_write  
+  
+```c  
+void (*_io_write)(ladder_ctx_t* ladder_ctx, uint32_t id)  
+```  
+  
+**Description**: Writes hardware values based on the output bits in the ladder context.  
+  
+**Parameters:**  
+  
+| **Parameter** | **Description** |  
+|---------------|-----------------|  
+| `ladder_ctx` | Pointer to the ladder context. |  
+| `id` | Identifier of the output to write. |  
+  
+**Returns**: None.  
+  
+### _io_init  
+  
+```c  
+bool (*_io_init)(ladder_ctx_t* ladder_ctx, uint32_t id, bool init_deinit)  
+```  
+  
+**Description**: Initializes or deinitializes an I/O function.  
+  
+**Parameters:**  
+  
+| **Parameter** | **Description** |  
+|---------------|-----------------|  
+| `ladder_ctx` | Pointer to the ladder context. |  
+| `id` | Identifier of the I/O function. |  
+| `init_deinit` | `true` to initialize, `false` to deinitialize. |  
+  
+**Returns**: `true` if successful, `false` otherwise.  
+  
+### _on_scan_end  
+  
+```c  
+bool (*_on_scan_end)(ladder_ctx_t* ladder_ctx)  
+```  
+  
+**Description**: Called at the end of each scan cycle for custom processing.  
+  
+**Parameters:**  
+  
+| **Parameter** | **Description** |  
+|---------------|-----------------|  
+| `ladder_ctx` | Pointer to the ladder context. |  
+  
+**Returns**: `true` to continue execution, `false` to stop.  
+  
+### _on_instruction  
+  
+```c  
+bool (*_on_instruction)(ladder_ctx_t* ladder_ctx)  
+```  
+  
+**Description**: Called for each instruction executed during a scan.  
+  
+**Parameters:**  
+  
+| **Parameter** | **Description** |  
+|---------------|-----------------|  
+| `ladder_ctx` | Pointer to the ladder context. |  
+  
+**Returns**: `true` to continue execution, `false` to stop.  
+  
+### _on_task_before  
+  
+```c  
+bool (*_on_task_before)(ladder_ctx_t* ladder_ctx)  
+```  
+  
+**Description**: Called before each task cycle scan begins.  
+  
+**Parameters:**  
+  
+| **Parameter** | **Description** |  
+|---------------|-----------------|  
+| `ladder_ctx` | Pointer to the ladder context. |  
+  
+**Returns**: `true` to proceed with the scan, `false` to skip.  
+  
+### _on_task_after  
+  
+```c  
+bool (*_on_task_after)(ladder_ctx_t* ladder_ctx)  
+```  
+  
+**Description**: Called after each task cycle scan completes.  
+  
+**Parameters:**  
+  
+| **Parameter** | **Description** |  
+|---------------|-----------------|  
+| `ladder_ctx` | Pointer to the ladder context. |  
+  
+**Returns**: `true` to continue, `false` to stop.  
+  
+### _on_panic  
+  
+```c  
+void (*_on_panic)(ladder_ctx_t* ladder_ctx)  
+```  
+  
+**Description**: Handles panic situations, such as critical errors.  
+  
+**Parameters:**  
+  
+| **Parameter** | **Description** |  
+|---------------|-----------------|  
+| `ladder_ctx` | Pointer to the ladder context. |  
+  
+**Returns**: None.  
+  
+### _on_end_task  
+  
+```c  
+void (*_on_end_task)(ladder_ctx_t* ladder_ctx)  
+```  
+  
+**Description**: Called when a task ends, for cleanup or final actions.  
+  
+**Parameters:**  
+  
+| **Parameter** | **Description** |  
+|---------------|-----------------|  
+| `ladder_ctx` | Pointer to the ladder context. |  
+  
+**Returns**: None.  
+  
+### _delay  
+  
+```c  
+void (*_delay)(long msec)  
+```  
+  
+**Description**: Implements a delay in milliseconds.  
+  
+**Parameters:**  
+  
+| **Parameter** | **Description** |  
+|---------------|-----------------|  
+| `msec` | Duration of the delay in milliseconds. |  
+  
+**Returns**: None.  
+  
+### _millis  
+  
+```c  
+uint64_t (*_millis)(void)  
+```  
+  
+**Description**: Returns the time elapsed since system start in milliseconds.  
+  
+**Parameters**: None.  
+  
+**Returns**: Number of milliseconds as a 64-bit unsigned integer.
   
 ## Basic Usage  
 To use Ladderlib, follow these steps:  
@@ -474,3 +978,5 @@ This example initializes a context, sets hardware callbacks, defines a simple pr
 ```c  
 // TODO: DOC  
 ```
+
+
