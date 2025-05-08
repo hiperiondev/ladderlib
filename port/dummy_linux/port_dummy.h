@@ -38,10 +38,17 @@
 
 #include "ladder.h"
 
-void dummy_read_inputs_local(ladder_ctx_t *ladder_ctx);
-void dummy_write_outputs_local(ladder_ctx_t *ladder_ctx);
-void dummy_read_inputs_remote(ladder_ctx_t *ladder_ctx);
-void dummy_write_outputs_remote(ladder_ctx_t *ladder_ctx);
+#define DUMMY_QTY_I  8
+#define DUMMY_QTY_Q  8
+#define DUMMY_QTY_IW 8
+#define DUMMY_QTY_QW 8
+
+bool dummy_init_read(ladder_ctx_t *ladder_ctx, uint32_t id, bool init);
+bool dummy_init_write(ladder_ctx_t *ladder_ctx, uint32_t id, bool init);
+
+void dummy_read(ladder_ctx_t *ladder_ctx, uint32_t id);
+void dummy_write(ladder_ctx_t *ladder_ctx, uint32_t id);
+
 bool dummy_on_scan_end(ladder_ctx_t *ladder_ctx);
 bool dummy_on_instruction(ladder_ctx_t *ladder_ctx);
 bool dummy_on_task_before(ladder_ctx_t *ladder_ctx);

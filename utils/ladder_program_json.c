@@ -29,6 +29,8 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
  */
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
@@ -110,6 +112,20 @@ static const char *str_types[] = {
         "MIN"    //
         };
 
+static bool parse_module_port(const char *str, ladder_moduleportvalue_t *result) {
+    unsigned int n;
+    unsigned int module_temp, port_temp;
+    int ret = sscanf(str, "%u.%u%n", &module_temp, &port_temp, &n);
+    if (ret == 2 && str[n] == '\0' && module_temp <= 255 && port_temp <= 255) {
+        result->module = (uint8_t) module_temp;
+        result->port = (uint8_t) port_temp;
+
+        return true;
+    }
+
+    return false;
+}
+
 static ladder_instruction_t get_instruction_code(const char *symbol) {
     for (int i = 0; i < sizeof(str_symbol) / sizeof(str_symbol[0]); i++) {
         if (strcmp(symbol, str_symbol[i]) == 0) {
@@ -178,7 +194,6 @@ ladder_json_error_t ladder_json_to_program(const char *prg, ladder_ctx_t *ladder
 
     cJSON *root = cJSON_Parse(json_string);
     if (!root) {
-        fprintf(stderr, "Error al analizar JSON\n");
         free(json_string);
         return JSON_ERROR_PARSE;
     }
@@ -234,18 +249,30 @@ ladder_json_error_t ladder_json_to_program(const char *prg, ladder_ctx_t *ladder
                     cJSON *type_json = cJSON_GetObjectItem(data_item, "type");
                     char *type_str = cJSON_GetStringValue(type_json);
                     cell->data[d].type = get_type_code(type_str);
-                    ;
+
                     if (cell->data[d].type == LADDER_TYPE_INV)
                         return JSON_ERROR_TYPE_INV;
 
                     cJSON *value_json = cJSON_GetObjectItem(data_item, "value");
                     char *value_str = cJSON_GetStringValue(value_json);
-                    if (cell->data[d].type == LADDER_TYPE_CSTR) {
-                        cell->data[d].value.cstr = strdup(value_str);
-                    } else if (cell->data[d].type == LADDER_TYPE_REAL) {
-                        cell->data[d].value.real = atof(value_str);
-                    } else {
-                        cell->data[d].value.u32 = strtoul(value_str, NULL, 10);
+
+                    switch (cell->data[d].type) {
+                        case LADDER_TYPE_I:
+                        case LADDER_TYPE_Q:
+                            if (!parse_module_port(value_str, &(cell->data[d].value.mp)))
+                                return JSON_ERROR_INVALIDVALUE;
+                            break;
+
+                        case LADDER_TYPE_CSTR:
+                            cell->data[d].value.cstr = strdup(value_str);
+                            break;
+                        case LADDER_TYPE_REAL:
+                            cell->data[d].value.real = atof(value_str);
+                            break;
+
+                        default:
+                            cell->data[d].value.u32 = strtoul(value_str, NULL, 10);
+                            break;
                     }
                 }
             }
@@ -271,7 +298,6 @@ ladder_json_error_t ladder_program_to_json(const char *prg, ladder_ctx_t *ladder
     }
 
     for (uint32_t n = 0; n < (*ladder_ctx).ladder.quantity.networks; n++) {
-        //ladder_network_t *net = &(*ladder_ctx).network[n];
         cJSON *network_obj = cJSON_CreateObject();
         if (network_obj == NULL) {
             cJSON_Delete(root);
@@ -350,13 +376,24 @@ ladder_json_error_t ladder_program_to_json(const char *prg, ladder_ctx_t *ladder
                     cJSON_AddStringToObject(data_obj, "type", type_str);
 
                     char value_str[32];
-                    if (val->type == LADDER_TYPE_CSTR) {
-                        snprintf(value_str, sizeof(value_str), "%s", val->value.cstr ? val->value.cstr : "");
-                    } else if (val->type == LADDER_TYPE_REAL) {
-                        snprintf(value_str, sizeof(value_str), "%f", val->value.real);
-                    } else {
-                        snprintf(value_str, sizeof(value_str), "%u", val->value.u32);
+                    switch (cell->data[d].type) {
+                        case LADDER_TYPE_I:
+                        case LADDER_TYPE_Q:
+                            snprintf(value_str, sizeof(value_str), "%u.%u", val->value.mp.module, val->value.mp.port);
+                            break;
+
+                        case LADDER_TYPE_CSTR:
+                            snprintf(value_str, sizeof(value_str), "%s", val->value.cstr ? val->value.cstr : "");
+                            break;
+                        case LADDER_TYPE_REAL:
+                            snprintf(value_str, sizeof(value_str), "%f", val->value.real);
+                            break;
+
+                        default:
+                            snprintf(value_str, sizeof(value_str), "%u", val->value.u32);
+                            break;
                     }
+
                     cJSON_AddStringToObject(data_obj, "value", value_str);
                     cJSON_AddItemToArray(data_array, data_obj);
                 }

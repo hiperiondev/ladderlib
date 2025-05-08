@@ -39,9 +39,15 @@
 #include <unistd.h>
 #include <sys/time.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include "ladder.h"
 #include "port_dummy.h"
+
+#define DUMMY_QTY_I  8
+#define DUMMY_QTY_Q  8
+#define DUMMY_QTY_IW 8
+#define DUMMY_QTY_QW 8
 
 static const char *_ladder_status_str[] = { "STOPPED",  //
         "RUNNING",  //
@@ -125,7 +131,7 @@ uint64_t dummy_millis(void) {
     return (uint64_t) ((time.tv_sec * 1000000L + time.tv_usec) / 1000);
 }
 
-void dummy_read_inputs_local(ladder_ctx_t *ladder_ctx) {
+void dummy_read(ladder_ctx_t *ladder_ctx, uint32_t id) {
     char ch = 0;
     struct termios orig_term, raw_term;
 
@@ -148,20 +154,20 @@ void dummy_read_inputs_local(ladder_ctx_t *ladder_ctx) {
         (*ladder_ctx).ladder.state = LADDER_ST_EXIT_TSK;
 
     if (ch > 47 && ch < 56)
-        (*ladder_ctx).memory.I[ch - 48] = (*ladder_ctx).memory.I[ch - 48] > 0 ? 0 : 1;
+        (*ladder_ctx).input[id].I[ch - 48] = (*ladder_ctx).input[id].I[ch - 48] > 0 ? 0 : 1;
 
     printf("[scan time: %lu ms]                                                               \n", (*ladder_ctx).scan_internals.actual_scan_time);
-    printf("Toggle I: 0-7  (Q: exit)                                                                                                      \n");
+    printf("Toggle I: 0-7  (Q: exit) (fn: %d)                                                                                                     \n", id);
     printf("-----------------------                                                           \n");
 
-    printf("I0-I1-I2-I3-I4-I5-I6-I7                              \n");
-    printf("%02d-%02d-%02d-%02d-%02d-%02d-%02d-%02d                              \n", (*ladder_ctx).memory.I[0], (*ladder_ctx).memory.I[1],
-            (*ladder_ctx).memory.I[2], (*ladder_ctx).memory.I[3], (*ladder_ctx).memory.I[4], (*ladder_ctx).memory.I[5], (*ladder_ctx).memory.I[6],
-            (*ladder_ctx).memory.I[7]);
+    printf("I0.0-I0.1-I0.2-I0.3-I0.4-I0.5-I0.6-I0.7                              \n");
+    printf("%04d-%04d-%04d-%04d-%04d-%04d-%04d-%04d                              \n", (*ladder_ctx).input[id].I[0], (*ladder_ctx).input[id].I[1],
+            (*ladder_ctx).input[id].I[2], (*ladder_ctx).input[id].I[3], (*ladder_ctx).input[id].I[4], (*ladder_ctx).input[id].I[5],
+            (*ladder_ctx).input[id].I[6], (*ladder_ctx).input[id].I[7]);
     printf("                                                     \n");
 }
 
-void dummy_write_outputs_local(ladder_ctx_t *ladder_ctx) {
+void dummy_write(ladder_ctx_t *ladder_ctx, uint32_t id) {
     uint32_t rets = 0;
 
     printf("                                                                                                                      \n");
@@ -172,10 +178,10 @@ void dummy_write_outputs_local(ladder_ctx_t *ladder_ctx) {
 
     printf("                                                     \n");
 
-    printf("Q0-Q1-Q2-Q3-Q4-Q5-Q6-Q7                                \n");
-    printf("%02d-%02d-%02d-%02d-%02d-%02d-%02d-%02d                              \n", (*ladder_ctx).memory.Q[0], (*ladder_ctx).memory.Q[1],
-            (*ladder_ctx).memory.Q[2], (*ladder_ctx).memory.Q[3], (*ladder_ctx).memory.Q[4], (*ladder_ctx).memory.Q[5], (*ladder_ctx).memory.Q[6],
-            (*ladder_ctx).memory.Q[7]);
+    printf("Q0.0-Q0.1-Q0.2-Q0.3-Q0.4-Q0.5-Q0.6-Q0.7                                \n");
+    printf("%04d-%04d-%04d-%04d-%04d-%04d-%04d-%04d                                \n", (*ladder_ctx).output[id].Q[0], (*ladder_ctx).output[id].Q[1],
+            (*ladder_ctx).output[id].Q[2], (*ladder_ctx).output[id].Q[3], (*ladder_ctx).output[id].Q[4], (*ladder_ctx).output[id].Q[5],
+            (*ladder_ctx).output[id].Q[6], (*ladder_ctx).output[id].Q[7]);
 
     printf("-----------------------                                                     \n");
     printf("        +----+----+-------+\n");
@@ -230,14 +236,6 @@ void dummy_write_outputs_local(ladder_ctx_t *ladder_ctx) {
     (*ladder_ctx).hw.time.delay(5);
 }
 
-void dummy_read_inputs_remote(ladder_ctx_t *ladder_ctx) {
-
-}
-
-void dummy_write_outputs_remote(ladder_ctx_t *ladder_ctx) {
-
-}
-
 bool dummy_on_scan_end(ladder_ctx_t *ladder_ctx) {
     return false;
 }
@@ -265,4 +263,48 @@ void dummy_on_panic(ladder_ctx_t *ladder_ctx) {
 }
 
 void dummy_on_end_task(ladder_ctx_t *ladder_ctx) {
+}
+
+bool dummy_init_read(ladder_ctx_t *ladder_ctx, uint32_t id, bool init) {
+    if (init) {
+        (*ladder_ctx).input[id].I = calloc(DUMMY_QTY_I, sizeof(uint8_t));
+        (*ladder_ctx).input[id].IW = calloc(DUMMY_QTY_IW, sizeof(int32_t));
+        (*ladder_ctx).input[id].Ih = calloc(DUMMY_QTY_I, sizeof(uint8_t));
+        (*ladder_ctx).input[id].i_qty = DUMMY_QTY_I;
+        (*ladder_ctx).input[id].iw_qty = DUMMY_QTY_IW;
+
+        for (uint32_t n = 0; n < DUMMY_QTY_I; n++) {
+            (*ladder_ctx).input[id].I[n] = 0;
+            (*ladder_ctx).input[id].Ih[n] = 0;
+        }
+        for (uint32_t n = 0; n < DUMMY_QTY_IW; n++) {
+            (*ladder_ctx).input[id].IW[n] = 0;
+        }
+    } else {
+        free((*ladder_ctx).input[id].I);
+        free((*ladder_ctx).input[id].IW);
+        free((*ladder_ctx).input[id].Ih);
+        (*ladder_ctx).input[id].i_qty = 0;
+        (*ladder_ctx).input[id].iw_qty = 0;
+    }
+
+    return true;
+}
+
+bool dummy_init_write(ladder_ctx_t *ladder_ctx, uint32_t id, bool init) {
+    if(init) {
+        (*ladder_ctx).output[id].Q = calloc(DUMMY_QTY_Q, sizeof(uint8_t));
+        (*ladder_ctx).output[id].QW = calloc(DUMMY_QTY_QW, sizeof(int32_t));
+        (*ladder_ctx).output[id].Qh = calloc(DUMMY_QTY_Q, sizeof(uint8_t));
+        (*ladder_ctx).output[id].q_qty = DUMMY_QTY_Q;
+        (*ladder_ctx).output[id].qw_qty = DUMMY_QTY_QW;
+    } else {
+        free((*ladder_ctx).output[id].Q);
+        free((*ladder_ctx).output[id].QW);
+        free((*ladder_ctx).output[id].Qh);
+        (*ladder_ctx).output[id].q_qty = 0;
+        (*ladder_ctx).output[id].qw_qty = 0;
+    }
+
+    return true;
 }

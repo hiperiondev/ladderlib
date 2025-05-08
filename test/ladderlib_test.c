@@ -42,10 +42,6 @@
 
 // registers quantity
 #define QTY_M  8
-#define QTY_I  8
-#define QTY_Q  8
-#define QTY_IW 8
-#define QTY_QW 8
 #define QTY_C  8
 #define QTY_T  8
 #define QTY_D  8
@@ -63,7 +59,7 @@ int main(void) {
     printf("\e[1;1H\e[2J");
 
     // initialize context
-    if (!ladder_ctx_init(&ladder_ctx, 6, 7, 3, QTY_M, QTY_I, QTY_Q, QTY_IW, QTY_QW, QTY_C, QTY_T, QTY_D, QTY_R, false)) {
+    if (!ladder_ctx_init(&ladder_ctx, 6, 7, 3, QTY_M, QTY_C, QTY_T, QTY_D, QTY_R, false)) {
         printf("ERROR Initializing\n");
         return 1;
     }
@@ -71,10 +67,16 @@ int main(void) {
     ///////////////////////////////////////////////////////
 
     // assign port functions
-    ladder_ctx.hw.io.read_inputs_local = dummy_read_inputs_local;
-    ladder_ctx.hw.io.write_outputs_local = dummy_write_outputs_local;
-    ladder_ctx.hw.io.read_inputs_remote = dummy_read_inputs_remote;
-    ladder_ctx.hw.io.write_outputs_remote = dummy_write_outputs_remote;
+    if (!ladder_add_read_fn(&ladder_ctx, dummy_read, dummy_init_read)) {
+        printf("ERROR Adding io read function\n");
+        return 1;
+    }
+
+    if (!ladder_add_write_fn(&ladder_ctx, dummy_write, dummy_init_write)) {
+        printf("ERROR Adding io write function\n");
+        return 1;
+    }
+
     ladder_ctx.on.scan_end = dummy_on_scan_end;
     ladder_ctx.on.instruction = dummy_on_instruction;
     ladder_ctx.on.task_before = dummy_on_task_before;

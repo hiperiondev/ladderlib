@@ -653,10 +653,12 @@ void ladder_set_data_value(ladder_ctx_t *ladder_ctx, uint32_t row, uint32_t colu
             (*ladder_ctx).memory.M[ladder_cell_data_exec(ladder_ctx, row, column, pos).value.i32] = *((uint8_t*) value);
             break;
         case LADDER_TYPE_Q:
-            (*ladder_ctx).memory.Q[ladder_cell_data_exec(ladder_ctx, row, column, pos).value.i32] = *((uint8_t*) value);
+            (*ladder_ctx).output[ladder_cell_data_exec(ladder_ctx, row, column, pos).value.mp.module].Q[ladder_cell_data_exec(ladder_ctx, row, column, pos).value.mp.port] =
+                    *((uint8_t*) value);
             break;
         case LADDER_TYPE_I:
-            (*ladder_ctx).memory.I[ladder_cell_data_exec(ladder_ctx, row, column, pos).value.i32] = *((uint8_t*) value);
+            (*ladder_ctx).input[ladder_cell_data_exec(ladder_ctx, row, column, pos).value.mp.module].I[ladder_cell_data_exec(ladder_ctx, row, column, pos).value.mp.port] =
+                    *((uint8_t*) value);
             break;
         case LADDER_TYPE_Cd:
             (*ladder_ctx).memory.Cd[ladder_cell_data_exec(ladder_ctx, row, column, pos).value.i32] = *((int32_t*) value);
@@ -671,10 +673,12 @@ void ladder_set_data_value(ladder_ctx_t *ladder_ctx, uint32_t row, uint32_t colu
             (*ladder_ctx).memory.Tr[ladder_cell_data_exec(ladder_ctx, row, column, pos).value.i32] = *((int32_t*) value);
             break;
         case LADDER_TYPE_IW:
-            (*ladder_ctx).registers.IW[ladder_cell_data_exec(ladder_ctx, row, column, pos).value.i32] = *((int32_t*) value);
+            (*ladder_ctx).input[ladder_cell_data_exec(ladder_ctx, row, column, pos).value.mp.module].IW[ladder_cell_data_exec(ladder_ctx, row, column, pos).value.mp.port] =
+                    *((int32_t*) value);
             break;
         case LADDER_TYPE_QW:
-            (*ladder_ctx).registers.QW[ladder_cell_data_exec(ladder_ctx, row, column, pos).value.i32] = *((int32_t*) value);
+            (*ladder_ctx).output[ladder_cell_data_exec(ladder_ctx, row, column, pos).value.mp.module].QW[ladder_cell_data_exec(ladder_ctx, row, column, pos).value.mp.port] =
+                    *((uint8_t*) value);
             break;
         case LADDER_TYPE_C:
             (*ladder_ctx).registers.C[ladder_cell_data_exec(ladder_ctx, row, column, pos).value.i32] = *((uint32_t*) value);

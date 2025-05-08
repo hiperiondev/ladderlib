@@ -252,18 +252,29 @@ typedef struct ladder_instructions_ioc_s {
 extern const ladder_instructions_iocd_t ladder_fn_iocd[];
 
 /**
+ * @struct ladder_moduleportvalue_s
+ * @brief Module/Port value
+ *
+ */
+typedef struct ladder_moduleportvalue_s {
+    uint8_t module; /**< Module */
+    uint8_t port;   /**< Port */
+} ladder_moduleportvalue_t;
+
+/**
  * @struct ladder_value_s
  * @brief Value container
  *
  */
 typedef struct ladder_value_s {
-    ladder_type_t type;   /**< Data type */
+    ladder_type_t type; /**< Data type */
     union {
-          uint32_t u32;   /**< Unsigned integer */
-           int32_t i32;   /**< Integer */
-        const char *cstr; /**< Constant string */
-             float real;  /**< Real */
-    } value;              /**< Data */
+                        uint32_t u32;   /**< Unsigned integer */
+                         int32_t i32;   /**< Integer */
+                      const char *cstr; /**< Constant string */
+                           float real;  /**< Real */
+        ladder_moduleportvalue_t mp;    /**< module.port value */
+    } value; /**< Data */
 } ladder_value_t;
 
 /**
@@ -319,10 +330,6 @@ typedef struct ladder_s {
 
     struct {
         uint32_t m;           /**< Quantity of regular flags */
-        uint32_t i;           /**< Quantity of digital inputs */
-        uint32_t q;           /**< Quantity of digital outputs */
-        uint32_t iw;          /**< Quantity of analog inputs */
-        uint32_t qw;          /**< Quantity of analog outputs */
         uint32_t c;           /**< Quantity of counters */
         uint32_t t;           /**< Quantity of timers */
         uint32_t d;           /**< Quantity of regular registers */
@@ -334,36 +341,34 @@ typedef struct ladder_s {
 typedef struct ladder_ctx_s ladder_ctx_t;
 
 /**
- * @fn void (*_read_inputs_local)(ladder_ctx_t *ladder_ctx)
- * @brief Read local hardware values
+ * @fn void (*_io_read)(ladder_ctx_t *ladder_ctx, uint32_t id)
+ * @brief Read hardware values
  *
  * @param ladder_ctx_t Ladder context
+ * @param id Function id
  */
-typedef void (*_read_inputs_local)(ladder_ctx_t* ladder_ctx);
+typedef void (*_io_read)(ladder_ctx_t* ladder_ctx, uint32_t id);
 
 /**
- * @fn void (*_write_outputs_local)(ladder_ctx_t *ladder_ctx)
- * @brief Write local hardware values
+ * @fn void (*_io_write)(ladder_ctx_t *ladder_ctx, uint32_t id)
+ * @brief Write hardware values
  *
  * @param ladder_ctx_t Ladder context
+ * @param id Function id
  */
-typedef void (*_write_outputs_local)(ladder_ctx_t* ladder_ctx);
+typedef void (*_io_write)(ladder_ctx_t* ladder_ctx, uint32_t id);
 
 /**
- * @fn void (*_read_inputs_remote)(ladder_ctx_t *ladder_ctx)
- * @brief Read remote hardware values
+ * @fn bool (*_io_init)(ladder_ctx_t* ladder_ctx, uint32_t id, bool init_deinit)
+ * @brief Initialize/deinitialize io function
  *
- * @param ladder_ctx_t Ladder context
- */
-typedef void (*_read_inputs_remote)(ladder_ctx_t* ladder_ctx);
-
-/**
- * @fn void (*_write_outputs_remote)(ladder_ctx_t *ladder_ctx
- * @brief Write remote hardware values
+ * @param ladder_ctx Ladder context
+ * @param id Function id
+ * @param init_deinit Initialize/deinitialize
  *
- * @param ladder_ctx_t Ladder context
+ * @return Status
  */
-typedef void (*_write_outputs_remote)(ladder_ctx_t* ladder_ctx);
+typedef bool (*_io_init)(ladder_ctx_t* ladder_ctx, uint32_t id, bool init_deinit);
 
 /**
  * @fn bool (*_on_scan_end)(ladder_ctx_t *ladder_ctx)
@@ -435,10 +440,12 @@ typedef uint64_t (*_millis)(void);
  */
 typedef struct ladder_hw_s {
     struct {
-           _read_inputs_local read_inputs_local;    /**< Read local hardware values */
-         _write_outputs_local write_outputs_local;  /**< Write local hardware values */
-          _read_inputs_remote read_inputs_remote;   /**< Read remote hardware values */
-        _write_outputs_remote write_outputs_remote; /**< Write local hardware values */
+               uint32_t fn_read_qty;  /**< Quantity of read functions */
+               uint32_t fn_write_qty; /**< Quantity of read functions */
+               _io_read *read;        /**< Read hardware values */
+              _io_write *write;       /**< Write hardware values */
+               _io_init *init_read;   /**< Initialize read functions */
+               _io_init *init_write;  /**< Initialize write functions */
     } io;
 
     struct {
@@ -467,8 +474,6 @@ typedef struct ladder_manage_s {
  */
 typedef struct ladder_memory_s {
     uint8_t *M;  /**< Regular flags */
-    uint8_t *I;  /**< Digital Inputs */
-    uint8_t *Q;  /**< Digital Outputs */
        bool *Cr; /**< Counter running */
        bool *Cd; /**< Counter done */
        bool *Tr; /**< Timer running */
@@ -482,8 +487,6 @@ typedef struct ladder_memory_s {
  */
 typedef struct ladder_prev_scan_vals_s {
     uint8_t *Mh;  /**< Regular flags previous */
-    uint8_t *Ih;  /**< Digital Inputs previous */
-    uint8_t *Qh;  /**< Digital Outputs previous */
        bool *Crh; /**< Counter running previous */
        bool *Cdh; /**< Counter done previous */
        bool *Trh; /**< Timer running previous */
@@ -496,12 +499,38 @@ typedef struct ladder_prev_scan_vals_s {
  *
  */
 typedef struct ladder_registers_s {
-     int32_t *IW; /**< Analog Inputs */
-     int32_t *QW; /**< Analog Outputs */
-    uint32_t *C;  /**< Counter registers */
-     int32_t *D;  /**< Regular registers */
-       float *R;  /**< Floating point registers */
+    uint32_t *C; /**< Counter registers */
+     int32_t *D; /**< Regular registers */
+       float *R; /**< Floating point registers */
 } ladder_registers_t;
+
+/**
+ * @struct ladder_hw_input_vals_t
+ * @brief Input scan values
+ *
+ */
+typedef struct ladder_hw_input_vals_s {
+    uint32_t fn_id;  /**< Function id */
+    uint32_t i_qty;  /**< Digital inputs quantity */
+    uint32_t iw_qty; /**< Analog inputs quantity */
+    uint8_t *I;      /**< Digital inputs */
+    int32_t *IW;     /**< Analog inputs */
+    uint8_t *Ih;     /**< Digital inputs previous */
+} ladder_hw_input_vals_t;
+
+/**
+ * @struct ladder_hw_output_vals_t
+ * @brief Output scan values
+ *
+ */
+typedef struct ladder_hw_output_vals_s {
+    uint32_t fn_id;  /**< Function id */
+    uint32_t q_qty;  /**< Digital outputs quantity*/
+    uint32_t qw_qty; /**< Analog outputs quantity */
+    uint8_t *Q;      /**< Digital outputs */
+    int32_t *QW;     /**< Analog outputs */
+    uint8_t *Qh;     /**< Digital outputs previous */
+} ladder_hw_output_vals_t;
 
 /**
  * @struct plc_scan_internals_s
@@ -581,6 +610,8 @@ typedef struct ladder_ctx_s {
             ladder_manage_t on;             /**< Manage functions */
             ladder_memory_t memory;         /**< Memory */
     ladder_prev_scan_vals_t prev_scan_vals; /**< Previous scan values */
+     ladder_hw_input_vals_t *input;         /**< Hw inputs */
+    ladder_hw_output_vals_t *output;        /**< Hw outputs */
          ladder_registers_t registers;      /**< Registers */
              ladder_timer_t *timers;        /**< Timers */
     ladder_scan_internals_t scan_internals; /**< Scan internals */
@@ -590,8 +621,8 @@ typedef struct ladder_ctx_s {
 } ladder_ctx_t;
 
 /**
- * @fn bool ladder_ctx_init(ladder_ctx_t *ladder_ctx, uint8_t net_columns_qty, uint8_t net_rows_qty, uint32_t networks_qty, uint32_t qty_m, uint32_t qty_i,
- uint32_t qty_q, uint32_t qty_iw, uint32_t qty_qw, uint32_t qty_c, uint32_t qty_t, uint32_t qty_d, uint32_t qty_r, bool init_netwok);
+ * @fn bool ladder_ctx_init(ladder_ctx_t *ladder_ctx, uint8_t net_columns_qty, uint8_t net_rows_qty, uint32_t networks_qty, uint32_t qty_m, uint32_t qty_c,
+ *  uint32_t qty_t, uint32_t qty_d, uint32_t qty_r, bool init_netwok);
  * @brief Initialize context.
  *
  *
@@ -600,19 +631,16 @@ typedef struct ladder_ctx_s {
  * @param net_rows_qty Network Logic matrix rows size (Maximum: 32).
  * @param networks_qty Total Networks.
  * @param qty_m Memory Areas quantities. Marks. Regular flags.
- * @param qty_i Memory Areas quantities. Digital Inputs.
- * @param qty_q Memory Areas quantities. Digital Outputs.
- * @param qty_iw Memory Areas quantities. Analog Inputs.
- * @param qty_qw Memory Areas quantities. Analog Outputs.
- * @param qty_c Memory Areas quantities. Counter registers (16 bits).
+ * @param qty_c Memory Areas qu        printf("ERROR Adding io read function\n");
+ * antities. Counter registers (16 bits).
  * @param qty_t Memory Areas quantities. Timers.
  * @param qty_d Memory Areas quantities. Regular registers (16 bit signed).
  * @param qty_r Memory Areas quantities. Float or Real registers.
  * @param init_netwok If false not initialize Networks
  * @return Error
  */
-bool ladder_ctx_init(ladder_ctx_t *ladder_ctx, uint8_t net_columns_qty, uint8_t net_rows_qty, uint32_t networks_qty, uint32_t qty_m, uint32_t qty_i,
-        uint32_t qty_q, uint32_t qty_iw, uint32_t qty_qw, uint32_t qty_c, uint32_t qty_t, uint32_t qty_d, uint32_t qty_r, bool init_netwok);
+bool ladder_ctx_init(ladder_ctx_t *ladder_ctx, uint8_t net_columns_qty, uint8_t net_rows_qty, uint32_t networks_qty, uint32_t qty_m, uint32_t qty_c,
+        uint32_t qty_t, uint32_t qty_d, uint32_t qty_r, bool init_netwok);
 
 /**
  * @fn bool ladder_ctx_deinit(ladder_ctx_t *ladder_ctx)
@@ -638,6 +666,28 @@ void ladder_task(void *ladderctx);
  * @param ladder_ctx Ladder context
  */
 void ladder_clear_program(ladder_ctx_t *ladder_ctx);
+
+/**
+ * @fn bool ladder_add_read_fn(ladder_ctx_t*, _io_read read, _io_init read_init)
+ * @brief Add read inputs function
+ *
+ * @param ladder_ctx Ladder context
+ * @param read Read function
+ * @param read_init Initialize/deinitialize read function
+ * @return Status
+ */
+bool ladder_add_read_fn(ladder_ctx_t *ladder_ctx, _io_read read, _io_init read_init);
+
+/**
+ * @fn bool ladder_add_write_fn(ladder_ctx_t*, _io_write write, _io_init write_init)
+ * @brief Add write outputs function
+ *
+ * @param ladder_ctx Ladder context
+ * @param write Write function
+ * @param write Initialize/deinitialize write function
+ * @return Status
+ */
+bool ladder_add_write_fn(ladder_ctx_t *ladder_ctx, _io_write write, _io_init write_init);
 
 /**
  * @fn bool ladder_add_foreign(ladder_ctx_t *ladder_ctx, _foreign_fn_init fn_init, void *init_data, uint32_t qty)

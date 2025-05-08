@@ -39,11 +39,16 @@
 // ladder logic execution task
 void ladder_task(void *ladderctx) {
     ladder_ctx_t *ladder_ctx = (ladder_ctx_t*) ladderctx;
-    if ((*ladder_ctx).hw.time.millis == NULL || (*ladder_ctx).hw.time.delay == NULL || (*ladder_ctx).hw.io.read_inputs_local == NULL
-            || (*ladder_ctx).hw.io.write_outputs_local == NULL) {
+    if ((*ladder_ctx).hw.time.millis == NULL || (*ladder_ctx).hw.time.delay == NULL || (*ladder_ctx).hw.io.read == NULL
+            || (*ladder_ctx).hw.io.write == NULL) {
         (*ladder_ctx).ladder.state = LADDER_ST_NULLFN;
         goto exit;
     }
+
+    for (uint32_t n=0;n<(*ladder_ctx).hw.io.fn_read_qty;n++)
+        (*ladder_ctx).hw.io.read[n](ladder_ctx, n);
+    for (uint32_t n=0;n<(*ladder_ctx).hw.io.fn_write_qty;n++)
+            (*ladder_ctx).hw.io.write[n](ladder_ctx, n);
 
     // task main loop
     while ((*ladder_ctx).ladder.state != LADDER_ST_EXIT_TSK) {
@@ -65,22 +70,15 @@ void ladder_task(void *ladderctx) {
             (*ladder_ctx).on.task_before(ladder_ctx);
 
         // ladder program scan
-        ladder_scan_time(ladder_ctx);
-
-        if ((*ladder_ctx).hw.io.read_inputs_local != NULL)
-            (*ladder_ctx).hw.io.read_inputs_local(ladder_ctx);
-
-        if ((*ladder_ctx).hw.io.read_inputs_remote != NULL)
-            (*ladder_ctx).hw.io.read_inputs_remote(ladder_ctx);
-
         ladder_scan(ladder_ctx);
         ladder_save_previous_values(ladder_ctx);
 
-        if ((*ladder_ctx).hw.io.write_outputs_local != NULL)
-            (*ladder_ctx).hw.io.write_outputs_local(ladder_ctx);
+        for (uint32_t n=0;n<(*ladder_ctx).hw.io.fn_read_qty;n++)
+            (*ladder_ctx).hw.io.read[n](ladder_ctx, n);
+        for (uint32_t n=0;n<(*ladder_ctx).hw.io.fn_write_qty;n++)
+                (*ladder_ctx).hw.io.write[n](ladder_ctx, n);
 
-        if ((*ladder_ctx).hw.io.write_outputs_remote != NULL)
-            (*ladder_ctx).hw.io.write_outputs_remote(ladder_ctx);
+        ladder_scan_time(ladder_ctx);
 
         // external function after scan
         if ((*ladder_ctx).on.task_after != NULL)

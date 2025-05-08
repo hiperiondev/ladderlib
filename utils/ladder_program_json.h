@@ -53,6 +53,7 @@ typedef enum JSON_ERROR {
     JSON_ERROR_PRINTOBJ,        //
     JSON_ERROR_COMPACTFILE,     //
     JSON_ERROR_WRITEFILE,       //
+    JSON_ERROR_INVALIDVALUE,    //
     //////////////////////////////
     JSON_ERROR_FAIL             //
 
