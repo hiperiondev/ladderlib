@@ -1339,18 +1339,3 @@ To use Ladderlib, follow these steps:
 6. **Monitor and Handle Errors**: Check `LADDER_STATE` and `LADDER_INS_ERROR` to monitor execution status and handle errors.  
 7. **Deinitialize**: Call `ladder_ctx_deinit` to free resources when the program is no longer needed.  
   
-### Example Workflow  
-Below is a simplified example of how to structure a Ladderlib program:  
-  
-```c  
- // TODO: EXAMPLE
-```  
-  
-This example initializes a context, sets hardware callbacks, defines a simple program, runs the task, and deinitializes the context. Actual implementations will vary based on specific hardware and logic requirements.  
-  
-## Limitations and Assumptions  
-```c  
-// TODO: DOC  
-```
-
-
