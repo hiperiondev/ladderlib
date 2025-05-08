@@ -643,37 +643,54 @@ This section documents all enums and structures from the header files.
   
 ### Enums  
   
-#### ladder_instruction_e  
+#### ladder_instruction_t 
   
 Defines the types of instructions supported by LadderLib.  
   
 ```c  
-typedef enum {  
-LADDER_INSTRUCTION_NOP, // No operation  
-LADDER_INSTRUCTION_LD, // Load  
-LADDER_INSTRUCTION_ST, // Store  
-LADDER_INSTRUCTION_AND, // Logical AND  
-LADDER_INSTRUCTION_OR, // Logical OR  
-LADDER_INSTRUCTION_NOT, // Logical NOT  
-LADDER_INSTRUCTION_TON, // Timer On Delay  
-LADDER_INSTRUCTION_TOF, // Timer Off Delay  
-LADDER_INSTRUCTION_CTU, // Counter Up  
-LADDER_INSTRUCTION_CTD, // Counter Down  
-LADDER_INSTRUCTION_END_NETWORK // End of network  
-} ladder_instruction_e;  
+typedef enum LADDER_INSTRUCTIONS {
+    LADDER_INS_NOP,     /**< Instruction NOP */
+    LADDER_INS_CONN,    /**< Instruction CONN */
+    LADDER_INS_NEG,     /**< Instruction NEG */
+    LADDER_INS_NO,      /**< Instruction NO */
+    LADDER_INS_NC,      /**< Instruction NC */
+    LADDER_INS_RE,      /**< Instruction RE */
+    LADDER_INS_FE,      /**< Instruction FE */
+    LADDER_INS_COIL,    /**< Instruction COIL */
+    LADDER_INS_COILL,   /**< Instruction COILL */
+    LADDER_INS_COILU,   /**< Instruction COILU */
+    LADDER_INS_TON,     /**< Instruction TON */
+    LADDER_INS_TOFF,    /**< Instruction TOFF */
+    LADDER_INS_TP,      /**< Instruction TP */
+    LADDER_INS_CTU,     /**< Instruction CTU */
+    LADDER_INS_CTD,     /**< Instruction CTD */
+    LADDER_INS_MOVE,    /**< Instruction MOVE */
+    LADDER_INS_SUB,     /**< Instruction SUB */
+    LADDER_INS_ADD,     /**< Instruction ADD */
+    LADDER_INS_MUL,     /**< Instruction MUL */
+    LADDER_INS_DIV,     /**< Instruction DIV */
+    LADDER_INS_MOD,     /**< Instruction MOD */
+    LADDER_INS_SHL,     /**< Instruction SHL */
+    LADDER_INS_SHR,     /**< Instruction SHR */
+    LADDER_INS_ROL,     /**< Instruction ROL */
+    LADDER_INS_ROR,     /**< Instruction ROR */
+    LADDER_INS_AND,     /**< Instruction AND */
+    LADDER_INS_OR,      /**< Instruction OR */
+    LADDER_INS_XOR,     /**< Instruction XOR */
+    LADDER_INS_NOT,     /**< Instruction NOT */
+    LADDER_INS_EQ,      /**< Instruction EQ */
+    LADDER_INS_GT,      /**< Instruction GT */
+    LADDER_INS_GE,      /**< Instruction GE */
+    LADDER_INS_LT,      /**< Instruction LT */
+    LADDER_INS_LE,      /**< Instruction LE */
+    LADDER_INS_NE,      /**< Instruction NE */
+    LADDER_INS_FOREIGN, /**< Instruction FOREIGN */
+    LADDER_INS_TMOVE,   /**< Instruction TMOVE */
+    ///////////////////
+    LADDER_INS_INV,     /**< First invalid */
+    LADDER_INS_MULTI,   /**< cell is a part of multi cell instruction */
+} ladder_instruction_t;
 ```  
-  
-- **LADDER_INSTRUCTION_NOP**: Performs no operation, used as a placeholder.  
-- **LADDER_INSTRUCTION_LD**: Loads a value from an input, memory, or other source.  
-- **LADDER_INSTRUCTION_ST**: Stores a value to an output or memory.  
-- **LADDER_INSTRUCTION_AND**: Performs a logical AND operation between operands.  
-- **LADDER_INSTRUCTION_OR**: Performs a logical OR operation between operands.  
-- **LADDER_INSTRUCTION_NOT**: Inverts the logical state of an operand.  
-- **LADDER_INSTRUCTION_TON**: Implements a timer that activates after a delay.  
-- **LADDER_INSTRUCTION_TOF**: Implements a timer that deactivates after a delay.  
-- **LADDER_INSTRUCTION_CTU**: Increments a counter on each activation.  
-- **LADDER_INSTRUCTION_CTD**: Decrements a counter on each activation.  
-- **LADDER_INSTRUCTION_END_NETWORK**: Marks the end of a network’s instruction set.  
   
 ### Structures  
   
