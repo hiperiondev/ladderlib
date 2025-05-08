@@ -690,107 +690,464 @@ typedef enum LADDER_INSTRUCTIONS {
     LADDER_INS_INV,     /**< First invalid */
     LADDER_INS_MULTI,   /**< cell is a part of multi cell instruction */
 } ladder_instruction_t;
-```  
-  
+```
+
+#### ladder_state_t
+
+General state
+
+```c
+typedef enum LADDER_STATE {
+    LADDER_ST_STOPPED,  /**< Stopped */
+    LADDER_ST_RUNNING,  /**< Running */
+    LADDER_ST_ERROR,    /**< Error */
+    LADDER_ST_EXIT_TSK, /**< Exit task */
+    LADDER_ST_NULLFN,   /**< pointer to NULL function */
+    LADDER_ST_INV,      /**< Invalid */
+} ladder_state_t;
+```
+
+#### ladder_ins_err_t
+
+Instruction status
+
+```c
+typedef enum LADDER_INS_ERROR {
+    LADDER_INS_ERR_OK,         /**< OK */
+    LADDER_INS_ERR_GETPREVVAL, /**< Error get previous value */
+    LADDER_INS_ERR_GETDATAVAL, /**< Error get data value */
+    LADDER_INS_ERR_SETDATAVAL, /**< Error set data value */
+    LADDER_INS_ERR_NOFOREIGN,  /**< Error foreign function not exist */
+    LADDER_INS_ERR_NOTABLE,    /**< Table not exist or net not disabled */
+    LADDER_INS_ERR_OUTOFRANGE, /**< Value out of range */
+    //...//
+    LADDER_INS_ERR_FAIL,       /**< Generic fail */
+} ladder_ins_err_t;
+```
+
+#### ladder_type_t
+
+Data types
+
+```c
+typedef enum LADDER_TYPE {
+    LADDER_TYPE_NONE,          /**< Type None */
+    LADDER_TYPE_M,             /**< Type M */
+    LADDER_TYPE_Q,             /**< Type Q */
+    LADDER_TYPE_I,             /**< Type I */
+    LADDER_TYPE_Cd,            /**< Type Cd */
+    LADDER_TYPE_Cr,            /**< Type Cr */
+    LADDER_TYPE_Td,            /**< Type Td */
+    LADDER_TYPE_Tr,            /**< Type Tr */
+    LADDER_TYPE_IW,            /**< Type IW */
+    LADDER_TYPE_QW,            /**< Type QW */
+    LADDER_TYPE_C,             /**< Type C */
+    LADDER_TYPE_T,             /**< Type T */
+    LADDER_TYPE_D,             /**< Type D */
+    LADDER_TYPE_CSTR,          /**< Type constant string */
+    LADDER_TYPE_REAL,          /**< Type float */
+    LADDER_TYPE_INV,           /**< First invalid */
+    LADDER_BASETIME_MS = 0xf0, /**< Basetime ms */
+    LADDER_BASETIME_10MS,      /**< Basetime 10 ms */
+    LADDER_BASETIME_100MS,     /**< Basetime 100 ms */
+    LADDER_BASETIME_SEC,       /**< Basetime seconds */
+    LADDER_BASETIME_MIN,       /**< Basetime minutes */
+} ladder_type_t;
+```
+
 ### Structures  
   
-#### ladder_instruction_s  
-  
-Represents a single instruction within a network.  
-  
-```c  
-typedef struct {  
-ladder_instruction_e instruction;  
-uint32_t id;  
-bool value;  
-} ladder_instruction_s;  
-```  
-  
-- **instruction**: Type of instruction (e.g., `LADDER_INSTRUCTION_LD`).  
-- **id**: Identifier for the operand (e.g., input, output, timer ID).  
-- **value**: Current value of the instruction (true/false).  
-  
-#### ladder_network_s  
-  
-Represents a ladder network, which is a grid of instructions.  
-  
-```c  
-typedef struct {  
-uint32_t id;  
-uint32_t rows_qty;  
-uint32_t columns_qty;  
-ladder_instruction_s** instructions;  
-} ladder_network_s;  
-```  
-  
-- **id**: Unique identifier for the network.  
-- **rows_qty**: Number of rows in the network grid.  
-- **columns_qty**: Number of columns in the network grid.  
-- **instructions**: 2D array of pointers to `ladder_instruction_s` structures.  
-  
-#### ladder_ctx_s  
-  
-Represents the main ladder context, managing all networks and resources.  
-  
-```c  
-typedef struct {  
-uint32_t net_columns_qty;  
-uint32_t net_rows_qty;  
-uint32_t networks_qty;  
-ladder_network_s** networks;  
-uint32_t qty_m;  
-uint32_t qty_i;  
-uint32_t qty_q;  
-uint32_t qty_t;  
-uint32_t qty_c;  
-uint32_t qty_b;  
-bool* m;  
-bool* i;  
-bool* q;  
-void* t;  
-void* c;  
-void* b;  
-_io_read read_fn;  
-_io_write write_fn;  
-_io_init init_fn;  
-_on_scan_end scan_end_fn;  
-_on_instruction instruction_fn;  
-_on_task_before task_before_fn;  
-_on_task_after task_after_fn;  
-_on_panic panic_fn;  
-_on_end_task end_task_fn;  
-_delay delay_fn;  
-_millis millis_fn;  
-} ladder_ctx_s;  
-```  
-  
-- **net_columns_qty**: Number of columns in each network (max 32).  
-- **net_rows_qty**: Number of rows in each network.  
-- **networks_qty**: Total number of networks.  
-- **networks**: Array of pointers to `ladder_network_s` structures.  
-- **qty_m**: Number of memory bits.  
-- **qty_i**: Number of input bits.  
-- **qty_q**: Number of output bits.  
-- **qty_t**: Number of timers.  
-- **qty_c**: Number of counters.  
-- **qty_b**: Number of blocks.  
-- **m**: Array of memory bits.  
-- **i**: Array of input bits.  
-- **q**: Array of output bits.  
-- **t**: Array of timer instances (opaque type).  
-- **c**: Array of counter instances (opaque type).  
-- **b**: Array of block instances (opaque type).  
-- **read_fn**: Callback for reading inputs.  
-- **write_fn**: Callback for writing outputs.  
-- **init_fn**: Callback for I/O initialization/deinitialization.  
-- **scan_end_fn**: Callback for end of scan cycle.  
-- **instruction_fn**: Callback for each instruction.  
-- **task_before_fn**: Callback before task cycle.  
-- **task_after_fn**: Callback after task cycle.  
-- **panic_fn**: Callback for panic situations.  
-- **end_task_fn**: Callback for task completion.  
-- **delay_fn**: Callback for delays.  
-- **millis_fn**: Callback for current time.  
+#### `ladder_instructions_ioc_s`
+
+Describes an instruction's input/output configuration and cell occupancy.
+
+```c
+typedef struct ladder_instructions_ioc_s {
+    uint8_t inputs;   /**< Inputs quantity */
+    uint8_t outputs;  /**< Outputs quantity */
+    uint8_t cells;    /**< Cells quantity */
+    uint8_t data_qty; /**< Quantity */
+} ladder_instructions_iocd_t;
+```
+
+- **Fields**:
+  - **`inputs`**: Number of input connections to the instruction.
+  - **`outputs`**: Number of output connections from the instruction.
+  - **`cells`**: Number of cells occupied by the instruction in the ladder diagram.
+  - **`data_qty`**: Quantity of data elements associated with the instruction.
+- **External Reference**:
+  - **`ladder_fn_iocd[]`**: A constant array of `ladder_instructions_iocd_t` defining instruction configurations.
+
+#### `ladder_moduleportvalue_s`
+
+Represents a value tied to a specific module and port, typically for I/O operations.
+
+```c
+typedef struct ladder_moduleportvalue_s {
+    uint8_t module; /**< Module */
+    uint8_t port;   /**< Port */
+} ladder_moduleportvalue_t;
+```
+
+- **Fields**:
+  - **`module`**: Identifier of the module.
+  - **`port`**: Identifier of the port within the module.
+
+#### `ladder_value_s`
+
+A versatile container for values of different types used in ladder logic.
+
+```c
+typedef struct ladder_value_s {
+    ladder_type_t type; /**< Data type */
+    union {
+        uint32_t u32;   /**< Unsigned integer */
+        int32_t i32;    /**< Integer */
+        const char *cstr; /**< Constant string */
+        float real;     /**< Real */
+        ladder_moduleportvalue_t mp; /**< module.port value */
+    } value; /**< Data */
+} ladder_value_t;
+```
+
+- **Fields**:
+  - **`type`**: Specifies the value's data type (e.g., `u32`, `i32`, `cstr`, `real`, `mp`).
+  - **`value`**: Union containing the actual value, interpreted based on `type`. Supports:
+    - Unsigned integer (`u32`).
+    - Signed integer (`i32`).
+    - Constant string (`cstr`).
+    - Floating-point number (`real`).
+    - Module/port value (`mp`).
+
+#### `ladder_cell_s`
+
+Represents a single cell in the ladder diagram, encapsulating an instruction and its data.
+
+```c
+typedef struct ladder_cell_s {
+    bool state;        /**< Output state */
+    bool vertical_bar; /**< Have vertical bar */
+    ladder_instruction_t code; /**< Code */
+    uint8_t data_qty;  /**< Data quantity */
+    ladder_value_t *data; /**< Data */
+} ladder_cell_t;
+```
+
+- **Fields**:
+  - **`state`**: Output state of the cell (`true` for active, `false` for inactive).
+  - **`vertical_bar`**: Indicates the presence of a vertical bar (for ladder diagram rendering).
+  - **`code`**: Instruction code executed by the cell.
+  - **`data_qty`**: Number of data elements associated with the instruction.
+  - **`data`**: Pointer to an array of `ladder_value_t` containing instruction data.
+
+#### `ladder_network_s`
+
+A network is a grid of cells forming a segment of the ladder logic program.
+
+```c
+typedef struct ladder_network_s {
+    bool enable;       /**< Enabled for execution */
+    uint32_t rows;     /**< Rows qty */
+    uint32_t cols;     /**< Columns qty */
+    ladder_cell_t **cells; /**< Cells */
+} ladder_network_t;
+```
+
+- **Fields**:
+  - **`enable`**: Indicates whether the network is active for execution.
+  - **`rows`**: Number of rows in the network grid.
+  - **`cols`**: Number of columns in the network grid.
+  - **`cells`**: 2D array of pointers to `ladder_cell_t`, representing the network's cells.
+
+#### `ladder_s`
+
+Holds the internal state and configuration of the ladder logic system.
+
+```c
+typedef struct ladder_s {
+    ladder_state_t state; /**< State */
+    struct {
+        uint8_t instr;    /**< Last executed instruction */
+        uint32_t network; /**< Last executed network */
+        uint32_t cell_column; /**< Last executed cell column */
+        uint32_t cell_row;    /**< Last executed cell row */
+        uint8_t err;      /**< Last executed error */
+    } last;
+    struct {
+        uint32_t m;       /**< Quantity of regular flags */
+        uint32_t c;       /**< Quantity of counters */
+        uint32_t t;       /**< Quantity of timers */
+        uint32_t d;       /**< Quantity of regular registers */
+        uint32_t r;       /**< Quantity of floating point registers */
+        uint32_t networks; /**< Quantity of networks */
+    } quantity;
+} ladder_t;
+```
+
+- **Fields**:
+  - **`state`**: Current operational state of the ladder system.
+  - **`last`**: Substructure tracking the last executed instruction:
+    - **`instr`**: Instruction code.
+    - **`network`**: Network index.
+    - **`cell_column`**: Column of the executed cell.
+    - **`cell_row`**: Row of the executed cell.
+    - **`err`**: Error code from the last execution.
+  - **`quantity`**: Substructure defining the system's capacity:
+    - **`m`**: Number of regular flags.
+    - **`c`**: Number of counters.
+    - **`t`**: Number of timers.
+    - **`d`**: Number of regular registers.
+    - **`r`**: Number of floating-point registers.
+    - **`networks`**: Number of networks.
+
+#### `ladder_hw_s`
+
+Defines hardware-dependent functions for I/O and time management.
+
+```c
+typedef struct ladder_hw_s {
+    struct {
+        uint32_t fn_read_qty;  /**< Quantity of read functions */
+        uint32_t fn_write_qty; /**< Quantity of write functions */
+        _io_read *read;        /**< Read hardware values */
+        _io_write *write;      /**< Write hardware values */
+        _io_init *init_read;   /**< Initialize read functions */
+        _io_init *init_write;  /**< Initialize write functions */
+    } io;
+    struct {
+        _millis millis; /**< Milliseconds from system start */
+        _delay delay;   /**< Delay in milliseconds */
+    } time;
+} ladder_hw_t;
+```
+
+- **Fields**:
+  - **`io`**: Substructure for I/O operations:
+    - **`fn_read_qty`**: Number of read functions.
+    - **`fn_write_qty`**: Number of write functions.
+    - **`read`**: Array of read function pointers.
+    - **`write`**: Array of write function pointers.
+    - **`init_read`**: Array of read initialization functions.
+    - **`init_write`**: Array of write initialization functions.
+  - **`time`**: Substructure for time management:
+    - **`millis`**: Function to get current time.
+    - **`delay`**: Function to delay execution.
+
+#### `ladder_hw_input_vals_s`
+
+Stores input values read from hardware.
+
+```c
+typedef struct ladder_hw_input_vals_s {
+    uint32_t fn_id;  /**< Function id */
+    uint32_t i_qty;  /**< Digital inputs quantity */
+    uint32_t iw_qty; /**< Analog inputs quantity */
+    uint8_t *I;      /**< Digital inputs */
+    int32_t *IW;     /**< Analog inputs */
+    uint8_t *Ih;     /**< Digital inputs previous */
+} ladder_hw_input_vals_t;
+```
+
+- **Fields**:
+  - **`fn_id`**: Identifier of the read function.
+  - **`i_qty`**: Number of digital inputs.
+  - **`iw_qty`**: Number of analog inputs.
+  - **`I`**: Array of digital input values.
+  - **`IW`**: Array of analog input values.
+  - **`Ih`**: Array of previous digital input values (for change detection).
+
+#### `ladder_hw_output_vals_s`
+
+Stores output values to be written to hardware.
+
+```c
+typedef struct ladder_hw_output_vals_s {
+    uint32_t fn_id;  /**< Function id */
+    uint32_t q_qty;  /**< Digital outputs quantity */
+    uint32_t qw_qty; /**< Analog outputs quantity */
+    uint8_t *Q;      /**< Digital outputs */
+    int32_t *QW;     /**< Analog outputs */
+    uint8_t *Qh;     /**< Digital outputs previous */
+} ladder_hw_output_vals_t;
+```
+
+- **Fields**:
+  - **`fn_id`**: Identifier of the write function.
+  - **`q_qty`**: Number of digital outputs.
+  - **`qw_qty`**: Number of analog outputs.
+  - **`Q`**: Array of digital output values.
+  - **`QW`**: Array of analog output values.
+  - **`Qh`**: Array of previous digital output values.
+
+#### `ladder_memory_s`
+
+Contains memory flags and status bits for counters and timers.
+
+```c
+typedef struct ladder_memory_s {
+    uint8_t *M;  /**< Regular flags */
+    bool *Cr;    /**< Counter running */
+    bool *Cd;    /**< Counter done */
+    bool *Tr;    /**< Timer running */
+    bool *Td;    /**< Timer done */
+} ladder_memory_t;
+```
+
+- **Fields**:
+  - **`M`**: Array of regular memory flags.
+  - **`Cr`**: Array indicating if counters are running.
+  - **`Cd`**: Array indicating if counters are done.
+  - **`Tr`**: Array indicating if timers are running.
+  - **`Td`**: Array indicating if timers are done.
+
+#### `ladder_prev_scan_vals_s`
+
+Stores previous scan values for memory flags and status bits.
+
+```c
+typedef struct ladder_prev_scan_vals_s {
+    uint8_t *Mh;  /**< Regular flags previous */
+    bool *Crh;    /**< Counter running previous */
+    bool *Cdh;    /**< Counter done previous */
+    bool *Trh;    /**< Timer running previous */
+    bool *Tdh;    /**< Timer done previous */
+} ladder_prev_scan_vals_t;
+```
+
+- **Fields**:
+  - **`Mh`**: Previous regular memory flags.
+  - **`Crh`**: Previous counter running states.
+  - **`Cdh`**: Previous counter done states.
+  - **`Trh`**: Previous timer running states.
+  - **`Tdh`**: Previous timer done states.
+
+#### `ladder_registers_s`
+
+Manages counter, integer, and floating-point registers.
+
+```c
+typedef struct ladder_registers_s {
+    uint32_t *C; /**< Counter registers */
+    int32_t *D;  /**< Regular registers */
+    float *R;    /**< Floating point registers */
+} ladder_registers_t;
+```
+
+- **Fields**:
+  - **`C`**: Array of counter register values.
+  - **`D`**: Array of regular integer register values.
+  - **`R`**: Array of floating-point register values.
+
+#### `ladder_timer_s`
+
+Represents a timer with its timestamp and accumulator.
+
+```c
+typedef struct ladder_timer_s {
+    uint64_t time_stamp; /**< Time stamp */
+    uint32_t acc;        /**< Activated counter */
+} ladder_timer_t;
+```
+
+- **Fields**:
+  - **`time_stamp`**: Time when the timer was last updated.
+  - **`acc`**: Accumulated time or count for the timer.
+
+#### `ladder_scan_internals_s`
+
+Manages timing data for scan cycles.
+
+```c
+typedef struct ladder_scan_internals_s {
+    uint64_t actual_scan_time; /**< Actual scan time */
+    uint64_t start_time;       /**< Start time for calculate scan time */
+} ladder_scan_internals_t;
+```
+
+- **Fields**:
+  - **`actual_scan_time`**: Duration of the last scan cycle.
+  - **`start_time`**: Starting time of the current scan cycle.
+
+#### `ladder_foreign_function_s`
+
+Defines a foreign function with its properties and execution logic.
+
+```c
+typedef struct ladder_foreign_function_s {
+    uint32_t id;          /**< Foreign function id */
+    char name[4];         /**< Foreign function name */
+    ladder_instructions_iocd_t description; /**< Foreign function description */
+    ladder_fn_t exec;     /**< Foreign functions pointers */
+    _foreign_fn_deinit deinit; /**< Foreign functions deinitializer pointers */
+    void *data;           /**< Internal data for foreign functions */
+} ladder_foreign_function_t;
+```
+
+- **Fields**:
+  - **`id`**: Unique identifier for the function.
+  - **`name`**: Short name (up to 3 characters + null terminator).
+  - **`description`**: Input/output configuration (`ladder_instructions_iocd_t`).
+  - **`exec`**: Pointer to the execution function.
+  - **`deinit`**: Pointer to the deinitialization function.
+  - **`data`**: Pointer to internal data for the function.
+
+#### `ladder_foreign_s`
+
+Manages a collection of foreign functions.
+
+```c
+typedef struct ladder_foreign_s {
+    uint32_t qty; /**< Foreign functions quantity */
+    ladder_foreign_function_t *fn; /**< Main foreign function definition */
+} ladder_foreign_t;
+```
+
+- **Fields**:
+  - **`qty`**: Number of foreign functions.
+  - **`fn`**: Array of `ladder_foreign_function_t` structures.
+
+#### `ladder_ctx_s`
+
+The central structure tying together all components of the ladder logic system.
+
+```c
+typedef struct ladder_ctx_s {
+    ladder_t ladder;         /**< Internals */
+    ladder_hw_t hw;          /**< Hardware functions */
+    ladder_manage_t on;      /**< Manage functions */
+    ladder_memory_t memory;  /**< Memory */
+    ladder_prev_scan_vals_t prev_scan_vals; /**< Previous scan values */
+    ladder_hw_input_vals_t *input; /**< Hw inputs */
+    ladder_hw_output_vals_t *output; /**< Hw outputs */
+    ladder_registers_t registers; /**< Registers */
+    ladder_timer_t *timers;  /**< Timers */
+    ladder_scan_internals_t scan_internals; /**< Scan internals */
+    ladder_network_t *network; /**< Networks */
+    ladder_network_t *exec_network; /**< Network in execution */
+    ladder_foreign_t foreign; /**< Foreign functions */
+} ladder_ctx_t;
+```
+
+- **Fields**:
+  - **`ladder`**: Internal state and configuration (`ladder_t`).
+  - **`hw`**: Hardware interface functions (`ladder_hw_t`).
+  - **`on`**: Management callbacks (`ladder_manage_t`):
+    - **`scan_end`**: Called at the end of each scan cycle.
+    - **`instruction`**: Called for each instruction.
+    - **`task_before`**: Called before each task cycle.
+    - **`task_after`**: Called after each task cycle.
+    - **`panic`**: Called during panic conditions.
+    - **`end_task`**: Called at task completion.
+  - **`memory`**: Memory flags and status bits (`ladder_memory_t`).
+  - **`prev_scan_vals`**: Previous scan values (`ladder_prev_scan_vals_t`).
+  - **`input`**: Array of hardware input values (`ladder_hw_input_vals_t`).
+  - **`output`**: Array of hardware output values (`ladder_hw_output_vals_t`).
+  - **`registers`**: Register storage (`ladder_registers_t`).
+  - **`timers`**: Array of timers (`ladder_timer_t`).
+  - **`scan_internals`**: Scan cycle timing data (`ladder_scan_internals_t`).
+  - **`network`**: Array of networks (`ladder_network_t`).
+  - **`exec_network`**: Currently executing network (`ladder_network_t`).
+  - **`foreign`**: Foreign function definitions (`ladder_foreign_t`).
   
 ## Callback Prototypes  
   
