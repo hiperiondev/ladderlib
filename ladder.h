@@ -210,32 +210,63 @@ typedef enum LADDER_INS_ERROR {
 } ladder_ins_err_t;
 
 /**
- * @enum LADDER_TYPE
+ * @enum LADDER_DATA_TYPE
  * @brief Data types
+ *
  */
-typedef enum LADDER_TYPE {
-    LADDER_TYPE_NONE,          /**< Type None */
-    LADDER_TYPE_M,             /**< Type M */
-    LADDER_TYPE_Q,             /**< Type Q */
-    LADDER_TYPE_I,             /**< Type I */
-    LADDER_TYPE_Cd,            /**< Type Cd */
-    LADDER_TYPE_Cr,            /**< Type Cr */
-    LADDER_TYPE_Td,            /**< Type Td */
-    LADDER_TYPE_Tr,            /**< Type Tr */
-    LADDER_TYPE_IW,            /**< Type IW */
-    LADDER_TYPE_QW,            /**< Type QW */
-    LADDER_TYPE_C,             /**< Type C */
-    LADDER_TYPE_T,             /**< Type T */
-    LADDER_TYPE_D,             /**< Type D */
-    LADDER_TYPE_CSTR,          /**< Type constant string */
-    LADDER_TYPE_REAL,          /**< Type float */
-    LADDER_TYPE_INV,           /**< First invalid */
-    LADDER_BASETIME_MS = 0xf0, /**< Basetime ms */
-    LADDER_BASETIME_10MS,      /**< Basetime 10 ms */
-    LADDER_BASETIME_100MS,     /**< Basetime 100 ms */
-    LADDER_BASETIME_SEC,       /**< Basetime seconds */
-    LADDER_BASETIME_MIN,       /**< Basetime minutes */
-} ladder_type_t;
+typedef enum LADDER_DATA_TYPE {
+    LADDER_DATATYPE_U8,   /**< Unsigned 8 bits */
+    LADDER_DATATYPE_U16,  /**< Unsigned 16 bits */
+    LADDER_DATATYPE_U32,  /**< Unsigned 32 bits */
+    LADDER_DATATYPE_I8,   /**< Signed 8 bits */
+    LADDER_DATATYPE_I16,  /**< Signed 16 bits */
+    LADDER_DATATYPE_I32,  /**< Signed 32 bits */
+    LADDER_DATATYPE_REAL, /**< Float 32 bits */
+    LADDER_DATATYPE_CSTR, /**< Constant string */
+} ladder_data_type_t;
+
+/**
+ * @enum LADDER_BASETIME
+ * @brief Basetime type
+ *
+ */
+typedef enum LADDER_BASETIME {
+    LADDER_BASETIME_MS,    /**< Basetime ms */
+    LADDER_BASETIME_10MS,  /**< Basetime 10 ms */
+    LADDER_BASETIME_100MS, /**< Basetime 100 ms */
+    LADDER_BASETIME_SEC,   /**< Basetime seconds */
+    LADDER_BASETIME_MIN,   /**< Basetime minutes */
+} ladder_basetime_t;
+
+/**
+ * @enum LADDER_REGISTERS
+ * @brief Registers
+ *
+ */
+typedef enum LADDER_REGISTERS {
+    LADDER_REGISTER_NONE, /**< Register None */
+    LADDER_REGISTER_M,    /**< Register M */
+    LADDER_REGISTER_Q,    /**< Register Q */
+    LADDER_REGISTER_I,    /**< Register I */
+    LADDER_REGISTER_Cd,   /**< Register Cd */
+    LADDER_REGISTER_Cr,   /**< Register Cr */
+    LADDER_REGISTER_Td,   /**< Register Td */
+    LADDER_REGISTER_Tr,   /**< Register Tr */
+    LADDER_REGISTER_IW,   /**< Register IW */
+    LADDER_REGISTER_QW,   /**< Register QW */
+    LADDER_REGISTER_C,    /**< Register C */
+    LADDER_REGISTER_T,    /**< Register T */
+    LADDER_REGISTER_D,    /**< Register D */
+    LADDER_REGISTER_S,    /**< Register string */
+    LADDER_REGISTER_R,    /**< Register real (float) */
+    LADDER_REGISTER_INV,  /**< Register invalid */
+
+    LADDER_TYPE_BASETIME_MS = 0xf0, /**< Basetime ms */
+    LADDER_TYPE_BASETIME_10MS,      /**< Basetime 10 ms */
+    LADDER_TYPE_BASETIME_100MS,     /**< Basetime 100 ms */
+    LADDER_TYPE_BASETIME_SEC,       /**< Basetime seconds */
+    LADDER_TYPE_BASETIME_MIN,       /**< Basetime minutes */
+} ladder_register_t;
 
 /**
  * @struct ladder_instructions_ioc_s
@@ -267,7 +298,7 @@ typedef struct ladder_moduleportvalue_s {
  *
  */
 typedef struct ladder_value_s {
-    ladder_type_t type; /**< Data type */
+    ladder_register_t type;             /**< Data type */
     union {
                         uint32_t u32;   /**< Unsigned integer */
                          int32_t i32;   /**< Integer */

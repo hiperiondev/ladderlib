@@ -187,15 +187,15 @@ static void fn_to_str(ladder_ctx_t ladder_ctx, uint32_t net, char (*cells)[6][32
 
             if (ladder_ctx.network[net].cells[row][column].data_qty > 0) {
                 switch (ladder_ctx.network[net].cells[row][column].data[0].type) {
-                    case LADDER_TYPE_CSTR:
+                    case LADDER_REGISTER_S:
                         sprintf((*cells)[1], "     %.10s   %s", ladder_ctx.network[net].cells[row][column].data[0].value.cstr,
                                 SPACE_BAR(ladder_ctx, net, row, column));
                         break;
-                    case LADDER_TYPE_I:
-                    case LADDER_TYPE_Q:
-                    case LADDER_TYPE_REAL:
-                        if (ladder_ctx.network[net].cells[row][column].data[0].type == LADDER_TYPE_I
-                                || ladder_ctx.network[net].cells[row][column].data[0].type == LADDER_TYPE_Q)
+                    case LADDER_REGISTER_I:
+                    case LADDER_REGISTER_Q:
+                    case LADDER_REGISTER_R:
+                        if (ladder_ctx.network[net].cells[row][column].data[0].type == LADDER_REGISTER_I
+                                || ladder_ctx.network[net].cells[row][column].data[0].type == LADDER_REGISTER_Q)
                             sprintf(strtmp, "%d.%d", ladder_ctx.network[net].cells[row][column].data[0].value.mp.module,
                                     ladder_ctx.network[net].cells[row][column].data[0].value.mp.port);
                         else
@@ -221,14 +221,14 @@ static void fn_to_str(ladder_ctx_t ladder_ctx, uint32_t net, char (*cells)[6][32
                 break;
             if (ladder_ctx.network[net].cells[row][column].data_qty > 0) {
                 switch (ladder_ctx.network[net].cells[row][column].data[0].type) {
-                    case LADDER_TYPE_CSTR:
+                    case LADDER_REGISTER_S:
                         sprintf((*cells)[1], "   | %.10s |  ", ladder_ctx.network[net].cells[row][column].data[0].value.cstr);
                         break;
-                    case LADDER_TYPE_I:
-                    case LADDER_TYPE_Q:
-                    case LADDER_TYPE_REAL:
-                        if (ladder_ctx.network[net].cells[row][column].data[0].type == LADDER_TYPE_I
-                                || ladder_ctx.network[net].cells[row][column].data[0].type == LADDER_TYPE_Q)
+                    case LADDER_REGISTER_I:
+                    case LADDER_REGISTER_Q:
+                    case LADDER_REGISTER_R:
+                        if (ladder_ctx.network[net].cells[row][column].data[0].type == LADDER_REGISTER_I
+                                || ladder_ctx.network[net].cells[row][column].data[0].type == LADDER_REGISTER_Q)
                             sprintf(strtmp, "%d.%d", ladder_ctx.network[net].cells[row][column].data[0].value.mp.module,
                                     ladder_ctx.network[net].cells[row][column].data[0].value.mp.port);
                         else
@@ -245,22 +245,22 @@ static void fn_to_str(ladder_ctx_t ladder_ctx, uint32_t net, char (*cells)[6][32
 
                 memset(strtmp, 0, 9 * sizeof(char));
                 switch (ladder_ctx.network[net].cells[row][column].data[1].type) {
-                    case LADDER_BASETIME_SEC:
+                    case LADDER_TYPE_BASETIME_SEC:
                         sprintf((*cells)[2], "%s| %04d %s |%s", actual_ioc.inputs == 1 ? "   " : "---",
                                 (int) ladder_ctx.network[net].cells[row][column].data[1].value.i32,
                                 basetime_graph[ladder_ctx.network[net].cells[row][column].data[1].type - 0xf0],
                                 actual_ioc.outputs == 1 ? "  " : PIN_OUT(ladder_ctx, net, row, column));
                         break;
-                    case LADDER_TYPE_CSTR:
+                    case LADDER_REGISTER_S:
                         sprintf((*cells)[2], "%s| %.10s |%s", actual_ioc.inputs == 1 ? "   " : "---",
                                 ladder_ctx.network[net].cells[row][column].data[1].value.cstr,
                                 actual_ioc.outputs == 1 ? "  " : PIN_OUT(ladder_ctx, net, row, column));
                         break;
-                    case LADDER_TYPE_I:
-                    case LADDER_TYPE_Q:
-                    case LADDER_TYPE_REAL:
-                        if (ladder_ctx.network[net].cells[row][column].data[1].type == LADDER_TYPE_I
-                                || ladder_ctx.network[net].cells[row][column].data[1].type == LADDER_TYPE_Q)
+                    case LADDER_REGISTER_I:
+                    case LADDER_REGISTER_Q:
+                    case LADDER_REGISTER_R:
+                        if (ladder_ctx.network[net].cells[row][column].data[1].type == LADDER_REGISTER_I
+                                || ladder_ctx.network[net].cells[row][column].data[1].type == LADDER_REGISTER_Q)
                             sprintf(strtmp, "%d.%d", ladder_ctx.network[net].cells[row][column].data[1].value.mp.module,
                                     ladder_ctx.network[net].cells[row][column].data[1].value.mp.port);
                         else
@@ -289,14 +289,14 @@ static void fn_to_str(ladder_ctx_t ladder_ctx, uint32_t net, char (*cells)[6][32
                 break;
             if (ladder_ctx.network[net].cells[row][column].data_qty > 0) {
                 switch (ladder_ctx.network[net].cells[row][column].data[0].type) {
-                    case LADDER_TYPE_CSTR:
+                    case LADDER_REGISTER_S:
                         sprintf((*cells)[1], "   | %.10s |  ", ladder_ctx.network[net].cells[row][column].data[0].value.cstr);
                         break;
-                    case LADDER_TYPE_I:
-                    case LADDER_TYPE_Q:
-                    case LADDER_TYPE_REAL:
-                        if (ladder_ctx.network[net].cells[row][column].data[0].type == LADDER_TYPE_I
-                                || ladder_ctx.network[net].cells[row][column].data[0].type == LADDER_TYPE_Q)
+                    case LADDER_REGISTER_I:
+                    case LADDER_REGISTER_Q:
+                    case LADDER_REGISTER_R:
+                        if (ladder_ctx.network[net].cells[row][column].data[0].type == LADDER_REGISTER_I
+                                || ladder_ctx.network[net].cells[row][column].data[0].type == LADDER_REGISTER_Q)
                             sprintf(strtmp, "%d.%d", ladder_ctx.network[net].cells[row][column].data[0].value.mp.module,
                                     ladder_ctx.network[net].cells[row][column].data[0].value.mp.port);
                         else
@@ -313,22 +313,22 @@ static void fn_to_str(ladder_ctx_t ladder_ctx, uint32_t net, char (*cells)[6][32
 
                 memset(strtmp, 0, 9 * sizeof(char));
                 switch (ladder_ctx.network[net].cells[row][column].data[1].type) {
-                    case LADDER_BASETIME_SEC:
+                    case LADDER_TYPE_BASETIME_SEC:
                         sprintf((*cells)[2], "%s| %04d %s |%s", actual_ioc.inputs < 2 ? "   " : "---",
                                 (int) ladder_ctx.network[net].cells[row][column].data[1].value.i32,
                                 basetime_graph[ladder_ctx.network[net].cells[row][column].data[1].type - 0xf0],
                                 actual_ioc.outputs < 2 ? "  " : PIN_OUT(ladder_ctx, net, row, column));
                         break;
-                    case LADDER_TYPE_CSTR:
+                    case LADDER_REGISTER_S:
                         sprintf((*cells)[2], "%s| %.10s |%s", actual_ioc.inputs < 2 ? "   " : "---",
                                 ladder_ctx.network[net].cells[row][column].data[1].value.cstr,
                                 actual_ioc.outputs < 2 ? "  " : PIN_OUT(ladder_ctx, net, row, column));
                         break;
-                    case LADDER_TYPE_I:
-                    case LADDER_TYPE_Q:
-                    case LADDER_TYPE_REAL:
-                        if (ladder_ctx.network[net].cells[row][column].data[1].type == LADDER_TYPE_I
-                                || ladder_ctx.network[net].cells[row][column].data[1].type == LADDER_TYPE_Q)
+                    case LADDER_REGISTER_I:
+                    case LADDER_REGISTER_Q:
+                    case LADDER_REGISTER_R:
+                        if (ladder_ctx.network[net].cells[row][column].data[1].type == LADDER_REGISTER_I
+                                || ladder_ctx.network[net].cells[row][column].data[1].type == LADDER_REGISTER_Q)
                             sprintf(strtmp, "%d.%d", ladder_ctx.network[net].cells[row][column].data[1].value.mp.module,
                                     ladder_ctx.network[net].cells[row][column].data[1].value.mp.port);
                         else
@@ -347,18 +347,18 @@ static void fn_to_str(ladder_ctx_t ladder_ctx, uint32_t net, char (*cells)[6][32
 
                 memset(strtmp, 0, 9 * sizeof(char));
                 switch (ladder_ctx.network[net].cells[row][column].data[2].type) {
-                    case LADDER_BASETIME_SEC:
+                    case LADDER_TYPE_BASETIME_SEC:
                         sprintf((*cells)[3], "   | %04d %s |  ", (int) ladder_ctx.network[net].cells[row][column].data[2].value.i32,
                                 basetime_graph[ladder_ctx.network[net].cells[row][column].data[2].type - 0xf0]);
                         break;
-                    case LADDER_TYPE_CSTR:
+                    case LADDER_REGISTER_S:
                         sprintf((*cells)[3], "   | %.10s |  ", ladder_ctx.network[net].cells[row][column].data[2].value.cstr);
                         break;
-                    case LADDER_TYPE_I:
-                    case LADDER_TYPE_Q:
-                    case LADDER_TYPE_REAL:
-                        if (ladder_ctx.network[net].cells[row][column].data[2].type == LADDER_TYPE_I
-                                || ladder_ctx.network[net].cells[row][column].data[2].type == LADDER_TYPE_Q)
+                    case LADDER_REGISTER_I:
+                    case LADDER_REGISTER_Q:
+                    case LADDER_REGISTER_R:
+                        if (ladder_ctx.network[net].cells[row][column].data[2].type == LADDER_REGISTER_I
+                                || ladder_ctx.network[net].cells[row][column].data[2].type == LADDER_REGISTER_Q)
                             sprintf(strtmp, "%d.%d", ladder_ctx.network[net].cells[row][column].data[2].value.mp.module,
                                     ladder_ctx.network[net].cells[row][column].data[2].value.mp.port);
                         else

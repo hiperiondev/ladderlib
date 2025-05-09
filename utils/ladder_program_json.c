@@ -135,15 +135,15 @@ static ladder_instruction_t get_instruction_code(const char *symbol) {
     return LADDER_INS_INV;
 }
 
-static ladder_type_t get_type_code(const char *type) {
+static ladder_register_t get_register_code(const char *type) {
     for (int i = 0; i < sizeof(str_types) / sizeof(str_types[0]); i++) {
         if (strcmp(type, str_types[i]) == 0) {
-            if (i > LADDER_TYPE_INV)
-                return (ladder_type_t) (i - LADDER_TYPE_INV - 1 + 0xf0);
-            return (ladder_type_t) i;
+            if (i > LADDER_REGISTER_INV)
+                return (i - LADDER_REGISTER_INV - 1 + 0xf0);
+            return i;
         }
     }
-    return LADDER_TYPE_INV;
+    return LADDER_REGISTER_INV;
 }
 
 static char* read_file(const char *path) {
@@ -248,25 +248,25 @@ ladder_json_error_t ladder_json_to_program(const char *prg, ladder_ctx_t *ladder
                     cJSON *data_item = cJSON_GetArrayItem(data_json, d);
                     cJSON *type_json = cJSON_GetObjectItem(data_item, "type");
                     char *type_str = cJSON_GetStringValue(type_json);
-                    cell->data[d].type = get_type_code(type_str);
+                    cell->data[d].type = get_register_code(type_str);
 
-                    if (cell->data[d].type == LADDER_TYPE_INV)
+                    if (cell->data[d].type == LADDER_REGISTER_INV)
                         return JSON_ERROR_TYPE_INV;
 
                     cJSON *value_json = cJSON_GetObjectItem(data_item, "value");
                     char *value_str = cJSON_GetStringValue(value_json);
 
                     switch (cell->data[d].type) {
-                        case LADDER_TYPE_I:
-                        case LADDER_TYPE_Q:
+                        case LADDER_REGISTER_I:
+                        case LADDER_REGISTER_Q:
                             if (!parse_module_port(value_str, &(cell->data[d].value.mp)))
                                 return JSON_ERROR_INVALIDVALUE;
                             break;
 
-                        case LADDER_TYPE_CSTR:
+                        case LADDER_REGISTER_S:
                             cell->data[d].value.cstr = strdup(value_str);
                             break;
-                        case LADDER_TYPE_REAL:
+                        case LADDER_REGISTER_R:
                             cell->data[d].value.real = atof(value_str);
                             break;
 
@@ -368,7 +368,7 @@ ladder_json_error_t ladder_program_to_json(const char *prg, ladder_ctx_t *ladder
                         return JSON_ERROR_CREATEDATAOBJ;
                     }
 
-                    uint8_t ttype = val->type > LADDER_TYPE_INV ? val->type - 0xf0 + LADDER_TYPE_INV + 1 : val->type;
+                    uint8_t ttype = val->type > LADDER_REGISTER_INV ? val->type - 0xf0 + LADDER_REGISTER_INV + 1 : val->type;
                     const char *type_str = (ttype < sizeof(str_types) / sizeof(str_types[0])) ? str_types[ttype] : "INV";
                     char val_str[16];
                     sprintf(val_str, "value%d", d);
@@ -377,15 +377,15 @@ ladder_json_error_t ladder_program_to_json(const char *prg, ladder_ctx_t *ladder
 
                     char value_str[32];
                     switch (cell->data[d].type) {
-                        case LADDER_TYPE_I:
-                        case LADDER_TYPE_Q:
+                        case LADDER_REGISTER_I:
+                        case LADDER_REGISTER_Q:
                             snprintf(value_str, sizeof(value_str), "%u.%u", val->value.mp.module, val->value.mp.port);
                             break;
 
-                        case LADDER_TYPE_CSTR:
+                        case LADDER_REGISTER_S:
                             snprintf(value_str, sizeof(value_str), "%s", val->value.cstr ? val->value.cstr : "");
                             break;
-                        case LADDER_TYPE_REAL:
+                        case LADDER_REGISTER_R:
                             snprintf(value_str, sizeof(value_str), "%f", val->value.real);
                             break;
 

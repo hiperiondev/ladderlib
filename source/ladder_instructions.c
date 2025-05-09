@@ -622,7 +622,7 @@ ladder_ins_err_t fn_TMOVE(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t ro
             return LADDER_INS_ERR_NOTABLE;
 
         // from table to value
-        if (ladder_get_type(ladder_ctx, row + 1, column, 0) == LADDER_TYPE_NONE) {
+        if (ladder_get_type(ladder_ctx, row + 1, column, 0) == LADDER_REGISTER_NONE) {
             uint32_t pos = to_integer(ladder_get_data_value(ladder_ctx, row, column, 1), 1);
             uint32_t val = ladder_get_table_i32(ladder_ctx, table, pos);
             ladder_set_data_value(ladder_ctx, row, column, 1, (void*) &val, &error);
@@ -631,7 +631,7 @@ ladder_ins_err_t fn_TMOVE(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t ro
         }
 
         // from value to table
-        if (ladder_get_type(ladder_ctx, row + 2, column, 0) == LADDER_TYPE_NONE) {
+        if (ladder_get_type(ladder_ctx, row + 2, column, 0) == LADDER_REGISTER_NONE) {
             uint32_t pos = to_integer(ladder_get_data_value(ladder_ctx, row, column, 2), 1);
             (*ladder_ctx).network[table].cells[ladder_table_pos_row(ladder_ctx, pos)][ladder_table_pos_column(ladder_ctx, pos)].data[0].value.i32 = to_integer(
                     ladder_get_data_value(ladder_ctx, row, column, 0), 1);
@@ -649,44 +649,44 @@ void ladder_set_data_value(ladder_ctx_t *ladder_ctx, uint32_t row, uint32_t colu
     *error = LADDER_INS_ERR_OK;
 
     switch (ladder_cell_data_exec(ladder_ctx, row, column, pos).type) {
-        case LADDER_TYPE_M:
+        case LADDER_REGISTER_M:
             (*ladder_ctx).memory.M[ladder_cell_data_exec(ladder_ctx, row, column, pos).value.i32] = *((uint8_t*) value);
             break;
-        case LADDER_TYPE_Q:
+        case LADDER_REGISTER_Q:
             (*ladder_ctx).output[ladder_cell_data_exec(ladder_ctx, row, column, pos).value.mp.module].Q[ladder_cell_data_exec(ladder_ctx, row, column, pos).value.mp.port] =
                     *((uint8_t*) value);
             break;
-        case LADDER_TYPE_I:
+        case LADDER_REGISTER_I:
             (*ladder_ctx).input[ladder_cell_data_exec(ladder_ctx, row, column, pos).value.mp.module].I[ladder_cell_data_exec(ladder_ctx, row, column, pos).value.mp.port] =
                     *((uint8_t*) value);
             break;
-        case LADDER_TYPE_Cd:
+        case LADDER_REGISTER_Cd:
             (*ladder_ctx).memory.Cd[ladder_cell_data_exec(ladder_ctx, row, column, pos).value.i32] = *((int32_t*) value);
             break;
-        case LADDER_TYPE_Cr:
+        case LADDER_REGISTER_Cr:
             (*ladder_ctx).memory.Cr[ladder_cell_data_exec(ladder_ctx, row, column, pos).value.i32] = *((int32_t*) value);
             break;
-        case LADDER_TYPE_Td:
+        case LADDER_REGISTER_Td:
             (*ladder_ctx).memory.Td[ladder_cell_data_exec(ladder_ctx, row, column, pos).value.i32] = *((int32_t*) value);
             break;
-        case LADDER_TYPE_Tr:
+        case LADDER_REGISTER_Tr:
             (*ladder_ctx).memory.Tr[ladder_cell_data_exec(ladder_ctx, row, column, pos).value.i32] = *((int32_t*) value);
             break;
-        case LADDER_TYPE_IW:
+        case LADDER_REGISTER_IW:
             (*ladder_ctx).input[ladder_cell_data_exec(ladder_ctx, row, column, pos).value.mp.module].IW[ladder_cell_data_exec(ladder_ctx, row, column, pos).value.mp.port] =
                     *((int32_t*) value);
             break;
-        case LADDER_TYPE_QW:
+        case LADDER_REGISTER_QW:
             (*ladder_ctx).output[ladder_cell_data_exec(ladder_ctx, row, column, pos).value.mp.module].QW[ladder_cell_data_exec(ladder_ctx, row, column, pos).value.mp.port] =
                     *((uint8_t*) value);
             break;
-        case LADDER_TYPE_C:
+        case LADDER_REGISTER_C:
             (*ladder_ctx).registers.C[ladder_cell_data_exec(ladder_ctx, row, column, pos).value.i32] = *((uint32_t*) value);
             break;
-        case LADDER_TYPE_D:
+        case LADDER_REGISTER_D:
             (*ladder_ctx).registers.D[ladder_cell_data_exec(ladder_ctx, row, column, pos).value.i32] = *((int32_t*) value);
             break;
-        case LADDER_TYPE_REAL:
+        case LADDER_REGISTER_R:
             ladder_cell_data_exec(ladder_ctx, row, column, pos).value.real = *((float*) value);
             break;
 
