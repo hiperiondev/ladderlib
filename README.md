@@ -21,7 +21,7 @@ Ladder logic programs consist of "rungs" connecting two vertical "rails," mimick
 # Table of Contents
 
 - [Basic Logic Instructions](#INSTRUCTIONS)
-- [API Documentation](#API)
+- [API Documentation](#APIDOC)
 - [Enums and Structures](#ENUMS)
 - [Callback Prototypes](#CALLBACKS)
 - [Basic Usage](#BASICUSAGE)
@@ -298,7 +298,7 @@ These instructions provide additional functionality, some of which may be specif
   </a>
 </div>
 
-<!-- API -->
+<!-- APIDOC -->
 ## API Documentation  
   
 This section provides detailed documentation for the core API functions of LadderLib, extracted from the header files `ladder.h`, `ladder_instructions.h`, and `ladder_internals.h`.  
