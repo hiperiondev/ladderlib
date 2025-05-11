@@ -329,39 +329,6 @@ void ladder_deinit(ladder_ctx_t* ladder_ctx)
   
 **Returns**: None.  
   
-### ladder_add_network  
-  
-Adds a new network to the ladder context with a specified ID.  
-  
-```c  
-ladder_network_t* ladder_add_network(ladder_ctx_t* ladder_ctx, uint32_t id)  
-```  
-  
-**Parameters:**  
-  
-| **Parameter** | **Description** |  
-|---------------|-----------------|  
-| `ladder_ctx` | Pointer to the ladder context. |  
-| `id` | Unique identifier for the network. |  
-  
-**Returns**: Pointer to the newly created `ladder_network_t` structure, or `NULL` if the operation fails.  
-  
-### ladder_execute  
-  
-Executes the ladder program, processing all networks and instructions.  
-  
-```c  
-void ladder_execute(ladder_ctx_t* ladder_ctx)  
-```  
-  
-**Parameters:**  
-  
-| **Parameter** | **Description** |  
-|---------------|-----------------|  
-| `ladder_ctx` | Pointer to the ladder context to execute. |  
-  
-**Returns**: None.  
-  
 ### ladder_add_read_fn  
   
 Registers a callback function for reading input values from hardware.  
@@ -396,144 +363,26 @@ bool ladder_add_write_fn(ladder_ctx_t *ladder_ctx, _io_write write, _io_init wri
 | `write`       | Pointer to the write callback function. |
 | `write_init`  | Initialize/deinitialize write function. |
   
-**Returns**: None.  
-  
-### ladder_add_scan_end_fn  
-  
-Registers a callback function to be called at the end of each scan cycle.  
-  
-```c  
-void ladder_add_scan_end_fn(ladder_ctx_t* ladder_ctx, _on_scan_end scan_end_fn)  
-```  
-  
+**Returns**: None.
+
+### ladder_add_foreign
+
+Add a foreign function
+
+```c
+bool ladder_add_foreign(ladder_ctx_t *ladder_ctx, _foreign_fn_init fn_init, void *init_data, uint32_t qty);
+```
+
 **Parameters:**  
   
 | **Parameter** | **Description** |  
 |---------------|-----------------|  
-| `ladder_ctx` | Pointer to the ladder context. |  
-| `scan_end_fn` | Pointer to the scan end callback function. |  
-  
-**Returns**: None.  
-  
-### ladder_add_instruction_fn  
-  
-Registers a callback function to be called for each instruction execution.  
-  
-```c  
-void ladder_add_instruction_fn(ladder_ctx_t* ladder_ctx, _on_instruction instruction_fn)  
-```  
-  
-**Parameters:**  
-  
-| **Parameter** | **Description** |  
-|---------------|-----------------|  
-| `ladder_ctx` | Pointer to the ladder context. |  
-| `instruction_fn` | Pointer to the instruction callback function. |  
-  
-**Returns**: None.  
-  
-### ladder_add_task_before_fn  
-  
-Registers a callback function to be called before each task cycle scan.  
-  
-```c  
-void ladder_add_task_before_fn(ladder_ctx_t* ladder_ctx, _on_task_before task_before_fn)  
-```  
-  
-**Parameters:**  
-  
-| **Parameter** | **Description** |  
-|---------------|-----------------|  
-| `ladder_ctx` | Pointer to the ladder context. |  
-| `task_before_fn` | Pointer to the task before callback function. |  
-  
-**Returns**: None.  
-  
-### ladder_add_task_after_fn  
-  
-Registers a callback function to be called after each task cycle scan.  
-  
-```c  
-void ladder_add_task_after_fn(ladder_ctx_t* ladder_ctx, _on_task_after task_after_fn)  
-```  
-  
-**Parameters:**  
-  
-| **Parameter** | **Description** |  
-|---------------|-----------------|  
-| `ladder_ctx` | Pointer to the ladder context. |  
-| `task_after_fn` | Pointer to the task after callback function. |  
-  
-**Returns**: None.  
-  
-### ladder_add_panic_fn  
-  
-Registers a callback function for panic situations.  
-  
-```c  
-void ladder_add_panic_fn(ladder_ctx_t* ladder_ctx, _on_panic panic_fn)  
-```  
-  
-**Parameters:**  
-  
-| **Parameter** | **Description** |  
-|---------------|-----------------|  
-| `ladder_ctx` | Pointer to the ladder context. |  
-| `panic_fn` | Pointer to the panic callback function. |  
-  
-**Returns**: None.  
-  
-### ladder_add_end_task_fn  
-  
-Registers a callback function to be called when a task ends.  
-  
-```c  
-void ladder_add_end_task_fn(ladder_ctx_t* ladder_ctx, _on_end_task end_task_fn)  
-```  
-  
-**Parameters:**  
-  
-| **Parameter** | **Description** |  
-|---------------|-----------------|  
-| `ladder_ctx` | Pointer to the ladder context. |  
-| `end_task_fn` | Pointer to the end task callback function. |  
-  
-**Returns**: None.  
-  
-### ladder_add_delay_fn  
-  
-Registers a callback function for implementing delays.  
-  
-```c  
-void ladder_add_delay_fn(ladder_ctx_t* ladder_ctx, _delay delay_fn)  
-```  
-  
-**Parameters:**  
-  
-| **Parameter** | **Description** |  
-|---------------|-----------------|  
-| `ladder_ctx` | Pointer to the ladder context. |  
-| `delay_fn` | Pointer to the delay callback function. |  
-  
-**Returns**: None.  
-  
-### ladder_add_millis_fn  
-  
-Registers a callback function for retrieving the current time in milliseconds.  
-  
-```c  
-void ladder_add_millis_fn(ladder_ctx_t* ladder_ctx, _millis millis_fn)  
-```  
-  
-**Parameters:**  
-  
-| **Parameter** | **Description** |  
-|---------------|-----------------|  
-| `ladder_ctx` | Pointer to the ladder context. |  
-| `millis_fn` | Pointer to the millis callback function. |  
-  
-**Returns**: None.  
-  
+| `ladder_ctx` | Ladder context. |
+| `fn_init` | Initialize internal foreign function. |
+| `init_data` | Generic foreign function data. |
+| `qty` | Quantity. |
+
+
 ## Utility Functions  
   
 This section documents utility functions from the header files `ladder_print.h`, `ladder_program_json.h`, and `ladder_program_check.h`.  
@@ -554,37 +403,55 @@ void ladder_print_program(ladder_ctx_t* ladder_ctx)
   
 **Returns**: None.  
   
-### ladder_print_network  
+### ladder_print  
   
-Prints a specific network within the ladder program.  
+Print networks in ascii graphical format.  
   
 ```c  
-void ladder_print_network(ladder_network_t* network)  
+void ladder_print(ladder_ctx_t ladder_ctx)
 ```  
   
 **Parameters:**  
   
 | **Parameter** | **Description** |  
 |---------------|-----------------|  
-| `network` | Pointer to the network to print. |  
+| `ladder_ctx` | Pointer to the ladder context. | 
   
 **Returns**: None.  
   
 ### ladder_program_to_json  
   
-Serializes the ladder program to a JSON string.  
+Save ladder program to a JSON file.  
   
 ```c  
-char* ladder_program_to_json(ladder_ctx_t* ladder_ctx)  
+ladder_json_error_t ladder_program_to_json(const char *prg, ladder_ctx_t *ladder_ctx) 
 ```  
   
 **Parameters:**  
   
 | **Parameter** | **Description** |  
 |---------------|-----------------|  
-| `ladder_ctx` | Pointer to the ladder context. |  
+| `prg` | File name. |
+| `ladder_ctx` | Pointer to the ladder context. |
   
-**Returns**: Pointer to a dynamically allocated JSON string representing the ladder program. Caller must free this memory.  
+**Returns**: Status.
+
+### ladder_json_to_program  
+  
+Load ladder program from a JSON file.  
+  
+```c  
+ladder_json_error_t ladder_json_to_program(const char *prg, ladder_ctx_t *ladder_ctx) 
+```  
+  
+**Parameters:**  
+  
+| **Parameter** | **Description** |  
+|---------------|-----------------|  
+| `prg` | File name. |
+| `ladder_ctx` | Pointer to the ladder context. |
+  
+**Returns**: Status.  
   
 ### ladder_program_check  
   
@@ -598,7 +465,7 @@ bool ladder_program_check(ladder_ctx_t* ladder_ctx)
   
 | **Parameter** | **Description** |  
 |---------------|-----------------|  
-| `ladder_ctx` | Pointer to the ladder context. |  
+| `ladder_ctx` | Pointer to the ladder context. |
   
 **Returns**: `true` if the program is valid, `false` otherwise.  
 
@@ -740,8 +607,6 @@ typedef struct ladder_instructions_ioc_s {
   - **`outputs`**: Number of output connections from the instruction.
   - **`cells`**: Number of cells occupied by the instruction in the ladder diagram.
   - **`data_qty`**: Quantity of data elements associated with the instruction.
-- **External Reference**:
-  - **`ladder_fn_iocd[]`**: A constant array of `ladder_instructions_iocd_t` defining instruction configurations.
 
 #### `ladder_moduleportvalue_s`
 
@@ -766,10 +631,10 @@ A versatile container for values of different types used in ladder logic.
 typedef struct ladder_value_s {
     ladder_type_t type; /**< Data type */
     union {
-        uint32_t u32;   /**< Unsigned integer */
-        int32_t i32;    /**< Integer */
+        uint32_t u32;     /**< Unsigned integer */
+        int32_t i32;      /**< Integer */
         const char *cstr; /**< Constant string */
-        float real;     /**< Real */
+        float real;       /**< Real */
         ladder_moduleportvalue_t mp; /**< module.port value */
     } value; /**< Data */
 } ladder_value_t;
