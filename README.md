@@ -30,7 +30,15 @@ Key features include:
 The library is likely optimized for embedded systems.
  
 ## Introduction to Ladder Logic  
-Ladder logic programs consist of "rungs" connecting two vertical "rails," mimicking electrical relay circuits. Each rung contains conditions (e.g., contacts) and actions (e.g., coils)
+Ladder logic programming stands as the fundamental programming language for Programmable Logic Controllers (PLCs), powering approximately 80% of industrial automation systems worldwide.
+
+It’s a visual programming methodology that evolved from traditional relay-based control systems, provides an intuitive approach to implementing complex control logic in manufacturing processes.
+The purpose of ladder logic programming is to simplify the process of programming and controlling complex machinery, such as assembly lines and manufacturing equipment.
+The transition from physical relay panels to digital programming has maintained the familiar ladder diagram format while incorporating advanced digital capabilities, making it the preferred choice for automation engineers and technicians.
+
+Ladder logic is a fast and simple way of creating logic expressions for a PLC in order to automate repetitive machine tasks and sequences. It is used in a multitude of industrial automation applications.
+
+[Ladder in Wikipedia](https://en.wikipedia.org/wiki/Ladder_logic)
 
 # Table of Contents
 
