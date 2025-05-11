@@ -309,7 +309,6 @@ bool ladder_ctx_init(ladder_ctx_t *ladder_ctx, uint8_t net_columns_qty, uint8_t 
 | `qty_t` | Quantity of timers. Number of timer instances available for timing operations. |  
 | `qty_d` | Quantity of memory areas quantities. |  
 | `qty_r` | Quantity of nemory areas quantities. Float or Real registers.. |  
-
 | `init_netwok` | If false not initialize Networks. |  
   
 **Returns**: Pointer to the initialized `ladder_ctx_t` structure, or `NULL` if initialization fails.  
