@@ -1260,8 +1260,6 @@ Distributed under the MIT License. See `LICENSE.txt` for more information.
 
 *Emiliano Augusto Gonzalez - egonzalez.hiperion@gmail.com*
 
-Project Link: ([[https://github.com/hiperiondev/stack_vm](https://github.com/hiperiondev/ladderlib)])
-
 <div align="right">
   <a href="#readme-top">
     <img src="images/backtotop.png" alt="backtotop" width="30" height="30">
