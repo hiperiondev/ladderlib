@@ -1,12 +1,6 @@
 # Ladderlib
   
-Ladderlib is a C library designed for implementing ladder logic programming, a method widely used in Programmable Logic Controllers (PLCs) for industrial automation. It provides a robust framework to define, execute, and manage ladder logic programs, supporting hardware interactions and custom function extensions. This library is particularly suited for embedded systems.  
-  
-**Project Information:**  
-- **Repository:** [Ladderlib GitHub](https://github.com/hiperiondev/ladderlib)  
-- **Version:** 2.0.0  
-- **License:** MIT License  
-- **Copyright:** 2025 Emiliano Gonzalez (egonzalez.hiperion@gmail.com)  
+Ladderlib is a C library designed for implementing ladder logic programming, a method widely used in Programmable Logic Controllers (PLCs) for industrial automation. It provides a robust framework to define, execute, and manage ladder logic programs, supporting hardware interactions and custom function extensions. This library is particularly suited for embedded systems.
 
 <!-- OVERVIEW -->
 ## Overview  
@@ -23,6 +17,17 @@ The library is likely optimized for embedded systems.
  
 ## Introduction to Ladder Logic  
 Ladder logic programs consist of "rungs" connecting two vertical "rails," mimicking electrical relay circuits. Each rung contains conditions (e.g., contacts) and actions (e.g., coils)
+
+# Table of Contents
+
+- [Basic Logic Instructions](#INSTRUCTIONS)
+- [API Documentation](#API)
+- [Enums and Structures](#ENUMS)
+- [Callback Prototypes](#CALLBACKS)
+- [Basic Usage](#BASICUSAGE)
+- [Contributing](#CONTRIBUTING)
+- [License](#LICENCE)
+- [Contact](#CONTACT)
 
 <!-- INSTRUCTIONS -->
 ## Basic Logic Instructions  
