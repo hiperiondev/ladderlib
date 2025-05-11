@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="47.360428mm"
+   height="26.987503mm"
+   viewBox="0 0 47.360428 26.987503"
+   version="1.1"
+   id="svg1"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm">
+    <inkscape:page
+       x="0"
+       y="4.7788184e-15"
+       width="47.360428"
+       height="26.987501"
+       id="page2"
+       margin="0"
+       bleed="0" />
+  </sodipodi:namedview>
+  <defs
+     id="defs1" />
+  <g
+     inkscape:label="Capa 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-54.107286,-104.99644)">
+    <g
+       id="g1">
+      <line
+         x1="54.107288"
+         y1="110.59583"
+         x2="59.398956"
+         y2="110.59583"
+         stroke="#808080"
+         stroke-width="0.529167"
+         id="line1"
+         inkscape:export-filename="logo.png"
+         inkscape:export-xdpi="96"
+         inkscape:export-ydpi="96" />
+      <line
+         x1="59.398956"
+         y1="107.95"
+         x2="59.398956"
+         y2="113.24166"
+         stroke="#808080"
+         stroke-width="0.529167"
+         id="line2" />
+      <line
+         x1="64.690628"
+         y1="107.95"
+         x2="64.690628"
+         y2="113.24166"
+         stroke="#808080"
+         stroke-width="0.529167"
+         id="line3" />
+      <line
+         x1="64.690628"
+         y1="110.59583"
+         x2="69.982292"
+         y2="110.59583"
+         stroke="#808080"
+         stroke-width="0.529167"
+         id="line4" />
+      <rect
+         x="72.485199"
+         y="105.26101"
+         width="10.583333"
+         height="26.458332"
+         fill="none"
+         stroke="#808080"
+         stroke-width="0.529167"
+         id="rect1" />
+      <line
+         x1="69.839363"
+         y1="110.55267"
+         x2="72.485199"
+         y2="110.55267"
+         stroke="#808080"
+         stroke-width="0.529167"
+         id="line2-6" />
+      <line
+         x1="83.068535"
+         y1="110.55267"
+         x2="85.714363"
+         y2="110.55267"
+         stroke="#808080"
+         stroke-width="0.529167"
+         id="line4-2" />
+      <line
+         x1="83.068535"
+         y1="126.49741"
+         x2="85.714363"
+         y2="126.49741"
+         stroke="#808080"
+         stroke-width="0.529167"
+         id="line5" />
+      <rect
+         style="opacity:0.363002;fill:#999999;stroke-width:0.264583"
+         id="rect4"
+         width="10.182317"
+         height="4.5332236"
+         x="72.66304"
+         y="105.49289" />
+      <line
+         x1="85.592705"
+         y1="110.57573"
+         x2="91.093597"
+         y2="110.57573"
+         stroke="#808080"
+         stroke-width="0.529167"
+         id="line1-7" />
+      <text
+         x="90.884361"
+         y="111.89864"
+         font-size="4.23333px"
+         fill="#808080"
+         id="text1-0"
+         style="stroke-width:0.264583">(</text>
+      <text
+         x="94.853111"
+         y="111.89864"
+         font-size="4.23333px"
+         fill="#808080"
+         id="text3"
+         style="stroke-width:0.264583">)</text>
+      <line
+         x1="95.897072"
+         y1="110.57573"
+         x2="101.46771"
+         y2="110.57573"
+         stroke="#808080"
+         stroke-width="0.529167"
+         id="line3-9" />
+      <line
+         x1="85.526566"
+         y1="126.51687"
+         x2="91.027458"
+         y2="126.51687"
+         stroke="#808080"
+         stroke-width="0.529167"
+         id="line1-6" />
+      <text
+         x="90.81823"
+         y="127.83978"
+         font-size="4.23333px"
+         fill="#808080"
+         id="text1-2"
+         style="stroke-width:0.264583">(</text>
+      <text
+         x="94.78698"
+         y="127.83978"
+         font-size="4.23333px"
+         fill="#808080"
+         id="text3-6"
+         style="stroke-width:0.264583">)</text>
+      <line
+         x1="95.830933"
+         y1="126.51687"
+         x2="101.40157"
+         y2="126.51687"
+         stroke="#808080"
+         stroke-width="0.529167"
+         id="line3-1" />
+    </g>
+  </g>
+</svg>
