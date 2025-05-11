@@ -1161,11 +1161,11 @@ uint64_t (*_millis)(void)
   
 ## Basic Usage  
 To use Ladderlib, follow these steps:  
-1. **Initialize Context**: Call `ladder_ctx_init` with appropriate quantities for networks, memory areas, inputs, outputs, counters, timers, data, and registers.  
+1. **Initialize Context**: Call `ladder_ctx_init` with appropriate quantities for networks, memory areas, counters, timers, data, and registers.  
 2. **Define Program**: Populate the `ladder_s` structure by defining networks (`ladder_network_s`) and cells (`ladder_cell_s`), assigning instructions from `LADDER_INSTRUCTIONS` and configuring data or timers as needed.  
-3. **Set Hardware Callbacks**: Provide functions for hardware interactions in `ladder_hw_s`, such as `_read_inputs_local` and `_write_outputs_local`, to interface with physical devices.  
+3. **Set Hardware Callbacks**: Provide functions for hardware interactions in `ladder_hw_s`, such as `_io_read` and `_io_write`, to interface with physical devices.  
 4. **Set Event Callbacks**: Optionally, assign callbacks in `ladder_manage_s` for events like scan end (`_on_scan_end`) or panic handling (`_on_panic`).  
-5. **Run Task**: Execute the ladder logic by calling `ladder_task` periodically, typically in a loop, to process the program and interact with hardware.  
-6. **Monitor and Handle Errors**: Check `LADDER_STATE` and `LADDER_INS_ERROR` to monitor execution status and handle errors.  
+5. **Run Task**: Execute the ladder logic by calling `ladder_task` to process the program and interact with hardware.  
+6. **Monitor and Handle Errors**: Check ladder.state and ladder.err to monitor execution status and handle errors.  
 7. **Deinitialize**: Call `ladder_ctx_deinit` to free resources when the program is no longer needed.  
   
