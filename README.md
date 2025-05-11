@@ -1218,6 +1218,12 @@ To use Ladderlib, follow these steps:
 6. **Monitor and Handle Errors**: Check ladder.state and ladder.err to monitor execution status and handle errors.  
 7. **Deinitialize**: Call `ladder_ctx_deinit` to free resources when the program is no longer needed.
 
+<div align="right">
+  <a href="#readme-top">
+    <img src="images/backtotop.png" alt="backtotop" width="30" height="30">
+  </a>
+</div>
+
 <!-- CONTRIBUTING -->
 ## Contributing
 
@@ -1254,7 +1260,7 @@ Distributed under the MIT License. See `LICENSE.txt` for more information.
 
 *Emiliano Augusto Gonzalez - egonzalez.hiperion@gmail.com*
 
-Project Link: ([https://github.com/hiperiondev/stack_vm](https://github.com/hiperiondev/ladderlib))
+Project Link: ([[https://github.com/hiperiondev/stack_vm](https://github.com/hiperiondev/ladderlib)])
 
 <div align="right">
   <a href="#readme-top">
