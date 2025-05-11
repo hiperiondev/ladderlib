@@ -294,7 +294,7 @@ This section provides detailed documentation for the core API functions of Ladde
 Initializes the ladder context with specified parameters for networks, memory, inputs, outputs, timers, counters, and blocks.  
   
 ```c  
-ladder_ctx_t* ladder_init(uint32_t net_columns_qty, uint32_t net_rows_qty, uint32_t networks_qty, uint32_t qty_m, uint32_t qty_i, uint32_t qty_q, uint32_t qty_t, uint32_t qty_c, uint32_t qty_b)  
+bool ladder_ctx_init(ladder_ctx_t *ladder_ctx, uint8_t net_columns_qty, uint8_t net_rows_qty, uint32_t networks_qty, uint32_t qty_m, uint32_t qty_c, uint32_t qty_t, uint32_t qty_d, uint32_t qty_r, bool init_netwok)  
 ```  
   
 **Parameters:**  
@@ -305,11 +305,12 @@ ladder_ctx_t* ladder_init(uint32_t net_columns_qty, uint32_t net_rows_qty, uint3
 | `net_rows_qty` | Number of rows in networks. Defines the height of each network grid. |  
 | `networks_qty` | Number of networks. Specifies how many ladder networks the context will manage. |  
 | `qty_m` | Quantity of memory bits. Number of general-purpose memory bits available. |  
-| `qty_i` | Quantity of input bits. Number of input bits for interfacing with external inputs. |  
-| `qty_q` | Quantity of output bits. Number of output bits for controlling external devices. |  
+| `qty_c` | Quantity of counters. Number of counter instances available for counting events |  
 | `qty_t` | Quantity of timers. Number of timer instances available for timing operations. |  
-| `qty_c` | Quantity of counters. Number of counter instances available for counting events. |  
-| `qty_b` | Quantity of blocks. Number of functional blocks available for advanced operations. |  
+| `qty_d` | Quantity of memory areas quantities. |  
+| `qty_r` | Quantity of nemory areas quantities. Float or Real registers.. |  
+
+| `init_netwok` | If false not initialize Networks. |  
   
 **Returns**: Pointer to the initialized `ladder_ctx_t` structure, or `NULL` if initialization fails.  
   
@@ -367,7 +368,7 @@ void ladder_execute(ladder_ctx_t* ladder_ctx)
 Registers a callback function for reading input values from hardware.  
   
 ```c  
-void ladder_add_read_fn(ladder_ctx_t* ladder_ctx, _io_read read_fn)  
+bool ladder_add_read_fn(ladder_ctx_t *ladder_ctx, _io_read read, _io_init read_init)  
 ```  
   
 **Parameters:**  
@@ -375,7 +376,8 @@ void ladder_add_read_fn(ladder_ctx_t* ladder_ctx, _io_read read_fn)
 | **Parameter** | **Description** |  
 |---------------|-----------------|  
 | `ladder_ctx` | Pointer to the ladder context. |  
-| `read_fn` | Pointer to the read callback function. |  
+| `read`       | Pointer to the read callback function. |  
+| `read_init`  | Initialize/deinitialize read function. |
   
 **Returns**: None.  
   
@@ -384,52 +386,16 @@ void ladder_add_read_fn(ladder_ctx_t* ladder_ctx, _io_read read_fn)
 Registers a callback function for writing output values to hardware.  
   
 ```c  
-void ladder_add_write_fn(ladder_ctx_t* ladder_ctx, _io_write write_fn)  
+bool ladder_add_write_fn(ladder_ctx_t *ladder_ctx, _io_write write, _io_init write_init);
 ```  
   
 **Parameters:**  
   
 | **Parameter** | **Description** |  
 |---------------|-----------------|  
-| `ladder_ctx` | Pointer to the ladder context. |  
-| `write_fn` | Pointer to the write callback function. |  
-  
-**Returns**: None.  
-  
-### ladder_add_instruction  
-  
-Adds an instruction to a specific position in a network.  
-  
-```c  
-bool ladder_add_instruction(ladder_network_t* network, uint32_t row, uint32_t column, ladder_instruction_e instruction, uint32_t id)  
-```  
-  
-**Parameters:**  
-  
-| **Parameter** | **Description** |  
-|---------------|-----------------|  
-| `network` | Pointer to the network where the instruction will be added. |  
-| `row` | Row index in the network grid (0-based). |  
-| `column` | Column index in the network grid (0-based). |  
-| `instruction` | Type of instruction (e.g., `LADDER_INSTRUCTION_LD`). See `ladder_instruction_e` enum. |  
-| `id` | Identifier for the instruction operand (e.g., input, output, timer ID). |  
-  
-**Returns**: `true` if the instruction was added successfully, `false` otherwise.  
-  
-### ladder_add_init_fn  
-  
-Registers a callback function for initializing or deinitializing I/O operations.  
-  
-```c  
-void ladder_add_init_fn(ladder_ctx_t* ladder_ctx, _io_init init_fn)  
-```  
-  
-**Parameters:**  
-  
-| **Parameter** | **Description** |  
-|---------------|-----------------|  
-| `ladder_ctx` | Pointer to the ladder context. |  
-| `init_fn` | Pointer to the init/deinit callback function. |  
+| `ladder_ctx`  | Pointer to the ladder context. |  
+| `write`       | Pointer to the write callback function. |
+| `write_init`  | Initialize/deinitialize write function. |
   
 **Returns**: None.  
   
