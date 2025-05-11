@@ -7,7 +7,8 @@ Ladderlib is a C library designed for implementing ladder logic programming, a m
 - **Version:** 2.0.0  
 - **License:** MIT License  
 - **Copyright:** 2025 Emiliano Gonzalez (egonzalez.hiperion@gmail.com)  
-  
+
+<!-- OVERVIEW -->
 ## Overview  
 Ladderlib enables developers to create ladder logic programs, which are graphical representations of control logic resembling electrical relay circuits. These programs are executed cyclically by PLCs to automate industrial processes, such as controlling machinery in manufacturing or chemical processing. The library  supports defining logic through cells and networks, managing execution states, handling hardware inputs/outputs, and integrating custom functions for enhanced flexibility.  
   
@@ -23,6 +24,7 @@ The library is likely optimized for embedded systems.
 ## Introduction to Ladder Logic  
 Ladder logic programs consist of "rungs" connecting two vertical "rails," mimicking electrical relay circuits. Each rung contains conditions (e.g., contacts) and actions (e.g., coils)
 
+<!-- INSTRUCTIONS -->
 ## Basic Logic Instructions  
 
 ### Instruction Summary Table  
@@ -285,6 +287,13 @@ These instructions provide additional functionality, some of which may be specif
 - **Description:** Indicates that the cell is part of a larger instruction spanning multiple cells, used for complex operations requiring additional data.  
 - **Example Use:** Implementing a multi-step operation like a sequence control.
 
+<div align="right">
+  <a href="#readme-top">
+    <img src="images/backtotop.png" alt="backtotop" width="30" height="30">
+  </a>
+</div>
+
+<!-- API -->
 ## API Documentation  
   
 This section provides detailed documentation for the core API functions of LadderLib, extracted from the header files `ladder.h`, `ladder_instructions.h`, and `ladder_internals.h`.  
@@ -469,10 +478,17 @@ bool ladder_program_check(ladder_ctx_t* ladder_ctx)
   
 **Returns**: `true` if the program is valid, `false` otherwise.  
 
+<div align="right">
+  <a href="#readme-top">
+    <img src="images/backtotop.png" alt="backtotop" width="30" height="30">
+  </a>
+</div>
+
+<!-- ENUMS -->
 ## Enums and Structures  
   
 This section documents all enums and structures from the header files.  
-  
+
 ### Enums  
   
 #### ladder_instruction_t 
@@ -978,7 +994,15 @@ typedef struct ladder_ctx_s {
   - **`network`**: Array of networks (`ladder_network_t`).
   - **`exec_network`**: Currently executing network (`ladder_network_t`).
   - **`foreign`**: Foreign function definitions (`ladder_foreign_t`).
-  
+  - 
+
+<div align="right">
+  <a href="#readme-top">
+    <img src="images/backtotop.png" alt="backtotop" width="30" height="30">
+  </a>
+</div>
+
+<!-- CALLBACKS -->
 ## Callback Prototypes  
   
 This section lists all callback prototypes used by LadderLib, with their exact function signatures and purposes.  
@@ -1158,7 +1182,14 @@ uint64_t (*_millis)(void)
 **Parameters**: None.  
   
 **Returns**: Number of milliseconds as a 64-bit unsigned integer.
-  
+
+<div align="right">
+  <a href="#readme-top">
+    <img src="images/backtotop.png" alt="backtotop" width="30" height="30">
+  </a>
+</div>
+
+<!-- BASICUSAGE -->  
 ## Basic Usage  
 To use Ladderlib, follow these steps:  
 1. **Initialize Context**: Call `ladder_ctx_init` with appropriate quantities for networks, memory areas, counters, timers, data, and registers.  
@@ -1167,5 +1198,49 @@ To use Ladderlib, follow these steps:
 4. **Set Event Callbacks**: Optionally, assign callbacks in `ladder_manage_s` for events like scan end (`_on_scan_end`) or panic handling (`_on_panic`).  
 5. **Run Task**: Execute the ladder logic by calling `ladder_task` to process the program and interact with hardware.  
 6. **Monitor and Handle Errors**: Check ladder.state and ladder.err to monitor execution status and handle errors.  
-7. **Deinitialize**: Call `ladder_ctx_deinit` to free resources when the program is no longer needed.  
+7. **Deinitialize**: Call `ladder_ctx_deinit` to free resources when the program is no longer needed.
+
+<!-- CONTRIBUTING -->
+## Contributing
+
+Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
+
+If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement".
+Don't forget to give the project a star! Thanks again!
+
+1. Fork it (<https://github.com/hiperiondev/ladderlib/fork>)
+2. Create your feature branch (`git checkout -b feature/fooBar`)
+3. Commit your changes (`git commit -am 'Add some fooBar'`)
+4. Push to the branch (`git push origin feature/fooBar`)
+5. Create a new Pull Request
+
+<div align="right">
+  <a href="#readme-top">
+    <img src="images/backtotop.png" alt="backtotop" width="30" height="30">
+  </a>
+</div>
+
+<!-- LICENSE -->
+## License
+
+Distributed under the MIT License. See `LICENSE.txt` for more information.
+
+<div align="right">
+  <a href="#readme-top">
+    <img src="images/backtotop.png" alt="backtotop" width="30" height="30">
+  </a>
+</div>
+
+<!-- CONTACT -->
+## Contact
+
+*Emiliano Augusto Gonzalez - egonzalez.hiperion@gmail.com*
+
+Project Link: ([https://github.com/hiperiondev/stack_vm](https://github.com/hiperiondev/ladderlib))
+
+<div align="right">
+  <a href="#readme-top">
+    <img src="images/backtotop.png" alt="backtotop" width="30" height="30">
+  </a>
+</div>
   
