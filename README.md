@@ -780,12 +780,12 @@ Defines hardware-dependent functions for I/O and time management.
 ```c
 typedef struct ladder_hw_s {
     struct {
-          uint32_t fn_read_qty;  /**< Quantity of read functions */
-          uint32_t fn_write_qty; /**< Quantity of write functions */
-         _io_read *read;         /**< Read hardware values */
-        _io_write *write;        /**< Write hardware values */
-         _io_init *init_read;    /**< Initialize read functions */
-         _io_init *init_write;   /**< Initialize write functions */
+         uint32_t fn_read_qty;  /**< Quantity of read functions */
+         uint32_t fn_write_qty; /**< Quantity of write functions */
+         _io_read *read;        /**< Read hardware values */
+        _io_write *write;       /**< Write hardware values */
+         _io_init *init_read;   /**< Initialize read functions */
+         _io_init *init_write;  /**< Initialize write functions */
     } io;
     struct {
         _millis millis; /**< Milliseconds from system start */
