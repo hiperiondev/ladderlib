@@ -674,11 +674,11 @@ A versatile container for values of different types used in ladder logic.
 typedef struct ladder_value_s {
     ladder_type_t type; /**< Data type */
     union {
-        uint32_t u32;     /**< Unsigned integer */
-        int32_t i32;      /**< Integer */
-        const char *cstr; /**< Constant string */
-        float real;       /**< Real */
-        ladder_moduleportvalue_t mp; /**< module.port value */
+                        uint32_t u32;   /**< Unsigned integer */
+                         int32_t i32;   /**< Integer */
+                      const char *cstr; /**< Constant string */
+                           float real;  /**< Real */
+        ladder_moduleportvalue_t mp;    /**< module.port value */
     } value; /**< Data */
 } ladder_value_t;
 ```
@@ -698,11 +698,11 @@ Represents a single cell in the ladder diagram, encapsulating an instruction and
 
 ```c
 typedef struct ladder_cell_s {
-    bool state;        /**< Output state */
-    bool vertical_bar; /**< Have vertical bar */
-    ladder_instruction_t code; /**< Code */
-    uint8_t data_qty;  /**< Data quantity */
-    ladder_value_t *data; /**< Data */
+                    bool state;        /**< Output state */
+                    bool vertical_bar; /**< Have vertical bar */
+    ladder_instruction_t code;         /**< Code */
+                 uint8_t data_qty;     /**< Data quantity */
+          ladder_value_t *data;        /**< Data */
 } ladder_cell_t;
 ```
 
@@ -719,9 +719,9 @@ A network is a grid of cells forming a segment of the ladder logic program.
 
 ```c
 typedef struct ladder_network_s {
-    bool enable;       /**< Enabled for execution */
-    uint32_t rows;     /**< Rows qty */
-    uint32_t cols;     /**< Columns qty */
+             bool enable;  /**< Enabled for execution */
+         uint32_t rows;    /**< Rows qty */
+         uint32_t cols;    /**< Columns qty */
     ladder_cell_t **cells; /**< Cells */
 } ladder_network_t;
 ```
@@ -740,18 +740,18 @@ Holds the internal state and configuration of the ladder logic system.
 typedef struct ladder_s {
     ladder_state_t state; /**< State */
     struct {
-        uint8_t instr;    /**< Last executed instruction */
-        uint32_t network; /**< Last executed network */
+         uint8_t instr;       /**< Last executed instruction */
+        uint32_t network;     /**< Last executed network */
         uint32_t cell_column; /**< Last executed cell column */
         uint32_t cell_row;    /**< Last executed cell row */
-        uint8_t err;      /**< Last executed error */
+         uint8_t err;         /**< Last executed error */
     } last;
     struct {
-        uint32_t m;       /**< Quantity of regular flags */
-        uint32_t c;       /**< Quantity of counters */
-        uint32_t t;       /**< Quantity of timers */
-        uint32_t d;       /**< Quantity of regular registers */
-        uint32_t r;       /**< Quantity of floating point registers */
+        uint32_t m;        /**< Quantity of regular flags */
+        uint32_t c;        /**< Quantity of counters */
+        uint32_t t;        /**< Quantity of timers */
+        uint32_t d;        /**< Quantity of regular registers */
+        uint32_t r;        /**< Quantity of floating point registers */
         uint32_t networks; /**< Quantity of networks */
     } quantity;
 } ladder_t;
@@ -780,16 +780,16 @@ Defines hardware-dependent functions for I/O and time management.
 ```c
 typedef struct ladder_hw_s {
     struct {
-        uint32_t fn_read_qty;  /**< Quantity of read functions */
-        uint32_t fn_write_qty; /**< Quantity of write functions */
-        _io_read *read;        /**< Read hardware values */
-        _io_write *write;      /**< Write hardware values */
-        _io_init *init_read;   /**< Initialize read functions */
-        _io_init *init_write;  /**< Initialize write functions */
+          uint32_t fn_read_qty;  /**< Quantity of read functions */
+          uint32_t fn_write_qty; /**< Quantity of write functions */
+         _io_read *read;         /**< Read hardware values */
+        _io_write *write;        /**< Write hardware values */
+         _io_init *init_read;    /**< Initialize read functions */
+         _io_init *init_write;   /**< Initialize write functions */
     } io;
     struct {
         _millis millis; /**< Milliseconds from system start */
-        _delay delay;   /**< Delay in milliseconds */
+         _delay delay;  /**< Delay in milliseconds */
     } time;
 } ladder_hw_t;
 ```
@@ -815,9 +815,9 @@ typedef struct ladder_hw_input_vals_s {
     uint32_t fn_id;  /**< Function id */
     uint32_t i_qty;  /**< Digital inputs quantity */
     uint32_t iw_qty; /**< Analog inputs quantity */
-    uint8_t *I;      /**< Digital inputs */
-    int32_t *IW;     /**< Analog inputs */
-    uint8_t *Ih;     /**< Digital inputs previous */
+     uint8_t *I;     /**< Digital inputs */
+     int32_t *IW;    /**< Analog inputs */
+     uint8_t *Ih;    /**< Digital inputs previous */
 } ladder_hw_input_vals_t;
 ```
 
@@ -838,9 +838,9 @@ typedef struct ladder_hw_output_vals_s {
     uint32_t fn_id;  /**< Function id */
     uint32_t q_qty;  /**< Digital outputs quantity */
     uint32_t qw_qty; /**< Analog outputs quantity */
-    uint8_t *Q;      /**< Digital outputs */
-    int32_t *QW;     /**< Analog outputs */
-    uint8_t *Qh;     /**< Digital outputs previous */
+     uint8_t *Q;     /**< Digital outputs */
+     int32_t *QW;    /**< Analog outputs */
+     uint8_t *Qh;    /**< Digital outputs previous */
 } ladder_hw_output_vals_t;
 ```
 
@@ -859,10 +859,10 @@ Contains memory flags and status bits for counters and timers.
 ```c
 typedef struct ladder_memory_s {
     uint8_t *M;  /**< Regular flags */
-    bool *Cr;    /**< Counter running */
-    bool *Cd;    /**< Counter done */
-    bool *Tr;    /**< Timer running */
-    bool *Td;    /**< Timer done */
+       bool *Cr; /**< Counter running */
+       bool *Cd; /**< Counter done */
+       bool *Tr; /**< Timer running */
+       bool *Td; /**< Timer done */
 } ladder_memory_t;
 ```
 
@@ -880,10 +880,10 @@ Stores previous scan values for memory flags and status bits.
 ```c
 typedef struct ladder_prev_scan_vals_s {
     uint8_t *Mh;  /**< Regular flags previous */
-    bool *Crh;    /**< Counter running previous */
-    bool *Cdh;    /**< Counter done previous */
-    bool *Trh;    /**< Timer running previous */
-    bool *Tdh;    /**< Timer done previous */
+       bool *Crh; /**< Counter running previous */
+       bool *Cdh; /**< Counter done previous */
+       bool *Trh; /**< Timer running previous */
+       bool *Tdh; /**< Timer done previous */
 } ladder_prev_scan_vals_t;
 ```
 
@@ -901,8 +901,8 @@ Manages counter, integer, and floating-point registers.
 ```c
 typedef struct ladder_registers_s {
     uint32_t *C; /**< Counter registers */
-    int32_t *D;  /**< Regular registers */
-    float *R;    /**< Floating point registers */
+     int32_t *D; /**< Regular registers */
+       float *R; /**< Floating point registers */
 } ladder_registers_t;
 ```
 
@@ -947,12 +947,12 @@ Defines a foreign function with its properties and execution logic.
 
 ```c
 typedef struct ladder_foreign_function_s {
-    uint32_t id;          /**< Foreign function id */
-    char name[4];         /**< Foreign function name */
+                      uint32_t id;          /**< Foreign function id */
+                          char name[4];     /**< Foreign function name */
     ladder_instructions_iocd_t description; /**< Foreign function description */
-    ladder_fn_t exec;     /**< Foreign functions pointers */
-    _foreign_fn_deinit deinit; /**< Foreign functions deinitializer pointers */
-    void *data;           /**< Internal data for foreign functions */
+                   ladder_fn_t exec;        /**< Foreign functions pointers */
+            _foreign_fn_deinit deinit;      /**< Foreign functions deinitializer pointers */
+                         void *data;        /**< Internal data for foreign functions */
 } ladder_foreign_function_t;
 ```
 
@@ -970,7 +970,7 @@ Manages a collection of foreign functions.
 
 ```c
 typedef struct ladder_foreign_s {
-    uint32_t qty; /**< Foreign functions quantity */
+                     uint32_t qty; /**< Foreign functions quantity */
     ladder_foreign_function_t *fn; /**< Main foreign function definition */
 } ladder_foreign_t;
 ```
@@ -985,19 +985,19 @@ The central structure tying together all components of the ladder logic system.
 
 ```c
 typedef struct ladder_ctx_s {
-    ladder_t ladder;         /**< Internals */
-    ladder_hw_t hw;          /**< Hardware functions */
-    ladder_manage_t on;      /**< Manage functions */
-    ladder_memory_t memory;  /**< Memory */
+                   ladder_t ladder;         /**< Internals */
+                ladder_hw_t hw;             /**< Hardware functions */
+            ladder_manage_t on;             /**< Manage functions */
+            ladder_memory_t memory;         /**< Memory */
     ladder_prev_scan_vals_t prev_scan_vals; /**< Previous scan values */
-    ladder_hw_input_vals_t *input; /**< Hw inputs */
-    ladder_hw_output_vals_t *output; /**< Hw outputs */
-    ladder_registers_t registers; /**< Registers */
-    ladder_timer_t *timers;  /**< Timers */
+    ladder_hw_input_vals_t *input;          /**< Hw inputs */
+    ladder_hw_output_vals_t *output;        /**< Hw outputs */
+         ladder_registers_t registers;      /**< Registers */
+             ladder_timer_t *timers;        /**< Timers */
     ladder_scan_internals_t scan_internals; /**< Scan internals */
-    ladder_network_t *network; /**< Networks */
-    ladder_network_t *exec_network; /**< Network in execution */
-    ladder_foreign_t foreign; /**< Foreign functions */
+           ladder_network_t *network;       /**< Networks */
+           ladder_network_t *exec_network;  /**< Network in execution */
+           ladder_foreign_t foreign;        /**< Foreign functions */
 } ladder_ctx_t;
 ```
 
