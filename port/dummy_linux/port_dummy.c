@@ -49,7 +49,8 @@
 #define DUMMY_QTY_IW 8
 #define DUMMY_QTY_QW 8
 
-static const char *_ladder_status_str[] = { "STOPPED",  //
+static const char *_ladder_status_str[] = {
+        "STOPPED",  //
         "RUNNING",  //
         "ERROR",    //
         "EXIT_TSK", //
@@ -57,7 +58,8 @@ static const char *_ladder_status_str[] = { "STOPPED",  //
         "INVALID",  //
         };
 
-static const char *_fn_str[] = { "NOP",     //
+static const char *_fn_str[] = {
+        "NOP",     //
         "CONN",    //
         "NEG",     //
         "NO",      //
@@ -68,7 +70,7 @@ static const char *_fn_str[] = { "NOP",     //
         "COILL",   //
         "COILU",   //
         "TON",     //
-        "TOFF",    //
+        "TOF",     //
         "TP",      //
         "CTU",     //
         "CTD",     //
@@ -96,7 +98,8 @@ static const char *_fn_str[] = { "NOP",     //
         "TMOVE",   //
         };
 
-static const char *_fn_err_str[] = { "OK",         //
+static const char *_fn_err_str[] = {
+        "OK",         //
         "GETPREVVAL", //
         "GETDATAVAL", //
         "NOFOREIGN",  //
