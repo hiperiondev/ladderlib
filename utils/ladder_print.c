@@ -244,7 +244,7 @@ static void fn_to_str(ladder_ctx_t ladder_ctx, uint32_t net, char (*cells)[6][32
                 }
 
                 memset(strtmp, 0, 9 * sizeof(char));
-                if (ladder_ctx.network[net].cells[row][column].code == LADDER_INS_TON || ladder_ctx.network[net].cells[row][column].code == LADDER_INS_TOFF
+                if (ladder_ctx.network[net].cells[row][column].code == LADDER_INS_TON || ladder_ctx.network[net].cells[row][column].code == LADDER_INS_TOF
                         || ladder_ctx.network[net].cells[row][column].code == LADDER_INS_TP) {
                     sprintf((*cells)[2], "%s| %04d %s |%s", actual_ioc.inputs == 1 ? "   " : "---",
                             (int) ladder_ctx.network[net].cells[row][column].data[1].value.i32,

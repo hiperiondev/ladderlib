@@ -52,7 +52,7 @@ const ladder_instructions_iocd_t ladder_fn_iocd[] = {
         { 1, 1, 1, 1 }, // COILL
         { 1, 1, 1, 1 }, // COILU
         { 1, 2, 2, 2 }, // TON
-        { 1, 2, 2, 2 }, // TOFF
+        { 1, 2, 2, 2 }, // TOF
         { 1, 2, 2, 2 }, // TP
         { 2, 2, 2, 2 }, // CTU
         { 2, 2, 2, 2 }, // CTD
@@ -206,7 +206,7 @@ ladder_ins_err_t fn_TON(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row)
     return LADDER_INS_ERR_OK;
 }
 
-ladder_ins_err_t fn_TOFF(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row) {
+ladder_ins_err_t fn_TOF(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row) {
     // timer is activated
     if (CELL_STATE_LEFT(ladder_ctx, column, row)) {
         (*ladder_ctx).memory.Td[ladder_cell_data_exec(ladder_ctx, row, column, 0).value.i32] = true;

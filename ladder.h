@@ -147,7 +147,7 @@ typedef enum LADDER_INSTRUCTIONS {
     LADDER_INS_COILL,   /**< Instruction COILL */
     LADDER_INS_COILU,   /**< Instruction COILU */
     LADDER_INS_TON,     /**< Instruction TON */
-    LADDER_INS_TOFF,    /**< Instruction TOFF */
+    LADDER_INS_TOF,     /**< Instruction TOFF */
     LADDER_INS_TP,      /**< Instruction TP */
     LADDER_INS_CTU,     /**< Instruction CTU */
     LADDER_INS_CTD,     /**< Instruction CTD */

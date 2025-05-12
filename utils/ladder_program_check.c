@@ -47,7 +47,7 @@ ladder_prg_check_t ladder_program_check(ladder_ctx_t ladder_ctx) {
                     status.error = LADDER_ERR_PRG_CHECK_OK;
                     status.code = ladder_ctx.network[nt].cells[row][column].code;
 
-                    if (ladder_ctx.network[nt].cells[row][column].code == LADDER_INS_TON || ladder_ctx.network[nt].cells[row][column].code == LADDER_INS_TOFF
+                    if (ladder_ctx.network[nt].cells[row][column].code == LADDER_INS_TON || ladder_ctx.network[nt].cells[row][column].code == LADDER_INS_TOF
                             || ladder_ctx.network[nt].cells[row][column].code == LADDER_INS_TP)
                         continue;
 

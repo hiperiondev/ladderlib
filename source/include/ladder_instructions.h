@@ -281,7 +281,7 @@ ladder_ins_err_t fn_TON(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row)
  * @param row Row
  * @return Status
  */
-ladder_ins_err_t fn_TOFF(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row);
+ladder_ins_err_t fn_TOF(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row);
 
 /**
  * @fn ladder_ins_err_t  fn_TP(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row)

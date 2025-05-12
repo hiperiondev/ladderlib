@@ -260,7 +260,7 @@ ladder_json_error_t ladder_json_to_program(const char *prg, ladder_ctx_t *ladder
                     cJSON *value_json = cJSON_GetObjectItem(data_item, "value");
                     char *value_str = cJSON_GetStringValue(value_json);
 
-                    if (cell->code == LADDER_INS_TON || cell->code == LADDER_INS_TOFF || cell->code == LADDER_INS_TP) {
+                    if (cell->code == LADDER_INS_TON || cell->code == LADDER_INS_TOF || cell->code == LADDER_INS_TP) {
                         cell->data[d].value.u32 = strtoul(value_str, NULL, 10);
                     } else {
                         switch (cell->data[d].type) {
@@ -377,7 +377,7 @@ ladder_json_error_t ladder_program_to_json(const char *prg, ladder_ctx_t *ladder
                     }
 
                     const char *type_str =
-                            ((cell->code == LADDER_INS_TON || cell->code == LADDER_INS_TOFF || cell->code == LADDER_INS_TP) && d == 1) ?
+                            ((cell->code == LADDER_INS_TON || cell->code == LADDER_INS_TOF || cell->code == LADDER_INS_TP) && d == 1) ?
                                     ((val->type < sizeof(str_basetime) / sizeof(str_basetime[0])) ? str_basetime[val->type] : "INV") :
                                     ((val->type < sizeof(str_types) / sizeof(str_types[0])) ? str_types[val->type] : "INV");
                     char val_str[16];
