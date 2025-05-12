@@ -52,6 +52,7 @@ int main(void) {
     const char prg_load[] = "ladder_networks.json";
     const char prg_save[] = "ladder_networks_save.json";
     uint8_t err = 0;
+    ladder_prg_check_t err_prg_check;
 
     // main context
     ladder_ctx_t ladder_ctx;
@@ -116,8 +117,10 @@ int main(void) {
 
     printf("\n");
 
-    if((err = ladder_program_check(ladder_ctx)) != LADDER_ERR_PRG_CHECK_OK) {
-        printf("ERROR: Program not valid (%d)\n", err);
+    err_prg_check = ladder_program_check(ladder_ctx);
+    if (err_prg_check.error != LADDER_ERR_PRG_CHECK_OK) {
+        printf("ERROR: Program not valid (%d) at network:%d [%d,%d] code: %d\n", err_prg_check.error, err_prg_check.network, err_prg_check.row,
+                err_prg_check.column, err_prg_check.code);
         goto end;
     }
 

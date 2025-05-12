@@ -105,6 +105,9 @@ static const char *str_types[] = {
         "CSTR",  //
         "REAL",  //
         "INV",   //
+        };
+
+static const char *str_basetime[] = {
         "MS",    //
         "10MS",  //
         "100MS", //
@@ -112,7 +115,7 @@ static const char *str_types[] = {
         "MIN"    //
         };
 
-static bool parse_module_port(const char *str, ladder_moduleportvalue_t *result) {
+static bool parse_module_port(const char *str, moduleport_t *result) {
     unsigned int n;
     unsigned int module_temp, port_temp;
     int ret = sscanf(str, "%u.%u%n", &module_temp, &port_temp, &n);
@@ -136,13 +139,14 @@ static ladder_instruction_t get_instruction_code(const char *symbol) {
 }
 
 static ladder_register_t get_register_code(const char *type) {
-    for (int i = 0; i < sizeof(str_types) / sizeof(str_types[0]); i++) {
-        if (strcmp(type, str_types[i]) == 0) {
-            if (i > LADDER_REGISTER_INV)
-                return (i - LADDER_REGISTER_INV - 1 + 0xf0);
+    for (int i = 0; i < sizeof(str_types) / sizeof(str_types[0]); i++)
+        if (strcmp(type, str_types[i]) == 0)
             return i;
-        }
-    }
+
+    for (int i = 0; i < sizeof(str_basetime) / sizeof(str_basetime[0]); i++)
+        if (strcmp(type, str_basetime[i]) == 0)
+            return i;
+
     return LADDER_REGISTER_INV;
 }
 
@@ -256,23 +260,27 @@ ladder_json_error_t ladder_json_to_program(const char *prg, ladder_ctx_t *ladder
                     cJSON *value_json = cJSON_GetObjectItem(data_item, "value");
                     char *value_str = cJSON_GetStringValue(value_json);
 
-                    switch (cell->data[d].type) {
-                        case LADDER_REGISTER_I:
-                        case LADDER_REGISTER_Q:
-                            if (!parse_module_port(value_str, &(cell->data[d].value.mp)))
-                                return JSON_ERROR_INVALIDVALUE;
-                            break;
+                    if (cell->code == LADDER_INS_TON || cell->code == LADDER_INS_TOFF || cell->code == LADDER_INS_TP) {
+                        cell->data[d].value.u32 = strtoul(value_str, NULL, 10);
+                    } else {
+                        switch (cell->data[d].type) {
+                            case LADDER_REGISTER_I:
+                            case LADDER_REGISTER_Q:
+                                if (!parse_module_port(value_str, &(cell->data[d].value.mp)))
+                                    return JSON_ERROR_INVALIDVALUE;
+                                break;
 
-                        case LADDER_REGISTER_S:
-                            cell->data[d].value.cstr = strdup(value_str);
-                            break;
-                        case LADDER_REGISTER_R:
-                            cell->data[d].value.real = atof(value_str);
-                            break;
+                            case LADDER_REGISTER_S:
+                                cell->data[d].value.cstr = strdup(value_str);
+                                break;
+                            case LADDER_REGISTER_R:
+                                cell->data[d].value.real = atof(value_str);
+                                break;
 
-                        default:
-                            cell->data[d].value.u32 = strtoul(value_str, NULL, 10);
-                            break;
+                            default:
+                                cell->data[d].value.u32 = strtoul(value_str, NULL, 10);
+                                break;
+                        }
                     }
                 }
             }
@@ -368,8 +376,10 @@ ladder_json_error_t ladder_program_to_json(const char *prg, ladder_ctx_t *ladder
                         return JSON_ERROR_CREATEDATAOBJ;
                     }
 
-                    uint8_t ttype = val->type > LADDER_REGISTER_INV ? val->type - 0xf0 + LADDER_REGISTER_INV + 1 : val->type;
-                    const char *type_str = (ttype < sizeof(str_types) / sizeof(str_types[0])) ? str_types[ttype] : "INV";
+                    const char *type_str =
+                            ((cell->code == LADDER_INS_TON || cell->code == LADDER_INS_TOFF || cell->code == LADDER_INS_TP) && d == 1) ?
+                                    ((val->type < sizeof(str_basetime) / sizeof(str_basetime[0])) ? str_basetime[val->type] : "INV") :
+                                    ((val->type < sizeof(str_types) / sizeof(str_types[0])) ? str_types[val->type] : "INV");
                     char val_str[16];
                     sprintf(val_str, "value%d", d);
                     cJSON_AddStringToObject(data_obj, "name", val_str);

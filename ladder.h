@@ -173,7 +173,7 @@ typedef enum LADDER_INSTRUCTIONS {
     LADDER_INS_NE,      /**< Instruction NE */
     LADDER_INS_FOREIGN, /**< Instruction FOREIGN */
     LADDER_INS_TMOVE,   /**< Instruction TMOVE */
-    ///////////////////
+    //...//
     LADDER_INS_INV,     /**< First invalid */
     LADDER_INS_MULTI,   /**< cell is a part of multi cell instruction */
 } ladder_instruction_t;
@@ -215,14 +215,15 @@ typedef enum LADDER_INS_ERROR {
  *
  */
 typedef enum LADDER_DATA_TYPE {
-    LADDER_DATATYPE_U8,   /**< Unsigned 8 bits */
-    LADDER_DATATYPE_U16,  /**< Unsigned 16 bits */
-    LADDER_DATATYPE_U32,  /**< Unsigned 32 bits */
-    LADDER_DATATYPE_I8,   /**< Signed 8 bits */
-    LADDER_DATATYPE_I16,  /**< Signed 16 bits */
-    LADDER_DATATYPE_I32,  /**< Signed 32 bits */
-    LADDER_DATATYPE_REAL, /**< Float 32 bits */
-    LADDER_DATATYPE_CSTR, /**< Constant string */
+    LADDER_DATATYPE_U8,       /**< Unsigned 8 bits */
+    LADDER_DATATYPE_U16,      /**< Unsigned 16 bits */
+    LADDER_DATATYPE_U32,      /**< Unsigned 32 bits */
+    LADDER_DATATYPE_I8,       /**< Signed 8 bits */
+    LADDER_DATATYPE_I16,      /**< Signed 16 bits */
+    LADDER_DATATYPE_I32,      /**< Signed 32 bits */
+    LADDER_DATATYPE_REAL,     /**< Float 32 bits */
+    LADDER_DATATYPE_CSTR,     /**< Constant string */
+    LADDER_DATATYPE_MOD_PORT, /**< Module.port format */
 } ladder_data_type_t;
 
 /**
@@ -259,13 +260,14 @@ typedef enum LADDER_REGISTERS {
     LADDER_REGISTER_D,    /**< Register D */
     LADDER_REGISTER_S,    /**< Register string */
     LADDER_REGISTER_R,    /**< Register real (float) */
+    //...//
     LADDER_REGISTER_INV,  /**< Register invalid */
 
-    LADDER_TYPE_BASETIME_MS = 0xf0, /**< Basetime ms */
-    LADDER_TYPE_BASETIME_10MS,      /**< Basetime 10 ms */
-    LADDER_TYPE_BASETIME_100MS,     /**< Basetime 100 ms */
-    LADDER_TYPE_BASETIME_SEC,       /**< Basetime seconds */
-    LADDER_TYPE_BASETIME_MIN,       /**< Basetime minutes */
+    //LADDER_TYPE_BASETIME_MS = 0xf0, /**< Basetime ms */
+    //LADDER_TYPE_BASETIME_10MS,      /**< Basetime 10 ms */
+    //LADDER_TYPE_BASETIME_100MS,     /**< Basetime 100 ms */
+    //LADDER_TYPE_BASETIME_SEC,       /**< Basetime seconds */
+    //LADDER_TYPE_BASETIME_MIN,       /**< Basetime minutes */
 } ladder_register_t;
 
 /**
@@ -283,14 +285,14 @@ typedef struct ladder_instructions_ioc_s {
 extern const ladder_instructions_iocd_t ladder_fn_iocd[];
 
 /**
- * @struct ladder_moduleportvalue_s
+ * @struct moduleportvalue_s
  * @brief Module/Port value
  *
  */
-typedef struct ladder_moduleportvalue_s {
+typedef struct moduleportvalue_s {
     uint8_t module; /**< Module */
     uint8_t port;   /**< Port */
-} ladder_moduleportvalue_t;
+} moduleport_t;
 
 /**
  * @struct ladder_value_s
@@ -298,13 +300,17 @@ typedef struct ladder_moduleportvalue_s {
  *
  */
 typedef struct ladder_value_s {
-    ladder_register_t type;             /**< Data type */
+    ladder_register_t type; /**< Data type */
     union {
-                        uint32_t u32;   /**< Unsigned integer */
-                         int32_t i32;   /**< Integer */
-                      const char *cstr; /**< Constant string */
-                           float real;  /**< Real */
-        ladder_moduleportvalue_t mp;    /**< module.port value */
+             uint8_t u8;    /**< Unsigned integer 8 bits */
+            uint16_t u16;   /**< Unsigned integer 16 bits */
+            uint32_t u32;   /**< Unsigned integer 32 bits */
+              int8_t i8;    /**< Signed integer 8 bits */
+             int16_t i16;   /**< Signed integer 16 bits */
+             int32_t i32;   /**< Signed integer 32 bits */
+          const char *cstr; /**< Constant string */
+               float real;  /**< Float */
+        moduleport_t mp;    /**< Module.port value */
     } value; /**< Data */
 } ladder_value_t;
 
@@ -662,8 +668,7 @@ typedef struct ladder_ctx_s {
  * @param net_rows_qty Network Logic matrix rows size (Maximum: 32).
  * @param networks_qty Total Networks.
  * @param qty_m Memory Areas quantities. Marks. Regular flags.
- * @param qty_c Memory Areas qu        printf("ERROR Adding io read function\n");
- * antities. Counter registers (16 bits).
+ * @param qty_c Memory Areas quantities. Counter registers (16 bits).
  * @param qty_t Memory Areas quantities. Timers.
  * @param qty_d Memory Areas quantities. Regular registers (16 bit signed).
  * @param qty_r Memory Areas quantities. Float or Real registers.
@@ -728,7 +733,7 @@ bool ladder_add_write_fn(ladder_ctx_t *ladder_ctx, _io_write write, _io_init wri
  * @param fn_init Initialize internal foreign function
  * @param init_data Generic foreign function data
  * @param qty Quantity
- * @return
+ * @return Status
  */
 bool ladder_add_foreign(ladder_ctx_t *ladder_ctx, _foreign_fn_init fn_init, void *init_data, uint32_t qty);
 

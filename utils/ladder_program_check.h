@@ -58,12 +58,25 @@ typedef enum LADDER_ERR_PRG_CHECK {
 } ladder_err_prg_check_t;
 
 /**
- * @fn ladder_err_prg_check_t ladder_program_check(ladder_ctx_t*)
+ * @struct ladder_prg_check_s
+ * @brief Return status of program check
+ *
+ */
+typedef struct ladder_prg_check_s {
+                  uint32_t network; //
+                  uint32_t row;     //
+                  uint32_t column;  //
+      ladder_instruction_t code;    //
+    ladder_err_prg_check_t error;   //
+} ladder_prg_check_t;
+
+/**
+ * @fn ladder_prg_check_t ladder_program_check(ladder_ctx_t*)
  * @brief Check if program is valid
  *
  * @param ladder_ctx Ladder context
- * @return
+ * @return Status
  */
-ladder_err_prg_check_t ladder_program_check(ladder_ctx_t ladder_ctx);
+ladder_prg_check_t ladder_program_check(ladder_ctx_t ladder_ctx);
 
 #endif /* LADDER_PROGRAM_CHECK_H_ */
