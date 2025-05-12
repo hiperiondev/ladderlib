@@ -262,12 +262,6 @@ typedef enum LADDER_REGISTERS {
     LADDER_REGISTER_R,    /**< Register real (float) */
     //...//
     LADDER_REGISTER_INV,  /**< Register invalid */
-
-    //LADDER_TYPE_BASETIME_MS = 0xf0, /**< Basetime ms */
-    //LADDER_TYPE_BASETIME_10MS,      /**< Basetime 10 ms */
-    //LADDER_TYPE_BASETIME_100MS,     /**< Basetime 100 ms */
-    //LADDER_TYPE_BASETIME_SEC,       /**< Basetime seconds */
-    //LADDER_TYPE_BASETIME_MIN,       /**< Basetime minutes */
 } ladder_register_t;
 
 /**
