@@ -632,7 +632,7 @@ typedef enum LADDER_BASETIME {
 
 #### ladder_register_t
 
-```
+```c
 typedef enum LADDER_REGISTERS {
     LADDER_REGISTER_NONE, /**< Register None */
     LADDER_REGISTER_M,    /**< Register M */
