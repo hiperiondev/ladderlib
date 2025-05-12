@@ -67,70 +67,6 @@
 #define LADDER_VERTICAL_BAR(lctx, n, r, c) ((*lctx).network[n].cells[r][c].vertical_bar)
 
 /**
- * @def ladder_cell_data
- * @brief
- *
- */
-#define ladder_cell_data(lctx, n, r, c, i, typ, val)                                                                                                           \
-    (*lctx).network[n].cells[r][c].data[i].type = typ;                                                                                                         \
-    switch (typ) {                                                                                                                                             \
-        case LADDER_TYPE_NONE: {                                                                                                                               \
-            (*lctx).network[n].cells[r][c].data[i].value.i32 = (int32_t)val;                                                                                   \
-        } break;                                                                                                                                               \
-        case LADDER_TYPE_M: {                                                                                                                                  \
-            (*lctx).network[n].cells[r][c].data[i].value.i32 = (int32_t)val;                                                                                   \
-        } break;                                                                                                                                               \
-        case LADDER_TYPE_Q: {                                                                                                                                  \
-            (*lctx).network[n].cells[r][c].data[i].value.i32 = (int32_t)val;                                                                                   \
-        } break;                                                                                                                                               \
-        case LADDER_TYPE_I: {                                                                                                                                  \
-            (*lctx).network[n].cells[r][c].data[i].value.i32 = (int32_t)val;                                                                                   \
-        } break;                                                                                                                                               \
-        case LADDER_TYPE_Cd: {                                                                                                                                 \
-            (*lctx).network[n].cells[r][c].data[i].value.i32 = (int32_t)val;                                                                                   \
-        } break;                                                                                                                                               \
-        case LADDER_TYPE_Cr: {                                                                                                                                 \
-            (*lctx).network[n].cells[r][c].data[i].value.i32 = (int32_t)val;                                                                                   \
-        } break;                                                                                                                                               \
-        case LADDER_TYPE_Td: {                                                                                                                                 \
-            (*lctx).network[n].cells[r][c].data[i].value.i32 = (int32_t)val;                                                                                   \
-        } break;                                                                                                                                               \
-        case LADDER_TYPE_Tr: {                                                                                                                                 \
-            (*lctx).network[n].cells[r][c].data[i].value.i32 = (int32_t)val;                                                                                   \
-        } break;                                                                                                                                               \
-        case LADDER_TYPE_IW: {                                                                                                                                 \
-            (*lctx).network[n].cells[r][c].data[i].value.i32 = (int32_t)val;                                                                                   \
-        } break;                                                                                                                                               \
-        case LADDER_TYPE_QW: {                                                                                                                                 \
-            (*lctx).network[n].cells[r][c].data[i].value.i32 = (int32_t)val;                                                                                   \
-        } break;                                                                                                                                               \
-        case LADDER_TYPE_C: {                                                                                                                                  \
-            (*lctx).network[n].cells[r][c].data[i].value.i32 = (int32_t)val;                                                                                   \
-        } break;                                                                                                                                               \
-        case LADDER_TYPE_T: {                                                                                                                                  \
-            (*lctx).network[n].cells[r][c].data[i].value.i32 = (int32_t)val;                                                                                   \
-        } break;                                                                                                                                               \
-        case LADDER_TYPE_D: {                                                                                                                                  \
-            (*lctx).network[n].cells[r][c].data[i].value.i32 = (int32_t)val;                                                                                   \
-        } break;                                                                                                                                               \
-        case LADDER_TYPE_REAL: {                                                                                                                               \
-            (*lctx).network[n].cells[r][c].data[i].value.real = (float)val;                                                                                    \
-        } break;                                                                                                                                               \
-        default: {                                                                                                                                             \
-            (*lctx).network[n].cells[r][c].data[i].value.i32 = (int32_t)val;                                                                                   \
-        } break;                                                                                                                                               \
-    }
-
-/**
- * @def ladder_cell_data_cstr
- * @brief
- *
- */
-#define ladder_cell_data_cstr(lctx, n, r, c, i, val)                                                                                                           \
-    (*lctx).network[n].cells[r][c].data[i].type = LADDER_TYPE_CSTR;                                                                                            \
-    (*lctx).network[n].cells[r][c].data[i].value.cstr = val
-
-/**
  * @enum LADDER_INSTRUCTIONS
  * @brief Ladder Instructions codes
  * Must match with array of functions in TaskLadder
@@ -215,6 +151,7 @@ typedef enum LADDER_INS_ERROR {
  *
  */
 typedef enum LADDER_DATA_TYPE {
+    LADDER_DATATYPE_BOOL,     /**< Boolean */
     LADDER_DATATYPE_U8,       /**< Unsigned 8 bits */
     LADDER_DATATYPE_U16,      /**< Unsigned 16 bits */
     LADDER_DATATYPE_U32,      /**< Unsigned 32 bits */
@@ -296,6 +233,7 @@ typedef struct moduleportvalue_s {
 typedef struct ladder_value_s {
     ladder_register_t type; /**< Data type */
     union {
+                bool b;     /**< Boolean */
              uint8_t u8;    /**< Unsigned integer 8 bits */
             uint16_t u16;   /**< Unsigned integer 16 bits */
             uint32_t u32;   /**< Unsigned integer 32 bits */

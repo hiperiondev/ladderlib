@@ -51,23 +51,23 @@
  * @brief Get data values
  *
  */
-#define ladder_get_data_value(lctx, r, c, i)                                                                                              \
-(                                                                                                                                         \
+#define ladder_get_data_value(lctx, r, c, i)                                                                                                  \
+(                                                                                                                                             \
 (exnet(lctx).cells[r][c].data[i].type == LADDER_REGISTER_NONE) ? (uint8_t)(exnet(lctx).cells[r][c].data[i].value.i32)                       : \
 (exnet(lctx).cells[r][c].data[i].type == LADDER_REGISTER_M)    ? (uint8_t)((*lctx).memory.M[exnet(lctx).cells[r][c].data[i].value.i32])     : \
 (exnet(lctx).cells[r][c].data[i].type == LADDER_REGISTER_Q)    ? (uint8_t)((*lctx).output[exnet(lctx).cells[r][c].data[i].value.mp.module].Q[exnet(lctx).cells[r][c].data[i].value.mp.port]) : \
-(exnet(lctx).cells[r][c].data[i].type == LADDER_REGISTER_I)    ? (uint8_t)((*lctx).input[exnet(lctx).cells[r][c].data[i].value.mp.module].I[exnet(lctx).cells[r][c].data[i].value.mp.port]) : \
+(exnet(lctx).cells[r][c].data[i].type == LADDER_REGISTER_I)    ? (uint8_t)((*lctx).input[exnet(lctx).cells[r][c].data[i].value.mp.module].I[exnet(lctx).cells[r][c].data[i].value.mp.port])  : \
 (exnet(lctx).cells[r][c].data[i].type == LADDER_REGISTER_Cd)   ? (bool)((*lctx).memory.Cd[exnet(lctx).cells[r][c].data[i].value.i32])       : \
 (exnet(lctx).cells[r][c].data[i].type == LADDER_REGISTER_Cr)   ? (bool)((*lctx).memory.Cr[exnet(lctx).cells[r][c].data[i].value.i32])       : \
 (exnet(lctx).cells[r][c].data[i].type == LADDER_REGISTER_Td)   ? (bool)((*lctx).memory.Td[exnet(lctx).cells[r][c].data[i].value.i32])       : \
 (exnet(lctx).cells[r][c].data[i].type == LADDER_REGISTER_Tr)   ? (bool)((*lctx).memory.Tr[exnet(lctx).cells[r][c].data[i].value.i32])       : \
-(exnet(lctx).cells[r][c].data[i].type == LADDER_REGISTER_IW)   ? (int32_t)((*lctx).input[exnet(lctx).cells[r][c].data[i].value.mp.module].IW[exnet(lctx).cells[r][c].data[i].value.mp.port]) : \
+(exnet(lctx).cells[r][c].data[i].type == LADDER_REGISTER_IW)   ? (int32_t)((*lctx).input[exnet(lctx).cells[r][c].data[i].value.mp.module].IW[exnet(lctx).cells[r][c].data[i].value.mp.port])  : \
 (exnet(lctx).cells[r][c].data[i].type == LADDER_REGISTER_QW)   ? (int32_t)((*lctx).output[exnet(lctx).cells[r][c].data[i].value.mp.module].QW[exnet(lctx).cells[r][c].data[i].value.mp.port]) : \
 (exnet(lctx).cells[r][c].data[i].type == LADDER_REGISTER_C)    ? (uint32_t)((*lctx).registers.C[exnet(lctx).cells[r][c].data[i].value.i32]) : \
 (exnet(lctx).cells[r][c].data[i].type == LADDER_REGISTER_T)    ? (uint64_t)((*lctx).timers[exnet(lctx).cells[r][c].data[i].value.i32].acc)  : \
 (exnet(lctx).cells[r][c].data[i].type == LADDER_REGISTER_D)    ? (int32_t)((*lctx).registers.D[exnet(lctx).cells[r][c].data[i].value.i32])  : \
 (exnet(lctx).cells[r][c].data[i].type == LADDER_REGISTER_INV)  ? 0                                                                          : \
-0                                                                                                                                         \
+0                                                                                                                                             \
 )
 
 /**
@@ -75,16 +75,16 @@
  * @brief Get previous value
  *
  */
-#define ladder_get_previous_value(lctx, r, c, i)                                                                                             \
-(                                                                                                                                            \
+#define ladder_get_previous_value(lctx, r, c, i)                                                                                                 \
+(                                                                                                                                                \
 (exnet(lctx).cells[r][c].data[i].type == LADDER_REGISTER_M)  ? (uint8_t)((*lctx).prev_scan_vals.Mh[exnet(lctx).cells[r][c].data[i].value.i32]) : \
 (exnet(lctx).cells[r][c].data[i].type == LADDER_REGISTER_Q)  ? (uint8_t)((*lctx).output[exnet(lctx).cells[r][c].data[i].value.mp.module].Qh[exnet(lctx).cells[r][c].data[i].value.mp.port]) : \
-(exnet(lctx).cells[r][c].data[i].type == LADDER_REGISTER_I)  ? (uint8_t)((*lctx).input[exnet(lctx).cells[r][c].data[i].value.mp.module].Ih[exnet(lctx).cells[r][c].data[i].value.mp.port]) : \
+(exnet(lctx).cells[r][c].data[i].type == LADDER_REGISTER_I)  ? (uint8_t)((*lctx).input[exnet(lctx).cells[r][c].data[i].value.mp.module].Ih[exnet(lctx).cells[r][c].data[i].value.mp.port])  : \
 (exnet(lctx).cells[r][c].data[i].type == LADDER_REGISTER_Cd) ? (bool)((*lctx).prev_scan_vals.Cdh[exnet(lctx).cells[r][c].data[i].value.i32])   : \
 (exnet(lctx).cells[r][c].data[i].type == LADDER_REGISTER_Cr) ? (bool)((*lctx).prev_scan_vals.Crh[exnet(lctx).cells[r][c].data[i].value.i32])   : \
 (exnet(lctx).cells[r][c].data[i].type == LADDER_REGISTER_Td) ? (bool)((*lctx).prev_scan_vals.Tdh[exnet(lctx).cells[r][c].data[i].value.i32])   : \
 (exnet(lctx).cells[r][c].data[i].type == LADDER_REGISTER_Tr) ? (bool)((*lctx).prev_scan_vals.Trh[exnet(lctx).cells[r][c].data[i].value.i32])   : \
-0                                                                                                                                            \
+0                                                                                                                                                \
 )
 
 /**
