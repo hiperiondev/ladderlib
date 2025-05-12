@@ -696,13 +696,17 @@ A versatile container for values of different types used in ladder logic.
 
 ```c
 typedef struct ladder_value_s {
-    ladder_type_t type; /**< Data type */
+    ladder_register_t type; /**< Data type */
     union {
-                        uint32_t u32;   /**< Unsigned integer */
-                         int32_t i32;   /**< Integer */
-                      const char *cstr; /**< Constant string */
-                           float real;  /**< Real */
-        ladder_moduleportvalue_t mp;    /**< module.port value */
+             uint8_t u8;    /**< Unsigned integer 8 bits */
+            uint16_t u16;   /**< Unsigned integer 16 bits */
+            uint32_t u32;   /**< Unsigned integer 32 bits */
+              int8_t i8;    /**< Signed integer 8 bits */
+             int16_t i16;   /**< Signed integer 16 bits */
+             int32_t i32;   /**< Signed integer 32 bits */
+          const char *cstr; /**< Constant string */
+               float real;  /**< Float */
+        moduleport_t mp;    /**< Module.port value */
     } value; /**< Data */
 } ladder_value_t;
 ```
@@ -710,11 +714,15 @@ typedef struct ladder_value_s {
 - **Fields**:
   - **`type`**: Specifies the value's data type (e.g., `u32`, `i32`, `cstr`, `real`, `mp`).
   - **`value`**: Union containing the actual value, interpreted based on `type`. Supports:
-    - Unsigned integer (`u32`).
-    - Signed integer (`i32`).
-    - Constant string (`cstr`).
-    - Floating-point number (`real`).
-    - Module/port value (`mp`).
+    -  Unsigned integer 8 bits  (`u8`).
+    -  Unsigned integer 16 bits  (`u16`).
+    -  Unsigned integer 32 bits  (`u32`).
+    -  Signed integer 8 bits  (`i8`).
+    -  Signed integer 16 bits  (`i16`).
+    -  Signed integer 32 bits  (`i32`).
+    -  Constant string  (`cstr`).
+    -  Float  (`real`).
+    -  Module.port value  (`mp`).
 
 #### `ladder_cell_s`
 
