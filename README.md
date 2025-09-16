@@ -2,7 +2,7 @@
 <!-- PROJECT LOGO -->
 <br />
 <div align="center">
-  <a href="https://github.com/hiperiondev/stack_vm">
+  <a href="https://github.com/hiperiondev/ladderlib">
     <img src="images/logo.png" alt="Logo" width="140" height="80">
   </a>
 
