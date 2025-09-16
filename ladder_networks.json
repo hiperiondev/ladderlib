@@ -758,27 +758,45 @@
       ],
       [
         {
-          "symbol": "NOP",
+          "symbol": "COIL",
+          "bar": false,
+          "data": [
+            {
+              "name": "value1",
+              "type": "M",
+              "value": "10"
+            }
+          ]
+        },
+        {
+          "symbol": "COIL",
+          "bar": false,
+          "data": [
+            {
+              "name": "value1",
+              "type": "M",
+              "value": "12"
+            }
+          ]
+        },
+        {
+          "symbol": "COIL",
+          "bar": false,
+          "data": [
+            {
+              "name": "value1",
+              "type": "M",
+              "value": "14"
+            }
+          ]
+        },
+        {
+          "symbol": "CONN",
           "bar": false,
           "data": []
         },
         {
-          "symbol": "NOP",
-          "bar": false,
-          "data": []
-        },
-        {
-          "symbol": "NOP",
-          "bar": false,
-          "data": []
-        },
-        {
-          "symbol": "NOP",
-          "bar": false,
-          "data": []
-        },
-        {
-          "symbol": "NOP",
+          "symbol": "CONN",
           "bar": false,
           "data": []
         }

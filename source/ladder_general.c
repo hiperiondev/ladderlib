@@ -37,6 +37,9 @@
 
 #include "ladder.h"
 #include "ladder_internals.h"
+#ifdef OPTIONAL_CRON
+#include "ladderlib_cron.h"
+#endif
 
 void ladder_scan_time(ladder_ctx_t *ladder_ctx) {
     uint64_t scanTimeMillis = (*ladder_ctx).hw.time.millis();
@@ -147,6 +150,10 @@ bool ladder_ctx_init(ladder_ctx_t *ladder_ctx, uint8_t net_columns_qty, uint8_t 
     (*ladder_ctx).ladder.quantity.r = qty_r;
     (*ladder_ctx).ladder.quantity.networks = networks_qty;
 
+#ifdef OPTIONAL_CRON
+    (*ladder_ctx).cron = (ladderlib_cron_t*) calloc(1, sizeof(ladderlib_cron_t));
+#endif
+
     return true;
 }
 
@@ -200,6 +207,12 @@ bool ladder_ctx_deinit(ladder_ctx_t *ladder_ctx) {
     free((*ladder_ctx).input);
     free((*ladder_ctx).output);
 
+#ifdef OPTIONAL_CRON
+    if (((ladderlib_cron_t*) (*ladder_ctx).cron)->ctx != NULL)
+        ladderlib_cron_deinit(ladder_ctx);
+    free((*ladder_ctx).cron);
+#endif
+
     return true;
 }
 
@@ -241,8 +254,7 @@ bool ladder_add_write_fn(ladder_ctx_t *ladder_ctx, _io_write write, _io_init wri
         (*ladder_ctx).output = realloc((*ladder_ctx).output, ((*ladder_ctx).hw.io.fn_write_qty + 1) * sizeof(ladder_hw_output_vals_t));
     }
 
-
-    if ((*ladder_ctx).hw.io.write == NULL ||  (*ladder_ctx).hw.io.init_write == NULL)
+    if ((*ladder_ctx).hw.io.write == NULL || (*ladder_ctx).hw.io.init_write == NULL)
         return false;
 
     (*ladder_ctx).output[(*ladder_ctx).hw.io.fn_write_qty].fn_id = (*ladder_ctx).hw.io.fn_write_qty;

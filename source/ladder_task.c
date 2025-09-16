@@ -50,6 +50,7 @@ void ladder_task(void *ladderctx) {
     for (uint32_t n=0;n<(*ladder_ctx).hw.io.fn_write_qty;n++)
             (*ladder_ctx).hw.io.write[n](ladder_ctx, n);
 
+
     // task main loop
     while ((*ladder_ctx).ladder.state != LADDER_ST_EXIT_TSK) {
 

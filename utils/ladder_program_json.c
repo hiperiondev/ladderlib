@@ -30,7 +30,6 @@
  *
  */
 
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
@@ -46,8 +45,7 @@
 #include "ladder.h"
 #include "ladder_program_json.h"
 
-static const char *str_symbol[] = {
-        "NOP",     //
+static const char *str_symbol[] = { "NOP",     //
         "CONN",    //
         "NEG",     //
         "NO",      //
@@ -88,8 +86,7 @@ static const char *str_symbol[] = {
         "occupied" //
         };
 
-static const char *str_types[] = {
-        "NONE",  //
+static const char *str_types[] = { "NONE",  //
         "M",     //
         "Q",     //
         "I",     //
@@ -107,8 +104,7 @@ static const char *str_types[] = {
         "INV",   //
         };
 
-static const char *str_basetime[] = {
-        "MS",    //
+static const char *str_basetime[] = { "MS",    //
         "10MS",  //
         "100MS", //
         "SEC",   //
@@ -400,7 +396,7 @@ ladder_json_error_t ladder_program_to_json(const char *prg, ladder_ctx_t *ladder
                             break;
 
                         default:
-                            snprintf(value_str, sizeof(value_str), "%u", val->value.u32);
+                            snprintf(value_str, sizeof(value_str), "%lu", (long unsigned int) val->value.u32);
                             break;
                     }
 

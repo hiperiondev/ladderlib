@@ -40,9 +40,12 @@
 #include "fn_dummy.h"
 #include "ladder_program_json.h"
 #include "ladder_program_check.h"
+#ifdef OPTIONAL_CRON
+#include "ladderlib_cron.h"
+#endif
 
 // registers quantity
-#define QTY_M  8
+#define QTY_M  18
 #define QTY_C  8
 #define QTY_T  8
 #define QTY_D  8
@@ -87,6 +90,28 @@ int main(void) {
     ladder_ctx.on.end_task = dummy_on_end_task;
     ladder_ctx.hw.time.millis = dummy_millis;
     ladder_ctx.hw.time.delay = dummy_delay;
+
+#ifdef OPTIONAL_CRON
+    if (ladderlib_cron_init(&ladder_ctx, 3) != LADDER_INS_ERR_OK) {
+        printf("ERROR Cron init\n");
+        exit(1);
+    }
+
+    if (ladderlib_cron_add(&ladder_ctx, false, 10, 11, "*/2 * * * * * *") != LADDER_INS_ERR_OK) {
+        printf("ERROR Cron add 1\n");
+        exit(1);
+    }
+
+    if (ladderlib_cron_add(&ladder_ctx, false, 12, 13, "*/10 * * * * * *") != LADDER_INS_ERR_OK) {
+        printf("ERROR Cron add 2\n");
+        exit(1);
+    }
+
+    if (ladderlib_cron_add(&ladder_ctx, false, 14, 15, "0 58 22 * * * *") != LADDER_INS_ERR_OK) {
+        printf("ERROR Cron add 3\n");
+        exit(1);
+    }
+#endif
 
     ladder_ctx.ladder.state = LADDER_ST_RUNNING;
 

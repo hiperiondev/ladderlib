@@ -36,45 +36,48 @@
 #include "ladder.h"
 #include "ladder_instructions.h"
 #include "ladder_internals.h"
+#ifdef OPTIONAL_CRON
+#include "ladderlib_cron.h"
+#endif
 
 static ladder_fn_t const ladder_function[] = { //
-        fn_NOP,     // 00
-        fn_CONN,    // 01
-        fn_NEG,     // 02
-        fn_NO,      // 03
-        fn_NC,      // 04
-        fn_RE,      // 05
-        fn_FE,      // 06
-        fn_COIL,    // 07
-        fn_COILL,   // 08
-        fn_COILU,   // 09
-        fn_TON,     // 10
-        fn_TOF,     // 11
-        fn_TP,      // 12
-        fn_CTU,     // 13
-        fn_CTD,     // 14
-        fn_MOVE,    // 15
-        fn_SUB,     // 16
-        fn_ADD,     // 17
-        fn_MUL,     // 18
-        fn_DIV,     // 19
-        fn_MOD,     // 20
-        fn_SHL,     // 21
-        fn_SHR,     // 22
-        fn_ROL,     // 23
-        fn_ROR,     // 24
-        fn_AND,     // 25
-        fn_OR,      // 26
-        fn_XOR,     // 27
-        fn_NOT,     // 28
-        fn_EQ,      // 29
-        fn_GT,      // 30
-        fn_GE,      // 31
-        fn_LT,      // 32
-        fn_LE,      // 33
-        fn_NE,      // 34
-        fn_FOREIGN, // 35
-        fn_TMOVE,   // 36
+        fn_NOP, // 00
+                fn_CONN, // 01
+                fn_NEG, // 02
+                fn_NO, // 03
+                fn_NC, // 04
+                fn_RE, // 05
+                fn_FE, // 06
+                fn_COIL, // 07
+                fn_COILL, // 08
+                fn_COILU, // 09
+                fn_TON, // 10
+                fn_TOF, // 11
+                fn_TP, // 12
+                fn_CTU, // 13
+                fn_CTD, // 14
+                fn_MOVE, // 15
+                fn_SUB, // 16
+                fn_ADD, // 17
+                fn_MUL, // 18
+                fn_DIV, // 19
+                fn_MOD, // 20
+                fn_SHL, // 21
+                fn_SHR, // 22
+                fn_ROL, // 23
+                fn_ROR, // 24
+                fn_AND, // 25
+                fn_OR, // 26
+                fn_XOR, // 27
+                fn_NOT, // 28
+                fn_EQ, // 29
+                fn_GT, // 30
+                fn_GE, // 31
+                fn_LT, // 32
+                fn_LE, // 33
+                fn_NE, // 34
+                fn_FOREIGN, // 35
+                fn_TMOVE, // 36
         };
 
 ladder_ins_err_t ins_err;
@@ -82,8 +85,17 @@ bool state;
 
 void ladder_scan(ladder_ctx_t *ladder_ctx) {
     ins_err = 0;
+    uint32_t network = 0;
 
-    for (uint32_t network = 0; network < (*ladder_ctx).ladder.quantity.networks; network++) {
+#ifdef OPTIONAL_CRON
+    // evaluate cron for actual time
+    if (ladderlib_cron_eval(ladder_ctx) != LADDER_INS_ERR_OK) {
+        (*ladder_ctx).ladder.state = LADDER_ST_INV;
+        goto exit;
+    }
+#endif
+
+    for (network = 0; network < (*ladder_ctx).ladder.quantity.networks; network++) {
         if (!(*ladder_ctx).network[network].enable)
             continue;
 
@@ -117,15 +129,23 @@ void ladder_scan(ladder_ctx_t *ladder_ctx) {
                     }
 
                     if ((*(*ladder_ctx).exec_network).cells[row][column].vertical_bar)
-                        (*(*ladder_ctx).exec_network).cells[row][column].state =
-                                state | (row == 0 ? 0 : (*(*ladder_ctx).exec_network).cells[row - 1][column].state);
+                        (*(*ladder_ctx).exec_network).cells[row][column].state = state
+                                | (row == 0 ? 0 : (*(*ladder_ctx).exec_network).cells[row - 1][column].state);
                 }
 
-                if((*ladder_ctx).on.instruction != NULL)
+                if ((*ladder_ctx).on.instruction != NULL)
                     (*ladder_ctx).on.instruction(ladder_ctx);
             }
         }
 
+#ifdef OPTIONAL_CRON
+        // clean auto reset cron registers
+        for (uint32_t n = 0; n < ((ladderlib_cron_t*) (*ladder_ctx).cron)->used; n++)
+            if (((ladderlib_cron_t*) (*ladder_ctx).cron)->ctx[n].enabled && ((ladderlib_cron_t*) (*ladder_ctx).cron)->ctx[n].auto_reset)
+                (*ladder_ctx).memory.M[((ladderlib_cron_t*) (*ladder_ctx).cron)->ctx[n].flag_reg] = false;
+
+        exit:
+#endif
         if ((*ladder_ctx).on.scan_end != NULL)
             (*ladder_ctx).on.scan_end(ladder_ctx);
     }

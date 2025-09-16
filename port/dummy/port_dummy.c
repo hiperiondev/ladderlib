@@ -49,64 +49,61 @@
 #define DUMMY_QTY_IW 8
 #define DUMMY_QTY_QW 8
 
-static const char *_ladder_status_str[] = {
-        "STOPPED",  //
-        "RUNNING",  //
-        "ERROR",    //
+static const char *_ladder_status_str[] = { "STOPPED", //
+        "RUNNING", //
+        "ERROR", //
         "EXIT_TSK", //
-        "NULLFN",   //
-        "INVALID",  //
+        "NULLFN", //
+        "INVALID", //
         };
 
-static const char *_fn_str[] = {
-        "NOP",     //
-        "CONN",    //
-        "NEG",     //
-        "NO",      //
-        "NC",      //
-        "RE",      //
-        "FE",      //
-        "COIL",    //
-        "COILL",   //
-        "COILU",   //
-        "TON",     //
-        "TOF",     //
-        "TP",      //
-        "CTU",     //
-        "CTD",     //
-        "MOVE",    //
-        "SUB",     //
-        "ADD",     //
-        "MUL",     //
-        "DIV",     //
-        "MOD",     //
-        "SHL",     //
-        "SHR",     //
-        "ROL",     //
-        "ROR",     //
-        "AND",     //
-        "OR",      //
-        "XOR",     //
-        "NOT",     //
-        "EQ",      //
-        "GT",      //
-        "GE",      //
-        "LT",      //
-        "LE",      //
-        "NE",      //
+static const char *_fn_str[] = { "NOP", //
+        "CONN", //
+        "NEG", //
+        "NO", //
+        "NC", //
+        "RE", //
+        "FE", //
+        "COIL", //
+        "COILL", //
+        "COILU", //
+        "TON", //
+        "TOF", //
+        "TP", //
+        "CTU", //
+        "CTD", //
+        "MOVE", //
+        "SUB", //
+        "ADD", //
+        "MUL", //
+        "DIV", //
+        "MOD", //
+        "SHL", //
+        "SHR", //
+        "ROL", //
+        "ROR", //
+        "AND", //
+        "OR", //
+        "XOR", //
+        "NOT", //
+        "EQ", //
+        "GT", //
+        "GE", //
+        "LT", //
+        "LE", //
+        "NE", //
         "FOREIGN", //
-        "TMOVE",   //
+        "TMOVE", //
         };
 
-static const char *_fn_err_str[] = {
-        "OK",         //
+static const char *_fn_err_str[] = { "OK", //
         "GETPREVVAL", //
         "GETDATAVAL", //
-        "NOFOREIGN",  //
-        "NOTABLE",    //
+        "NOFOREIGN", //
+        "NOTABLE", //
         "OUTOFRANGE", //
         // [...] //
-        "FAIL",       //
+        "FAIL", //
         };
 
 void dummy_delay(long msec) {
@@ -160,11 +157,11 @@ void dummy_read(ladder_ctx_t *ladder_ctx, uint32_t id) {
         (*ladder_ctx).input[id].I[ch - 48] = (*ladder_ctx).input[id].I[ch - 48] > 0 ? 0 : 1;
 
     printf("[scan time: %lu ms]                                                               \n", (*ladder_ctx).scan_internals.actual_scan_time);
-    printf("Toggle I: 0-7  (Q: exit) (fn: %d)                                                                                                     \n", id);
+    printf("Toggle I: 0-7  (q: exit) (fn: %d)                                                                                                     \n", id);
     printf("-----------------------                                                           \n");
 
-    printf("I0.0-I0.1-I0.2-I0.3-I0.4-I0.5-I0.6-I0.7                              \n");
-    printf("%04d-%04d-%04d-%04d-%04d-%04d-%04d-%04d                              \n", (*ladder_ctx).input[id].I[0], (*ladder_ctx).input[id].I[1],
+    printf("I0.0|I0.1|I0.2|I0.3|I0.4|I0.5|I0.6|I0.7                              \n");
+    printf("%04d|%04d|%04d|%04d|%04d|%04d|%04d|%04d                              \n", (*ladder_ctx).input[id].I[0], (*ladder_ctx).input[id].I[1],
             (*ladder_ctx).input[id].I[2], (*ladder_ctx).input[id].I[3], (*ladder_ctx).input[id].I[4], (*ladder_ctx).input[id].I[5],
             (*ladder_ctx).input[id].I[6], (*ladder_ctx).input[id].I[7]);
     printf("                                                     \n");
@@ -173,16 +170,24 @@ void dummy_read(ladder_ctx_t *ladder_ctx, uint32_t id) {
 void dummy_write(ladder_ctx_t *ladder_ctx, uint32_t id) {
     uint32_t rets = 0;
 
-    printf("                                                                                                                      \n");
-    printf("M0-M1-M2-M3-M4-M5-M6-M7                                \n");
-    printf("%02d-%02d-%02d-%02d-%02d-%02d-%02d-%02d                              \n", (*ladder_ctx).memory.M[0], (*ladder_ctx).memory.M[1],
+    printf("M0|M1|M2|M3|M4|M5|M6|M7                                \n");
+    printf("%02d|%02d|%02d|%02d|%02d|%02d|%02d|%02d                              \n", (*ladder_ctx).memory.M[0], (*ladder_ctx).memory.M[1],
             (*ladder_ctx).memory.M[2], (*ladder_ctx).memory.M[3], (*ladder_ctx).memory.M[4], (*ladder_ctx).memory.M[5], (*ladder_ctx).memory.M[6],
             (*ladder_ctx).memory.M[7]);
 
     printf("                                                     \n");
 
-    printf("Q0.0-Q0.1-Q0.2-Q0.3-Q0.4-Q0.5-Q0.6-Q0.7                                \n");
-    printf("%04d-%04d-%04d-%04d-%04d-%04d-%04d-%04d                                \n", (*ladder_ctx).output[id].Q[0], (*ladder_ctx).output[id].Q[1],
+#ifdef OPTIONAL_CRON
+    printf("M10|M11|M12|M13|M14|M15|M16|M17                                \n");
+    printf("%02d |%02d |%02d |%02d |%02d |%02d |%02d |%02d                              \n", (*ladder_ctx).memory.M[10], (*ladder_ctx).memory.M[11],
+            (*ladder_ctx).memory.M[12], (*ladder_ctx).memory.M[13], (*ladder_ctx).memory.M[14], (*ladder_ctx).memory.M[15], (*ladder_ctx).memory.M[16],
+            (*ladder_ctx).memory.M[17]);
+
+    printf("                                                     \n");
+#endif
+
+    printf("Q0.0|Q0.1|Q0.2|Q0.3|Q0.4|Q0.5|Q0.6|Q0.7                                \n");
+    printf("%04d|%04d|%04d|%04d|%04d|%04d|%04d|%04d                                \n", (*ladder_ctx).output[id].Q[0], (*ladder_ctx).output[id].Q[1],
             (*ladder_ctx).output[id].Q[2], (*ladder_ctx).output[id].Q[3], (*ladder_ctx).output[id].Q[4], (*ladder_ctx).output[id].Q[5],
             (*ladder_ctx).output[id].Q[6], (*ladder_ctx).output[id].Q[7]);
 
@@ -229,8 +234,11 @@ void dummy_write(ladder_ctx_t *ladder_ctx, uint32_t id) {
     }
 
     // data
-    printf("\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A"
+    printf("\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A"
             "\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A\033[A");
+#ifdef OPTIONAL_CRON
+    printf("\033[A\033[A\033[A");
+#endif
 
     //networks
     for (uint32_t n = 0; n < rets; n++)
@@ -295,7 +303,7 @@ bool dummy_init_read(ladder_ctx_t *ladder_ctx, uint32_t id, bool init) {
 }
 
 bool dummy_init_write(ladder_ctx_t *ladder_ctx, uint32_t id, bool init) {
-    if(init) {
+    if (init) {
         (*ladder_ctx).output[id].Q = calloc(DUMMY_QTY_Q, sizeof(uint8_t));
         (*ladder_ctx).output[id].QW = calloc(DUMMY_QTY_QW, sizeof(int32_t));
         (*ladder_ctx).output[id].Qh = calloc(DUMMY_QTY_Q, sizeof(uint8_t));

@@ -40,8 +40,7 @@
 static uint32_t basetime_factor[] = { 1, 10, 100, 1000, 60000 };
 static uint8_t error;
 
-const ladder_instructions_iocd_t ladder_fn_iocd[] = {
-        { 1, 1, 1, 0 }, // NOP
+const ladder_instructions_iocd_t ladder_fn_iocd[] = { { 1, 1, 1, 0 }, // NOP
         { 1, 1, 1, 0 }, // CONN
         { 1, 1, 1, 1 }, // NEG
         { 1, 1, 1, 1 }, // NO
@@ -119,8 +118,9 @@ ladder_ins_err_t fn_RE(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row) 
 
 ladder_ins_err_t fn_FE(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row) {
     CELL_STATE(ladder_ctx, column, row) =
-            MAKE_BOOL(
-                    !ladder_get_data_value(ladder_ctx, row, column, 0) && ladder_get_previous_value(ladder_ctx, row, column, 0)) && CELL_STATE_LEFT(ladder_ctx, column, row);
+    MAKE_BOOL(
+            !ladder_get_data_value(ladder_ctx, row, column, 0)
+            && ladder_get_previous_value(ladder_ctx, row, column, 0)) && CELL_STATE_LEFT(ladder_ctx, column, row);
 
     return LADDER_INS_ERR_OK;
 }
@@ -568,40 +568,35 @@ ladder_ins_err_t fn_EQ(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row) 
 
 ladder_ins_err_t fn_GT(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row) {
     CELL_STATE(ladder_ctx, column, row) =
-            CELL_STATE_LEFT(ladder_ctx, column, row) ?
-                    (ladder_get_data_value(ladder_ctx, row, column, 0) > ladder_get_data_value(ladder_ctx, row, column, 1)) : false;
+    CELL_STATE_LEFT(ladder_ctx, column, row) ? (ladder_get_data_value(ladder_ctx, row, column, 0) > ladder_get_data_value(ladder_ctx, row, column, 1)) : false;
 
     return LADDER_INS_ERR_OK;
 }
 
 ladder_ins_err_t fn_GE(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row) {
     CELL_STATE(ladder_ctx, column, row) =
-            CELL_STATE_LEFT(ladder_ctx, column, row) ?
-                    (ladder_get_data_value(ladder_ctx, row, column, 0) >= ladder_get_data_value(ladder_ctx, row, column, 1)) : false;
+    CELL_STATE_LEFT(ladder_ctx, column, row) ? (ladder_get_data_value(ladder_ctx, row, column, 0) >= ladder_get_data_value(ladder_ctx, row, column, 1)) : false;
 
     return LADDER_INS_ERR_OK;
 }
 
 ladder_ins_err_t fn_LT(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row) {
     CELL_STATE(ladder_ctx, column, row) =
-            CELL_STATE_LEFT(ladder_ctx, column, row) ?
-                    (ladder_get_data_value(ladder_ctx, row, column, 0) < ladder_get_data_value(ladder_ctx, row, column, 1)) : false;
+    CELL_STATE_LEFT(ladder_ctx, column, row) ? (ladder_get_data_value(ladder_ctx, row, column, 0) < ladder_get_data_value(ladder_ctx, row, column, 1)) : false;
 
     return LADDER_INS_ERR_OK;
 }
 
 ladder_ins_err_t fn_LE(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row) {
     CELL_STATE(ladder_ctx, column, row) =
-            CELL_STATE_LEFT(ladder_ctx, column, row) ?
-                    (ladder_get_data_value(ladder_ctx, row, column, 0) <= ladder_get_data_value(ladder_ctx, row, column, 1)) : false;
+    CELL_STATE_LEFT(ladder_ctx, column, row) ? (ladder_get_data_value(ladder_ctx, row, column, 0) <= ladder_get_data_value(ladder_ctx, row, column, 1)) : false;
 
     return LADDER_INS_ERR_OK;
 }
 
 ladder_ins_err_t fn_NE(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row) {
     CELL_STATE(ladder_ctx, column, row) =
-            CELL_STATE_LEFT(ladder_ctx, column, row) ?
-                    (ladder_get_data_value(ladder_ctx, row, column, 0) != ladder_get_data_value(ladder_ctx, row, column, 1)) : false;
+    CELL_STATE_LEFT(ladder_ctx, column, row) ? (ladder_get_data_value(ladder_ctx, row, column, 0) != ladder_get_data_value(ladder_ctx, row, column, 1)) : false;
 
     return LADDER_INS_ERR_OK;
 }

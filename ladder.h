@@ -60,6 +60,13 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
+ * @def OPTIONAL_CRON
+ * @brief Include CRON
+ *
+ */
+#define OPTIONAL_CRON 1
+
+/**
  * @def LADDER_VERTICAL_BAR
  * @brief Point to vertical bar flag
  *
@@ -587,6 +594,9 @@ typedef struct ladder_ctx_s {
            ladder_network_t *network;       /**< Networks */
            ladder_network_t *exec_network;  /**< Network in execution */
            ladder_foreign_t foreign;        /**< Foreign functions */
+           #ifdef OPTIONAL_CRON
+                      void *cron;           /*< Cron list */
+           #endif
 } ladder_ctx_t;
 
 /**
