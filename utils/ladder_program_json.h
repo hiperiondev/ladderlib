@@ -89,5 +89,6 @@ ladder_json_error_t ladder_program_to_json(const char *prg, ladder_ctx_t *ladder
  */
 ladder_json_error_t ladder_compact_json_file(const char *input_path, const char *output_path);
 
+bool ladder_validate_json_file(const char *json_file, const char *schema_file);
 
 #endif /* LADDER_PROGRAM_PARSER_H */

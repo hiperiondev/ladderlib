@@ -1,0 +1,663 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "integer"
+      },
+      "rows": {
+        "type": "integer"
+      },
+      "cols": {
+        "type": "integer"
+      },
+      "networkData": {
+        "type": "array",
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "symbol": {
+                "type": "string",
+                "enum": [
+                  "CONN",
+                  "NEG",
+                  "NO",
+                  "NC",
+                  "RE",
+                  "FE",
+                  "COIL",
+                  "COILL",
+                  "TON",
+                  "TOF",
+                  "TP",
+                  "CTU",
+                  "occupied",
+                  "NOP",
+                  "CTD",
+                  "MOV",
+                  "SUB",
+                  "ADD",
+                  "MUL",
+                  "NE",
+                  "TMOV",
+                  "DIV",
+                  "MOD",
+                  "SHL",
+                  "SHR",
+                  "ROL",
+                  "ROR",
+                  "AND",
+                  "OR",
+                  "XOR",
+                  "NOT",
+                  "EQ",
+                  "GT",
+                  "GE",
+                  "LT",
+                  "LE",
+                  "COILU"
+                ]
+              },
+              "bar": {
+                "type": "boolean"
+              },
+              "data": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string",
+                      "enum": [
+                        "I",
+                        "M",
+                        "T",
+                        "MS",
+                        "C",
+                        "D",
+                        "NONE",
+                        "Q",
+                        "SEC",
+                        "10MS",
+                        "100MS",
+                        "MIN"
+                      ]
+                    },
+                    "value": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "type",
+                    "value"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            },
+            "required": [
+              "symbol",
+              "bar",
+              "data"
+            ],
+            "additionalProperties": false,
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "symbol": {
+                      "enum": [
+                        "CONN",
+                        "occupied",
+                        "NOP"
+                      ]
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "data": {
+                      "minItems": 0,
+                      "maxItems": 0
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "symbol": {
+                      "enum": [
+                        "NO",
+                        "NC",
+                        "RE",
+                        "FE"
+                      ]
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "data": {
+                      "minItems": 1,
+                      "maxItems": 1,
+                      "items": [
+                        {
+                          "properties": {
+                            "name": {
+                              "const": "value"
+                            },
+                            "type": {
+                              "enum": [
+                                "I",
+                                "M",
+                                "Q"
+                              ]
+                            },
+                            "value": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "symbol": {
+                      "enum": [
+                        "COIL",
+                        "COILL",
+                        "COILU"
+                      ]
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "data": {
+                      "minItems": 1,
+                      "maxItems": 1,
+                      "items": [
+                        {
+                          "properties": {
+                            "name": {
+                              "const": "value"
+                            },
+                            "type": {
+                              "enum": [
+                                "M",
+                                "Q"
+                              ]
+                            },
+                            "value": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "symbol": {
+                      "enum": [
+                        "TON",
+                        "TOF",
+                        "TP"
+                      ]
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "data": {
+                      "minItems": 2,
+                      "maxItems": 2,
+                      "items": [
+                        {
+                          "properties": {
+                            "name": {
+                              "const": "timer"
+                            },
+                            "type": {
+                              "const": "T"
+                            },
+                            "value": {
+                              "type": "string"
+                            }
+                          }
+                        },
+                        {
+                          "properties": {
+                            "name": {
+                              "const": "basetime"
+                            },
+                            "type": {
+                              "enum": [
+                                "MS",
+                                "10MS",
+                                "100MS",
+                                "SEC",
+                                "MIN"
+                              ]
+                            },
+                            "value": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "symbol": {
+                      "enum": [
+                        "CTU",
+                        "CTD"
+                      ]
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "data": {
+                      "minItems": 2,
+                      "maxItems": 2,
+                      "items": [
+                        {
+                          "properties": {
+                            "name": {
+                              "const": "counter"
+                            },
+                            "type": {
+                              "const": "C"
+                            },
+                            "value": {
+                              "type": "string"
+                            }
+                          }
+                        },
+                        {
+                          "properties": {
+                            "name": {
+                              "const": "preset value"
+                            },
+                            "type": {
+                              "const": "NONE"
+                            },
+                            "value": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "symbol": {
+                      "const": "MOV"
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "data": {
+                      "minItems": 2,
+                      "maxItems": 2,
+                      "items": [
+                        {
+                          "properties": {
+                            "name": {
+                              "const": "from"
+                            },
+                            "type": {
+                              "const": "D"
+                            },
+                            "value": {
+                              "type": "string"
+                            }
+                          }
+                        },
+                        {
+                          "properties": {
+                            "name": {
+                              "const": "to"
+                            },
+                            "type": {
+                              "const": "D"
+                            },
+                            "value": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "symbol": {
+                      "enum": [
+                        "ADD",
+                        "SUB",
+                        "MUL",
+                        "DIV",
+                        "MOD",
+                        "AND",
+                        "OR",
+                        "XOR"
+                      ]
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "data": {
+                      "minItems": 3,
+                      "maxItems": 3,
+                      "items": [
+                        {
+                          "properties": {
+                            "name": {
+                              "const": "value1"
+                            },
+                            "type": {
+                              "const": "D"
+                            },
+                            "value": {
+                              "type": "string"
+                            }
+                          }
+                        },
+                        {
+                          "properties": {
+                            "name": {
+                              "const": "value2"
+                            },
+                            "type": {
+                              "const": "D"
+                            },
+                            "value": {
+                              "type": "string"
+                            }
+                          }
+                        },
+                        {
+                          "properties": {
+                            "name": {
+                              "const": "result"
+                            },
+                            "type": {
+                              "const": "D"
+                            },
+                            "value": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "symbol": {
+                      "enum": [
+                        "EQ",
+                        "NE",
+                        "GT",
+                        "GE",
+                        "LT",
+                        "LE"
+                      ]
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "data": {
+                      "minItems": 2,
+                      "maxItems": 2,
+                      "items": [
+                        {
+                          "properties": {
+                            "name": {
+                              "const": "value1"
+                            },
+                            "type": {
+                              "const": "D"
+                            },
+                            "value": {
+                              "type": "string"
+                            }
+                          }
+                        },
+                        {
+                          "properties": {
+                            "name": {
+                              "const": "value2"
+                            },
+                            "type": {
+                              "const": "D"
+                            },
+                            "value": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "symbol": {
+                      "const": "TMOV"
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "data": {
+                      "minItems": 3,
+                      "maxItems": 3,
+                      "items": [
+                        {
+                          "properties": {
+                            "name": {
+                              "const": "value1"
+                            },
+                            "type": {
+                              "const": "D"
+                            },
+                            "value": {
+                              "type": "string"
+                            }
+                          }
+                        },
+                        {
+                          "properties": {
+                            "name": {
+                              "const": "value2"
+                            },
+                            "type": {
+                              "const": "D"
+                            },
+                            "value": {
+                              "type": "string"
+                            }
+                          }
+                        },
+                        {
+                          "properties": {
+                            "name": {
+                              "const": "to"
+                            },
+                            "type": {
+                              "const": "D"
+                            },
+                            "value": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "symbol": {
+                      "enum": [
+                        "NOT",
+                        "NEG"
+                      ]
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "data": {
+                      "minItems": 2,
+                      "maxItems": 2,
+                      "items": [
+                        {
+                          "properties": {
+                            "name": {
+                              "const": "value"
+                            },
+                            "type": {
+                              "const": "D"
+                            },
+                            "value": {
+                              "type": "string"
+                            }
+                          }
+                        },
+                        {
+                          "properties": {
+                            "name": {
+                              "const": "result"
+                            },
+                            "type": {
+                              "const": "D"
+                            },
+                            "value": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "symbol": {
+                      "enum": [
+                        "SHL",
+                        "SHR",
+                        "ROL",
+                        "ROR"
+                      ]
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "data": {
+                      "minItems": 3,
+                      "maxItems": 3,
+                      "items": [
+                        {
+                          "properties": {
+                            "name": {
+                              "const": "value"
+                            },
+                            "type": {
+                              "const": "D"
+                            },
+                            "value": {
+                              "type": "string"
+                            }
+                          }
+                        },
+                        {
+                          "properties": {
+                            "name": {
+                              "const": "n"
+                            },
+                            "type": {
+                              "const": "D"
+                            },
+                            "value": {
+                              "type": "string"
+                            }
+                          }
+                        },
+                        {
+                          "properties": {
+                            "name": {
+                              "const": "result"
+                            },
+                            "type": {
+                              "const": "D"
+                            },
+                            "value": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    "required": [
+      "id",
+      "rows",
+      "cols",
+      "networkData"
+    ],
+    "additionalProperties": false
+  }
+}

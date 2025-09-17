@@ -45,70 +45,70 @@
 #include "ladder.h"
 #include "ladder_program_json.h"
 
-static const char *str_symbol[] = { "NOP",     //
-        "CONN",    //
-        "NEG",     //
-        "NO",      //
-        "NC",      //
-        "RE",      //
-        "FE",      //
-        "COIL",    //
-        "COILL",   //
-        "COILU",   //
-        "TON",     //
-        "TOFF",    //
-        "TP",      //
-        "CTU",     //
-        "CTD",     //
-        "MOV",     //
-        "SUB",     //
-        "ADD",     //
-        "MUL",     //
-        "DIV",     //
-        "MOD",     //
-        "SHL",     //
-        "SHR",     //
-        "ROL",     //
-        "ROR",     //
-        "AND",     //
-        "OR",      //
-        "XOR",     //
-        "NOT",     //
-        "EQ",      //
-        "GT",      //
-        "GE",      //
-        "LT",      //
-        "LE",      //
-        "NE",      //
+static const char *str_symbol[] = { "NOP", //
+        "CONN", //
+        "NEG", //
+        "NO", //
+        "NC", //
+        "RE", //
+        "FE", //
+        "COIL", //
+        "COILL", //
+        "COILU", //
+        "TON", //
+        "TOFF", //
+        "TP", //
+        "CTU", //
+        "CTD", //
+        "MOV", //
+        "SUB", //
+        "ADD", //
+        "MUL", //
+        "DIV", //
+        "MOD", //
+        "SHL", //
+        "SHR", //
+        "ROL", //
+        "ROR", //
+        "AND", //
+        "OR", //
+        "XOR", //
+        "NOT", //
+        "EQ", //
+        "GT", //
+        "GE", //
+        "LT", //
+        "LE", //
+        "NE", //
         "FOREIGN", //
-        "TMOV",    //
-        "INV",     //
+        "TMOV", //
+        "INV", //
         "occupied" //
         };
 
-static const char *str_types[] = { "NONE",  //
-        "M",     //
-        "Q",     //
-        "I",     //
-        "Cd",    //
-        "Cr",    //
-        "Td",    //
-        "Tr",    //
-        "IW",    //
-        "QW",    //
-        "C",     //
-        "T",     //
-        "D",     //
-        "CSTR",  //
-        "REAL",  //
-        "INV",   //
+static const char *str_types[] = { "NONE", //
+        "M", //
+        "Q", //
+        "I", //
+        "Cd", //
+        "Cr", //
+        "Td", //
+        "Tr", //
+        "IW", //
+        "QW", //
+        "C", //
+        "T", //
+        "D", //
+        "CSTR", //
+        "REAL", //
+        "INV", //
         };
 
-static const char *str_basetime[] = { "MS",    //
-        "10MS",  //
+static const char *str_basetime[] = { "MS", //
+        "10MS", //
         "100MS", //
-        "SEC",   //
-        "MIN"    //
+        "SEC", //
+        "MIN" //
         };
 
 static bool parse_module_port(const char *str, moduleport_t *result) {
@@ -169,6 +169,344 @@ static int write_file(const char *path, const char *content) {
     fprintf(file, "%s", content);
     fclose(file);
     return 1;
+}
+
+static bool validate_json(cJSON *json, cJSON *schema) {
+    if (cJSON_IsBool(schema)) {
+        return cJSON_IsTrue(schema);
+    }
+
+    if (!cJSON_IsObject(schema)) {
+        return false; // Invalid schema
+    }
+
+    // Handle if-then
+    cJSON *if_schema = cJSON_GetObjectItemCaseSensitive(schema, "if");
+    cJSON *then_schema = cJSON_GetObjectItemCaseSensitive(schema, "then");
+    if (if_schema && then_schema) {
+        if (validate_json(json, if_schema)) {
+            return validate_json(json, then_schema);
+        } else {
+            return true;
+        }
+    }
+
+    // Handle allOf
+    cJSON *allOf = cJSON_GetObjectItemCaseSensitive(schema, "allOf");
+    if (allOf && cJSON_IsArray(allOf)) {
+        cJSON *sub = allOf->child;
+        while (sub) {
+            if (!validate_json(json, sub)) {
+                return false;
+            }
+            sub = sub->next;
+        }
+    }
+
+    // Get type
+    cJSON *type = cJSON_GetObjectItemCaseSensitive(schema, "type");
+    const char *typestr = NULL;
+    if (type && cJSON_IsString(type)) {
+        typestr = type->valuestring;
+    }
+
+    // Check type if specified
+    bool type_ok = true;
+    if (typestr) {
+        if (strcmp(typestr, "null") == 0) {
+            type_ok = cJSON_IsNull(json);
+        } else if (strcmp(typestr, "boolean") == 0) {
+            type_ok = cJSON_IsBool(json);
+        } else if (strcmp(typestr, "number") == 0) {
+            type_ok = cJSON_IsNumber(json);
+        } else if (strcmp(typestr, "integer") == 0) {
+            type_ok = cJSON_IsNumber(json) && (json->valuedouble == (double) ((int) json->valuedouble));
+        } else if (strcmp(typestr, "string") == 0) {
+            type_ok = cJSON_IsString(json);
+        } else if (strcmp(typestr, "array") == 0) {
+            type_ok = cJSON_IsArray(json);
+        } else if (strcmp(typestr, "object") == 0) {
+            type_ok = cJSON_IsObject(json);
+        } else {
+            type_ok = false;
+        }
+    }
+    if (!type_ok) {
+        return false;
+    }
+
+    // General keywords: enum, const
+    cJSON *enum_arr = cJSON_GetObjectItemCaseSensitive(schema, "enum");
+    if (enum_arr && cJSON_IsArray(enum_arr)) {
+        bool found = false;
+        cJSON *e = enum_arr->child;
+        while (e) {
+            if (cJSON_Compare(json, e, 1)) {
+                found = true;
+                break;
+            }
+            e = e->next;
+        }
+        if (!found) {
+            return false;
+        }
+    }
+
+    cJSON *const_val = cJSON_GetObjectItemCaseSensitive(schema, "const");
+    if (const_val) {
+        if (!cJSON_Compare(json, const_val, 1)) {
+            return false;
+        }
+    }
+
+    // Type-specific or general validations
+    if (typestr && (strcmp(typestr, "number") == 0 || strcmp(typestr, "integer") == 0)) {
+        cJSON *min = cJSON_GetObjectItemCaseSensitive(schema, "minimum");
+        if (min && cJSON_IsNumber(min) && json->valuedouble < min->valuedouble) {
+            return false;
+        }
+        cJSON *max = cJSON_GetObjectItemCaseSensitive(schema, "maximum");
+        if (max && cJSON_IsNumber(max) && json->valuedouble > max->valuedouble) {
+            return false;
+        }
+    }
+
+    if (typestr && strcmp(typestr, "string") == 0) {
+        cJSON *minlen = cJSON_GetObjectItemCaseSensitive(schema, "minLength");
+        if (minlen && cJSON_IsNumber(minlen) && strlen(json->valuestring) < (size_t) minlen->valueint) {
+            return false;
+        }
+        cJSON *maxlen = cJSON_GetObjectItemCaseSensitive(schema, "maxLength");
+        if (maxlen && cJSON_IsNumber(maxlen) && strlen(json->valuestring) > (size_t) maxlen->valueint) {
+            return false;
+        }
+    }
+
+    if (typestr && strcmp(typestr, "array") == 0) {
+        cJSON *items = cJSON_GetObjectItemCaseSensitive(schema, "items");
+        if (items) {
+            if (cJSON_IsArray(items)) {
+                // Tuple validation
+                int schema_size = cJSON_GetArraySize(items);
+                int json_size = cJSON_GetArraySize(json);
+                for (int i = 0; i < schema_size; ++i) {
+                    if (i >= json_size) {
+                        break;
+                    }
+                    cJSON *item_schema = cJSON_GetArrayItem(items, i);
+                    cJSON *item_json = cJSON_GetArrayItem(json, i);
+                    if (!validate_json(item_json, item_schema)) {
+                        return false;
+                    }
+                }
+                // additionalItems
+                cJSON *additems = cJSON_GetObjectItemCaseSensitive(schema, "additionalItems");
+                bool allow_add = true;
+                if (additems && cJSON_IsFalse(additems)) {
+                    allow_add = false;
+                }
+                if (!allow_add && json_size > schema_size) {
+                    return false;
+                }
+            } else {
+                // Uniform items
+                cJSON *item = json->child;
+                while (item) {
+                    if (!validate_json(item, items)) {
+                        return false;
+                    }
+                    item = item->next;
+                }
+            }
+        }
+        cJSON *minitems = cJSON_GetObjectItemCaseSensitive(schema, "minItems");
+        if (minitems && cJSON_IsNumber(minitems) && cJSON_GetArraySize(json) < minitems->valueint) {
+            return false;
+        }
+        cJSON *maxitems = cJSON_GetObjectItemCaseSensitive(schema, "maxItems");
+        if (maxitems && cJSON_IsNumber(maxitems) && cJSON_GetArraySize(json) > maxitems->valueint) {
+            return false;
+        }
+    }
+
+    if (typestr && strcmp(typestr, "object") == 0) {
+        cJSON *props = cJSON_GetObjectItemCaseSensitive(schema, "properties");
+        if (props && cJSON_IsObject(props)) {
+            cJSON *prop = props->child;
+            while (prop) {
+                const char *key = prop->string;
+                cJSON *subjson = cJSON_GetObjectItemCaseSensitive(json, key);
+                bool is_required = false;
+                cJSON *required = cJSON_GetObjectItemCaseSensitive(schema, "required");
+                if (required && cJSON_IsArray(required)) {
+                    cJSON *req_item = required->child;
+                    while (req_item) {
+                        if (cJSON_IsString(req_item) && strcmp(req_item->valuestring, key) == 0) {
+                            is_required = true;
+                            break;
+                        }
+                        req_item = req_item->next;
+                    }
+                }
+                if (!subjson) {
+                    if (is_required) {
+                        return false;
+                    }
+                    prop = prop->next;
+                    continue;
+                }
+                if (!validate_json(subjson, prop)) {
+                    return false;
+                }
+                prop = prop->next;
+            }
+        }
+        // additionalProperties
+        cJSON *addprops = cJSON_GetObjectItemCaseSensitive(schema, "additionalProperties");
+        bool allow_additional = true;
+        if (addprops && cJSON_IsFalse(addprops)) {
+            allow_additional = false;
+        }
+        if (!allow_additional && cJSON_IsObject(json)) {
+            cJSON *json_prop = json->child;
+            while (json_prop) {
+                const char *key = json_prop->string;
+                if (!props || !cJSON_HasObjectItem(props, key)) {
+                    return false;
+                }
+                json_prop = json_prop->next;
+            }
+        }
+    }
+
+    if (!typestr) {
+        // No type specified, apply relevant keywords based on json type
+        // enum and const already handled above
+
+        // Number keywords
+        if (cJSON_IsNumber(json)) {
+            cJSON *min = cJSON_GetObjectItemCaseSensitive(schema, "minimum");
+            if (min && cJSON_IsNumber(min) && json->valuedouble < min->valuedouble) {
+                return false;
+            }
+            cJSON *max = cJSON_GetObjectItemCaseSensitive(schema, "maximum");
+            if (max && cJSON_IsNumber(max) && json->valuedouble > max->valuedouble) {
+                return false;
+            }
+        }
+
+        // String keywords
+        if (cJSON_IsString(json)) {
+            cJSON *minlen = cJSON_GetObjectItemCaseSensitive(schema, "minLength");
+            if (minlen && cJSON_IsNumber(minlen) && strlen(json->valuestring) < (size_t) minlen->valueint) {
+                return false;
+            }
+            cJSON *maxlen = cJSON_GetObjectItemCaseSensitive(schema, "maxLength");
+            if (maxlen && cJSON_IsNumber(maxlen) && strlen(json->valuestring) > (size_t) maxlen->valueint) {
+                return false;
+            }
+        }
+
+        // Array keywords
+        if (cJSON_IsArray(json)) {
+            cJSON *items = cJSON_GetObjectItemCaseSensitive(schema, "items");
+            if (items) {
+                if (cJSON_IsArray(items)) {
+                    // Tuple
+                    int schema_size = cJSON_GetArraySize(items);
+                    int json_size = cJSON_GetArraySize(json);
+                    for (int i = 0; i < schema_size; ++i) {
+                        if (i >= json_size) {
+                            break;
+                        }
+                        cJSON *item_schema = cJSON_GetArrayItem(items, i);
+                        cJSON *item_json = cJSON_GetArrayItem(json, i);
+                        if (!validate_json(item_json, item_schema)) {
+                            return false;
+                        }
+                    }
+                    cJSON *additems = cJSON_GetObjectItemCaseSensitive(schema, "additionalItems");
+                    bool allow_add = true;
+                    if (additems && cJSON_IsFalse(additems)) {
+                        allow_add = false;
+                    }
+                    if (!allow_add && json_size > schema_size) {
+                        return false;
+                    }
+                } else {
+                    // Uniform
+                    cJSON *item = json->child;
+                    while (item) {
+                        if (!validate_json(item, items)) {
+                            return false;
+                        }
+                        item = item->next;
+                    }
+                }
+            }
+            cJSON *minitems = cJSON_GetObjectItemCaseSensitive(schema, "minItems");
+            if (minitems && cJSON_IsNumber(minitems) && cJSON_GetArraySize(json) < minitems->valueint) {
+                return false;
+            }
+            cJSON *maxitems = cJSON_GetObjectItemCaseSensitive(schema, "maxItems");
+            if (maxitems && cJSON_IsNumber(maxitems) && cJSON_GetArraySize(json) > maxitems->valueint) {
+                return false;
+            }
+        }
+
+        // Object keywords
+        if (cJSON_IsObject(json)) {
+            cJSON *props = cJSON_GetObjectItemCaseSensitive(schema, "properties");
+            if (props && cJSON_IsObject(props)) {
+                cJSON *prop = props->child;
+                while (prop) {
+                    const char *key = prop->string;
+                    cJSON *subjson = cJSON_GetObjectItemCaseSensitive(json, key);
+                    bool is_required = false;
+                    cJSON *required = cJSON_GetObjectItemCaseSensitive(schema, "required");
+                    if (required && cJSON_IsArray(required)) {
+                        cJSON *req_item = required->child;
+                        while (req_item) {
+                            if (cJSON_IsString(req_item) && strcmp(req_item->valuestring, key) == 0) {
+                                is_required = true;
+                                break;
+                            }
+                            req_item = req_item->next;
+                        }
+                    }
+                    if (!subjson) {
+                        if (is_required) {
+                            return false;
+                        }
+                        prop = prop->next;
+                        continue;
+                    }
+                    if (!validate_json(subjson, prop)) {
+                        return false;
+                    }
+                    prop = prop->next;
+                }
+            }
+            // additionalProperties
+            cJSON *addprops = cJSON_GetObjectItemCaseSensitive(schema, "additionalProperties");
+            bool allow_additional = true;
+            if (addprops && cJSON_IsFalse(addprops)) {
+                allow_additional = false;
+            }
+            if (!allow_additional) {
+                cJSON *json_prop = json->child;
+                while (json_prop) {
+                    const char *key = json_prop->string;
+                    if (!props || !cJSON_HasObjectItem(props, key)) {
+                        return false;
+                    }
+                    json_prop = json_prop->next;
+                }
+            }
+        }
+    }
+
+    return true;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -372,32 +710,126 @@ ladder_json_error_t ladder_program_to_json(const char *prg, ladder_ctx_t *ladder
                         return JSON_ERROR_CREATEDATAOBJ;
                     }
 
-                    const char *type_str =
-                            ((cell->code == LADDER_INS_TON || cell->code == LADDER_INS_TOF || cell->code == LADDER_INS_TP) && d == 1) ?
-                                    ((val->type < sizeof(str_basetime) / sizeof(str_basetime[0])) ? str_basetime[val->type] : "INV") :
-                                    ((val->type < sizeof(str_types) / sizeof(str_types[0])) ? str_types[val->type] : "INV");
-                    char val_str[16];
-                    sprintf(val_str, "value%d", d);
-                    cJSON_AddStringToObject(data_obj, "name", val_str);
+                    const char *name = "";
+                    switch (cell->code) {
+                        case LADDER_INS_NO:
+                        case LADDER_INS_NC:
+                        case LADDER_INS_RE:
+                        case LADDER_INS_FE:
+                        case LADDER_INS_COIL:
+                        case LADDER_INS_COILL:
+                        case LADDER_INS_COILU:
+                        case LADDER_INS_NEG:
+                        case LADDER_INS_NOT:
+                        case LADDER_INS_SHL:
+                        case LADDER_INS_SHR:
+                        case LADDER_INS_ROL:
+                        case LADDER_INS_ROR:
+                            if (d == 0)
+                                name = "value";
+                            if (d == 1 && (cell->code == LADDER_INS_SHL || cell->code == LADDER_INS_SHR))
+                                name = "n";
+                            if (d == 1 && (cell->code == LADDER_INS_NOT || cell->code == LADDER_INS_ROL || cell->code == LADDER_INS_ROR))
+                                name = "result";
+                            if (d == 2)
+                                name = "result";
+                            break;
+                        case LADDER_INS_TON:
+                        case LADDER_INS_TOF:
+                        case LADDER_INS_TP:
+                            if (d == 0)
+                                name = "timer";
+                            if (d == 1)
+                                name = "basetime";
+                            break;
+                        case LADDER_INS_CTU:
+                        case LADDER_INS_CTD:
+                            if (d == 0)
+                                name = "counter";
+                            if (d == 1)
+                                name = "preset value";
+                            break;
+                        case LADDER_INS_MOVE:
+                            if (d == 0)
+                                name = "value";
+                            if (d == 1)
+                                name = "to";
+                            break;
+                        case LADDER_INS_SUB:
+                        case LADDER_INS_ADD:
+                        case LADDER_INS_MUL:
+                        case LADDER_INS_DIV:
+                        case LADDER_INS_MOD:
+                        case LADDER_INS_AND:
+                        case LADDER_INS_OR:
+                        case LADDER_INS_XOR:
+                            if (d == 0)
+                                name = "value1";
+                            if (d == 1)
+                                name = "value2";
+                            if (d == 2)
+                                name = "result";
+                            break;
+                        case LADDER_INS_EQ:
+                        case LADDER_INS_GT:
+                        case LADDER_INS_GE:
+                        case LADDER_INS_LT:
+                        case LADDER_INS_LE:
+                        case LADDER_INS_NE:
+                            if (d == 0)
+                                name = "value1";
+                            if (d == 1)
+                                name = "value2";
+                            break;
+                        case LADDER_INS_TMOVE:
+                            if (d == 0)
+                                name = "value1";
+                            if (d == 1)
+                                name = "value2";
+                            if (d == 2)
+                                name = "to";
+                            break;
+                        default:
+                            name = "value";
+                            break;
+                    }
+                    cJSON_AddStringToObject(data_obj, "name", name);
+
+                    const char *type_str;
+                    if (val->type != LADDER_REGISTER_NONE) {
+                        if ((cell->code == LADDER_INS_TON || cell->code == LADDER_INS_TOF || cell->code == LADDER_INS_TP) && d == 1) {
+                            type_str = (val->type < sizeof(str_basetime) / sizeof(str_basetime[0])) ? str_basetime[val->type] : "INV";
+                        } else {
+                            type_str = (val->type < sizeof(str_types) / sizeof(str_types[0])) ? str_types[val->type] : "INV";
+                        }
+                    } else {
+                        if (strcmp(name, "preset value") == 0) {
+                            type_str = "NONE";
+                        } else {
+                            type_str = "K";
+                        }
+                    }
                     cJSON_AddStringToObject(data_obj, "type", type_str);
 
                     char value_str[32];
-                    switch (cell->data[d].type) {
-                        case LADDER_REGISTER_I:
-                        case LADDER_REGISTER_Q:
-                            snprintf(value_str, sizeof(value_str), "%u.%u", val->value.mp.module, val->value.mp.port);
-                            break;
-
-                        case LADDER_REGISTER_S:
-                            snprintf(value_str, sizeof(value_str), "%s", val->value.cstr ? val->value.cstr : "");
-                            break;
-                        case LADDER_REGISTER_R:
-                            snprintf(value_str, sizeof(value_str), "%f", val->value.real);
-                            break;
-
-                        default:
-                            snprintf(value_str, sizeof(value_str), "%lu", (long unsigned int) val->value.u32);
-                            break;
+                    if ((cell->code == LADDER_INS_TON || cell->code == LADDER_INS_TOF || cell->code == LADDER_INS_TP) && d == 1) {
+                        snprintf(value_str, sizeof(value_str), "%lu", (unsigned long) val->value.u32);
+                    } else {
+                        switch (val->type) {
+                            case LADDER_REGISTER_I:
+                            case LADDER_REGISTER_Q:
+                                snprintf(value_str, sizeof(value_str), "%u.%u", val->value.mp.module, val->value.mp.port);
+                                break;
+                            case LADDER_REGISTER_S:
+                                snprintf(value_str, sizeof(value_str), "%s", val->value.cstr ? val->value.cstr : "");
+                                break;
+                            case LADDER_REGISTER_R:
+                                snprintf(value_str, sizeof(value_str), "%f", val->value.real);
+                                break;
+                            default:
+                                snprintf(value_str, sizeof(value_str), "%lu", (unsigned long) val->value.u32);
+                                break;
+                        }
                     }
 
                     cJSON_AddStringToObject(data_obj, "value", value_str);
@@ -457,4 +889,37 @@ ladder_json_error_t ladder_compact_json_file(const char *input_path, const char 
     free(json_str);
 
     return JSON_ERROR_OK;
+}
+
+bool ladder_validate_json_file(const char *json_file, const char *schema_file) {
+    char *json_str = read_file(json_file);
+    if (!json_str)
+        return false;
+
+    char *schema_str = read_file(schema_file);
+    if (!schema_str) {
+        free(json_str);
+        return false;
+    }
+
+    cJSON *json = cJSON_Parse(json_str);
+    free(json_str);
+    if (!json) {
+        free(schema_str);
+        return false;
+    }
+
+    cJSON *schema = cJSON_Parse(schema_str);
+    free(schema_str);
+    if (!schema) {
+        cJSON_Delete(json);
+        return false;
+    }
+
+    bool result = validate_json(json, schema);
+
+    cJSON_Delete(json);
+    cJSON_Delete(schema);
+
+    return result;
 }

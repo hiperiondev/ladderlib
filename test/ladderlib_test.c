@@ -122,6 +122,12 @@ int main(void) {
         exit(1);
     }
 
+    printf("Check schema demo program: %s\n", prg_load);
+    if (!ladder_validate_json_file(prg_load, "ladder_networks_schema.json")) {
+        printf("ERROR: Check schema demo program\n");
+        goto end;
+    }
+
     printf("Load demo program: %s\n", prg_load);
     if ((err = ladder_json_to_program(prg_load, &ladder_ctx)) != JSON_ERROR_OK) {
         printf("ERROR: Load demo program %d\n", err);
