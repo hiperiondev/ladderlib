@@ -88,7 +88,7 @@ int main(void) {
     printf("\e[1;1H\e[2J");
 
     // initialize context
-    if (!ladder_ctx_init(&ladder_ctx, 6, 7, 3, QTY_M, QTY_C, QTY_T, QTY_D, QTY_R, false)) {
+    if (!ladder_ctx_init(&ladder_ctx, 6, 7, 3, QTY_M, QTY_C, QTY_T, QTY_D, QTY_R, true)) {
         printf("ERROR Initializing\n");
         return 1;
     }

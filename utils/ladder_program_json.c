@@ -512,119 +512,286 @@ static bool validate_json(cJSON *json, cJSON *schema) {
 //////////////////////////////////////////////////////////////////////////////////////////
 
 ladder_json_error_t ladder_json_to_program(const char *prg, ladder_ctx_t *ladder_ctx) {
-
-    FILE *fp = fopen(prg, "r");
-    if (!fp) {
+    char *json_str = read_file(prg);
+    if (!json_str) {
         return JSON_ERROR_OPENFILE;
     }
 
-    fseek(fp, 0, SEEK_END);
-    long size = ftell(fp);
-    fseek(fp, 0, SEEK_SET);
-    char *json_string = malloc(size + 1);
-    if (!json_string) {
-        fclose(fp);
-        return JSON_ERROR_ALLOC_STRING;
-    }
-    fread(json_string, 1, size, fp);
-    json_string[size] = '\0';
-    fclose(fp);
-
-    cJSON *root = cJSON_Parse(json_string);
+    cJSON *root = cJSON_Parse(json_str);
+    free(json_str);
     if (!root) {
-        free(json_string);
         return JSON_ERROR_PARSE;
     }
 
-    (*ladder_ctx).ladder.quantity.networks = cJSON_GetArraySize(root);
-
-    (*ladder_ctx).network = calloc((*ladder_ctx).ladder.quantity.networks, sizeof(ladder_network_t));
-    if (!(*ladder_ctx).network) {
+    if (!cJSON_IsArray(root)) {
         cJSON_Delete(root);
-        free(json_string);
-        return JSON_ERROR_ALLOC_NETWORK;
+        return JSON_ERROR_TYPE_INV;
     }
 
-    for (int n = 0; n < (*ladder_ctx).ladder.quantity.networks; n++) {
-        cJSON *network_json = cJSON_GetArrayItem(root, n);
-        ladder_network_t *network = &((*ladder_ctx).network[n]);
-        network->enable = true;
+    ladder_clear_program(ladder_ctx);
 
-        cJSON *rows_json = cJSON_GetObjectItem(network_json, "rows");
-        network->rows = (int) cJSON_GetNumberValue(rows_json);
-        cJSON *cols_json = cJSON_GetObjectItem(network_json, "cols");
-        network->cols = (int) cJSON_GetNumberValue(cols_json);
+    int num_networks = cJSON_GetArraySize(root);
+    bool load_ok = true;
 
-        network->cells = calloc(network->rows, sizeof(ladder_cell_t*));
-        for (int r = 0; r < network->rows; r++) {
-            network->cells[r] = calloc(network->cols, sizeof(ladder_cell_t));
+    for (int i = 0; i < num_networks && load_ok; i++) {
+        cJSON *net_obj = cJSON_GetArrayItem(root, i);
+        if (!cJSON_IsObject(net_obj)) {
+            load_ok = false;
+            continue;
         }
 
-        cJSON *networkData = cJSON_GetObjectItem(network_json, "networkData");
-        for (int r = 0; r < network->rows; r++) {
-            cJSON *row_json = cJSON_GetArrayItem(networkData, r);
-            for (int c = 0; c < network->cols; c++) {
-                cJSON *cell_json = cJSON_GetArrayItem(row_json, c);
-                ladder_cell_t *cell = &network->cells[r][c];
+        cJSON *id_json = cJSON_GetObjectItemCaseSensitive(net_obj, "id");
+        if (!id_json || !cJSON_IsNumber(id_json)) {
+            load_ok = false;
+            continue;
+        }
+        uint32_t n = (uint32_t)id_json->valuedouble;
+        if (n >= ladder_ctx->ladder.quantity.networks) {
+            load_ok = false;
+            continue;
+        }
+
+        ladder_network_t *net = &ladder_ctx->network[n];
+        net->enable = true;
+
+        cJSON *rows_json = cJSON_GetObjectItemCaseSensitive(net_obj, "rows");
+        if (!rows_json || !cJSON_IsNumber(rows_json)) {
+            load_ok = false;
+            continue;
+        }
+        net->rows = (uint32_t)rows_json->valuedouble;
+
+        cJSON *cols_json = cJSON_GetObjectItemCaseSensitive(net_obj, "cols");
+        if (!cols_json || !cJSON_IsNumber(cols_json)) {
+            load_ok = false;
+            continue;
+        }
+        net->cols = (uint32_t)cols_json->valuedouble;
+
+        cJSON *network_data = cJSON_GetObjectItemCaseSensitive(net_obj, "networkData");
+        if (!network_data || !cJSON_IsArray(network_data) || (int)net->rows != cJSON_GetArraySize(network_data)) {
+            load_ok = false;
+            continue;
+        }
+
+        net->cells = (ladder_cell_t **)calloc(net->rows, sizeof(ladder_cell_t *));
+        if (!net->cells) {
+            load_ok = false;
+            continue;
+        }
+
+        bool alloc_ok = true;
+        for (uint32_t r = 0; r < net->rows && alloc_ok; r++) {
+            net->cells[r] = (ladder_cell_t *)calloc(net->cols, sizeof(ladder_cell_t));
+            if (!net->cells[r]) {
+                alloc_ok = false;
+            }
+        }
+        if (!alloc_ok) {
+            for (uint32_t r = 0; r < net->rows; r++) {
+                if (net->cells[r]) {
+                    free(net->cells[r]);
+                }
+            }
+            free(net->cells);
+            net->cells = NULL;
+            net->rows = 0;
+            net->cols = 0;
+            load_ok = false;
+            continue;
+        }
+
+        bool parse_ok = true;
+        for (uint32_t r = 0; r < net->rows && parse_ok; r++) {
+            cJSON *row_array = cJSON_GetArrayItem(network_data, r);
+            if (!cJSON_IsArray(row_array) || (int)net->cols != cJSON_GetArraySize(row_array)) {
+                parse_ok = false;
+                continue;
+            }
+
+            for (uint32_t c = 0; c < net->cols && parse_ok; c++) {
+                cJSON *cell_obj = cJSON_GetArrayItem(row_array, c);
+                if (!cJSON_IsObject(cell_obj)) {
+                    parse_ok = false;
+                    continue;
+                }
+
+                cJSON *symbol_json = cJSON_GetObjectItemCaseSensitive(cell_obj, "symbol");
+                if (!symbol_json || !cJSON_IsString(symbol_json)) {
+                    parse_ok = false;
+                    continue;
+                }
+                ladder_instruction_t code = get_instruction_code(symbol_json->valuestring);
+                if (code == LADDER_INS_INV) {
+                    parse_ok = false;
+                    continue;
+                }
+                if (code == LADDER_INS_MULTI) {
+                    code = LADDER_INS_NOP;
+                }
+
+                ladder_cell_t *cell = &net->cells[r][c];
+                cell->code = code;
                 cell->state = false;
 
-                cJSON *bar_json = cJSON_GetObjectItem(cell_json, "bar");
+                cJSON *bar_json = cJSON_GetObjectItemCaseSensitive(cell_obj, "bar");
+                if (!bar_json || !cJSON_IsBool(bar_json)) {
+                    parse_ok = false;
+                    continue;
+                }
                 cell->vertical_bar = cJSON_IsTrue(bar_json);
 
-                cJSON *symbol_json = cJSON_GetObjectItem(cell_json, "symbol");
-                char *symbol = cJSON_GetStringValue(symbol_json);
-                cell->code = get_instruction_code(symbol);
-                if (cell->code == LADDER_INS_INV)
-                    return JSON_ERROR_INS_INV;
+                if (code == LADDER_INS_NOP && cell->vertical_bar) {
+                    cell->code = LADDER_INS_CONN;
+                }
 
-                cJSON *data_json = cJSON_GetObjectItem(cell_json, "data");
-                int data_qty = cJSON_GetArraySize(data_json);
-                cell->data_qty = data_qty;
-                cell->data = calloc(data_qty, sizeof(ladder_value_t));
+                cJSON *data_array = cJSON_GetObjectItemCaseSensitive(cell_obj, "data");
+                if (!data_array || !cJSON_IsArray(data_array)) {
+                    parse_ok = false;
+                    continue;
+                }
+                int data_qty = cJSON_GetArraySize(data_array);
+                if (data_qty != (int)ladder_fn_iocd[code].data_qty) {
+                    parse_ok = false;
+                    continue;
+                }
 
-                for (int d = 0; d < data_qty; d++) {
-                    cJSON *data_item = cJSON_GetArrayItem(data_json, d);
-                    cJSON *type_json = cJSON_GetObjectItem(data_item, "type");
-                    char *type_str = cJSON_GetStringValue(type_json);
-                    cell->data[d].type = get_register_code(type_str);
+                cell->data_qty = (uint8_t)data_qty;
+                if (data_qty == 0) {
+                    continue;
+                }
 
-                    if (cell->data[d].type == LADDER_REGISTER_INV)
-                        return JSON_ERROR_TYPE_INV;
+                cell->data = (ladder_value_t *)malloc((size_t)data_qty * sizeof(ladder_value_t));
+                if (!cell->data) {
+                    parse_ok = false;
+                    continue;
+                }
 
-                    cJSON *value_json = cJSON_GetObjectItem(data_item, "value");
-                    char *value_str = cJSON_GetStringValue(value_json);
+                bool data_parse_ok = true;
+                for (int d = 0; d < data_qty && data_parse_ok; d++) {
+                    cJSON *data_obj = cJSON_GetArrayItem(data_array, d);
+                    if (!cJSON_IsObject(data_obj)) {
+                        data_parse_ok = false;
+                        continue;
+                    }
 
-                    if (cell->code == LADDER_INS_TON || cell->code == LADDER_INS_TOF || cell->code == LADDER_INS_TP) {
-                        cell->data[d].value.u32 = strtoul(value_str, NULL, 10);
+                    cJSON *name_json = cJSON_GetObjectItemCaseSensitive(data_obj, "name");
+                    if (!name_json || !cJSON_IsString(name_json)) {
+                        data_parse_ok = false;
+                        continue;
+                    }
+
+                    cJSON *type_json = cJSON_GetObjectItemCaseSensitive(data_obj, "type");
+                    if (!type_json || !cJSON_IsString(type_json)) {
+                        data_parse_ok = false;
+                        continue;
+                    }
+                    const char *type_str = type_json->valuestring;
+
+                    cJSON *value_json = cJSON_GetObjectItemCaseSensitive(data_obj, "value");
+                    if (!value_json || !cJSON_IsString(value_json)) {
+                        data_parse_ok = false;
+                        continue;
+                    }
+                    const char *value_str = value_json->valuestring;
+
+                    ladder_value_t *val = &cell->data[d];
+
+                    if ((code == LADDER_INS_TON || code == LADDER_INS_TOF || code == LADDER_INS_TP) && d == 1) {
+                        // basetime
+                        int bt_idx = -1;
+                        for (int k = 0; k < (int)(sizeof(str_basetime) / sizeof(str_basetime[0])); k++) {
+                            if (strcmp(type_str, str_basetime[k]) == 0) {
+                                bt_idx = k;
+                                break;
+                            }
+                        }
+                        if (bt_idx == -1) {
+                            data_parse_ok = false;
+                            continue;
+                        }
+                        val->type = (ladder_register_t)bt_idx;
+                        char *endptr;
+                        unsigned long tmp = strtoul(value_str, &endptr, 10);
+                        if (*endptr != '\0') {
+                            data_parse_ok = false;
+                            continue;
+                        }
+                        val->value.u32 = (uint32_t)tmp;
                     } else {
-                        switch (cell->data[d].type) {
-                            case LADDER_REGISTER_I:
-                            case LADDER_REGISTER_Q:
-                                if (!parse_module_port(value_str, &(cell->data[d].value.mp)))
-                                    return JSON_ERROR_INVALIDVALUE;
-                                break;
+                        ladder_register_t reg_type = get_register_code(type_str);
+                        if (reg_type == LADDER_REGISTER_INV) {
+                            data_parse_ok = false;
+                            continue;
+                        }
+                        val->type = reg_type;
 
-                            case LADDER_REGISTER_S:
-                                cell->data[d].value.cstr = strdup(value_str);
-                                break;
-                            case LADDER_REGISTER_R:
-                                cell->data[d].value.real = atof(value_str);
-                                break;
-
-                            default:
-                                cell->data[d].value.u32 = strtoul(value_str, NULL, 10);
-                                break;
+                        if (reg_type == LADDER_REGISTER_S) {
+                            val->value.cstr = strdup(value_str);
+                            if (!val->value.cstr) {
+                                data_parse_ok = false;
+                                continue;
+                            }
+                        } else if (reg_type == LADDER_REGISTER_R) {
+                            val->value.real = strtof(value_str, NULL);
+                        } else if (reg_type == LADDER_REGISTER_I || reg_type == LADDER_REGISTER_Q) {
+                            moduleport_t mp;
+                            if (!parse_module_port(value_str, &mp)) {
+                                data_parse_ok = false;
+                                continue;
+                            }
+                            val->value.mp = mp;
+                        } else {
+                            // numeric u32
+                            char *endptr;
+                            unsigned long tmp = strtoul(value_str, &endptr, 10);
+                            if (*endptr != '\0') {
+                                data_parse_ok = false;
+                                continue;
+                            }
+                            val->value.u32 = (uint32_t)tmp;
                         }
                     }
                 }
+
+                if (!data_parse_ok) {
+                    free(cell->data);
+                    cell->data = NULL;
+                    cell->data_qty = 0;
+                    parse_ok = false;
+                }
             }
+        }
+
+        if (!parse_ok) {
+            // Cleanup this network on parse failure
+            for (uint32_t rr = 0; rr < net->rows; rr++) {
+                for (uint32_t cc = 0; cc < net->cols; cc++) {
+                    if (net->cells[rr][cc].data_qty > 0 && net->cells[rr][cc].data) {
+                        for (uint8_t dd = 0; dd < net->cells[rr][cc].data_qty; dd++) {
+                            if (net->cells[rr][cc].data[dd].type == LADDER_REGISTER_S && net->cells[rr][cc].data[dd].value.cstr) {
+                                free((void *)net->cells[rr][cc].data[dd].value.cstr);
+                            }
+                        }
+                        free(net->cells[rr][cc].data);
+                    }
+                }
+                free(net->cells[rr]);
+            }
+            free(net->cells);
+            net->cells = NULL;
+            net->rows = 0;
+            net->cols = 0;
+            load_ok = false;
         }
     }
 
-    cJSON_Delete(root);
-    free(json_string);
+    if (!load_ok) {
+        ladder_clear_program(ladder_ctx);
+    }
 
-    return JSON_ERROR_OK;
+    cJSON_Delete(root);
+    return load_ok ? JSON_ERROR_OK : JSON_ERROR_FAIL;
 }
 
 ladder_json_error_t ladder_program_to_json(const char *prg, ladder_ctx_t *ladder_ctx) {
