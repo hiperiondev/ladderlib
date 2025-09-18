@@ -44,6 +44,30 @@
 #include "ladderlib_cron.h"
 #endif
 
+#define EP(x) [x] = #x
+const char *json_errors[] = { //
+        EP(JSON_ERROR_OK), //
+        EP(JSON_ERROR_OPENFILE), //
+        EP(JSON_ERROR_PARSE), //
+        EP(JSON_ERROR_ALLOC_STRING), //
+        EP(JSON_ERROR_ALLOC_NETWORK), //
+        EP(JSON_ERROR_INS_INV), //
+        EP(JSON_ERROR_TYPE_INV), //
+        EP(JSON_ERROR_CREATEARRAY), //
+        EP(JSON_ERROR_CREATENETOBJT), //
+        EP(JSON_ERROR_CREATENETDATA), //
+        EP(JSON_ERROR_CREATEROWARRAY), //
+        EP(JSON_ERROR_CREATECELLOBJ), //
+        EP(JSON_ERROR_CREATEDATAARRAY), //
+        EP(JSON_ERROR_CREATEDATAOBJ), //
+        EP(JSON_ERROR_PRINTOBJ), //
+        EP(JSON_ERROR_COMPACTFILE), //
+        EP(JSON_ERROR_WRITEFILE), //
+        EP(JSON_ERROR_INVALIDVALUE), //
+        EP(JSON_ERROR_SCHEMA), //
+        EP(JSON_ERROR_FAIL), //
+};
+
 // registers quantity
 #define QTY_M  18
 #define QTY_C  8
@@ -130,19 +154,19 @@ int main(void) {
 
     printf("Load demo program: %s\n", prg_load);
     if ((err = ladder_json_to_program(prg_load, &ladder_ctx)) != JSON_ERROR_OK) {
-        printf("ERROR: Load demo program %d\n", err);
+        printf("ERROR: Load demo program (%d) %s\n", err, json_errors[err]);
         goto end;
     }
 
     printf("Save demo program: %s\n", prg_save);
     if ((err = ladder_program_to_json(prg_save, &ladder_ctx)) != JSON_ERROR_OK) {
-        printf("ERROR: Save demo program\n");
+        printf("ERROR: Save demo program (%d) %s\n", err, json_errors[err]);
         goto end;
     }
 
     printf("Compact saved program: %s\n", prg_save);
     if ((err = ladder_compact_json_file(prg_save, "compact.json")) != JSON_ERROR_OK) {
-        printf("ERROR: Compact saved program\n");
+        printf("ERROR: Compact saved program (%d) %s\n", err, json_errors[err]);
         goto end;
     }
 

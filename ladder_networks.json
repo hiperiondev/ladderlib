@@ -10,7 +10,7 @@
           "bar": false,
           "data": [
             {
-              "name": "value1",
+              "name": "value",
               "type": "M",
               "value": "3"
             }
@@ -21,7 +21,7 @@
           "bar": false,
           "data": [
             {
-              "name": "value1",
+              "name": "value",
               "type": "M",
               "value": "2"
             }
@@ -32,12 +32,12 @@
           "bar": false,
           "data": [
             {
-              "name": "value1",
+              "name": "timer",
               "type": "T",
               "value": "0"
             },
             {
-              "name": "value2",
+              "name": "basetime",
               "type": "SEC",
               "value": "5"
             }
@@ -53,7 +53,7 @@
           "bar": false,
           "data": [
             {
-              "name": "value1",
+              "name": "value",
               "type": "M",
               "value": "1"
             }
@@ -93,7 +93,7 @@
           "bar": false,
           "data": [
             {
-              "name": "value1",
+              "name": "value",
               "type": "M",
               "value": "1"
             }
@@ -109,12 +109,12 @@
           "bar": false,
           "data": [
             {
-              "name": "value1",
+              "name": "timer",
               "type": "T",
               "value": "1"
             },
             {
-              "name": "value2",
+              "name": "basetime",
               "type": "SEC",
               "value": "5"
             }
@@ -130,7 +130,7 @@
           "bar": false,
           "data": [
             {
-              "name": "value1",
+              "name": "value",
               "type": "M",
               "value": "2"
             }
@@ -170,7 +170,7 @@
           "bar": false,
           "data": [
             {
-              "name": "value1",
+              "name": "value",
               "type": "M",
               "value": "1"
             }
@@ -196,7 +196,7 @@
           "bar": false,
           "data": [
             {
-              "name": "value1",
+              "name": "value",
               "type": "Q",
               "value": "0.0"
             }
@@ -209,7 +209,7 @@
           "bar": false,
           "data": [
             {
-              "name": "value1",
+              "name": "value",
               "type": "Q",
               "value": "0.0"
             }
@@ -225,12 +225,12 @@
           "bar": false,
           "data": [
             {
-              "name": "value1",
+              "name": "counter",
               "type": "C",
               "value": "0"
             },
             {
-              "name": "value2",
+              "name": "preset value",
               "type": "NONE",
               "value": "5"
             }
@@ -246,7 +246,7 @@
           "bar": false,
           "data": [
             {
-              "name": "value1",
+              "name": "value",
               "type": "M",
               "value": "3"
             }
@@ -293,7 +293,7 @@
           "bar": false,
           "data": [
             {
-              "name": "value1",
+              "name": "value",
               "type": "M",
               "value": "3"
             }
@@ -304,7 +304,7 @@
           "bar": false,
           "data": [
             {
-              "name": "value1",
+              "name": "value",
               "type": "M",
               "value": "4"
             }
@@ -315,7 +315,7 @@
           "bar": false,
           "data": [
             {
-              "name": "value1",
+              "name": "value",
               "type": "M",
               "value": "5"
             }
@@ -326,12 +326,12 @@
           "bar": false,
           "data": [
             {
-              "name": "value1",
+              "name": "timer",
               "type": "T",
               "value": "2"
             },
             {
-              "name": "value2",
+              "name": "basetime",
               "type": "SEC",
               "value": "5"
             }
@@ -342,7 +342,7 @@
           "bar": false,
           "data": [
             {
-              "name": "value1",
+              "name": "value",
               "type": "M",
               "value": "6"
             }
@@ -382,7 +382,7 @@
           "bar": false,
           "data": [
             {
-              "name": "value1",
+              "name": "value",
               "type": "M",
               "value": "6"
             }
@@ -403,12 +403,12 @@
           "bar": false,
           "data": [
             {
-              "name": "value1",
+              "name": "timer",
               "type": "T",
               "value": "3"
             },
             {
-              "name": "value2",
+              "name": "basetime",
               "type": "SEC",
               "value": "5"
             }
@@ -419,7 +419,7 @@
           "bar": false,
           "data": [
             {
-              "name": "value1",
+              "name": "value",
               "type": "M",
               "value": "5"
             }
@@ -459,7 +459,7 @@
           "bar": false,
           "data": [
             {
-              "name": "value1",
+              "name": "value",
               "type": "M",
               "value": "6"
             }
@@ -485,7 +485,7 @@
           "bar": false,
           "data": [
             {
-              "name": "value1",
+              "name": "value",
               "type": "Q",
               "value": "0.1"
             }
@@ -498,7 +498,7 @@
           "bar": false,
           "data": [
             {
-              "name": "value1",
+              "name": "value",
               "type": "Q",
               "value": "0.1"
             }
@@ -519,12 +519,12 @@
           "bar": false,
           "data": [
             {
-              "name": "value1",
+              "name": "counter",
               "type": "C",
               "value": "1"
             },
             {
-              "name": "value2",
+              "name": "preset value",
               "type": "NONE",
               "value": "5"
             }
@@ -535,7 +535,7 @@
           "bar": false,
           "data": [
             {
-              "name": "value1",
+              "name": "value",
               "type": "M",
               "value": "4"
             }
@@ -582,7 +582,7 @@
           "bar": false,
           "data": [
             {
-              "name": "value1",
+              "name": "value",
               "type": "I",
               "value": "0.7"
             }
@@ -608,7 +608,7 @@
           "bar": false,
           "data": [
             {
-              "name": "value1",
+              "name": "value",
               "type": "Q",
               "value": "0.3"
             }
@@ -641,7 +641,7 @@
           "bar": false,
           "data": [
             {
-              "name": "value1",
+              "name": "value",
               "type": "Q",
               "value": "0.4"
             }
@@ -762,7 +762,7 @@
           "bar": false,
           "data": [
             {
-              "name": "value1",
+              "name": "value",
               "type": "M",
               "value": "10"
             }
@@ -773,7 +773,7 @@
           "bar": false,
           "data": [
             {
-              "name": "value1",
+              "name": "value",
               "type": "M",
               "value": "12"
             }
@@ -784,7 +784,7 @@
           "bar": false,
           "data": [
             {
-              "name": "value1",
+              "name": "value",
               "type": "M",
               "value": "14"
             }

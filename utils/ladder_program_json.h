@@ -55,8 +55,8 @@ typedef enum JSON_ERROR {
     JSON_ERROR_WRITEFILE,       //
     JSON_ERROR_INVALIDVALUE,    //
     //////////////////////////////
+    JSON_ERROR_SCHEMA,          //
     JSON_ERROR_FAIL             //
-
 } ladder_json_error_t;
 
 /**
