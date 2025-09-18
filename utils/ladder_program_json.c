@@ -626,9 +626,6 @@ ladder_json_error_t ladder_json_to_program(const char *prg, ladder_ctx_t *ladder
                     parse_ok = false;
                     continue;
                 }
-                if (code == LADDER_INS_MULTI) {
-                    code = LADDER_INS_NOP;
-                }
 
                 ladder_cell_t *cell = &net->cells[r][c];
                 cell->code = code;
@@ -640,10 +637,6 @@ ladder_json_error_t ladder_json_to_program(const char *prg, ladder_ctx_t *ladder
                     continue;
                 }
                 cell->vertical_bar = cJSON_IsTrue(bar_json);
-
-                if (code == LADDER_INS_NOP && cell->vertical_bar) {
-                    cell->code = LADDER_INS_CONN;
-                }
 
                 cJSON *data_array = cJSON_GetObjectItemCaseSensitive(cell_obj, "data");
                 if (!data_array || !cJSON_IsArray(data_array)) {
