@@ -545,7 +545,7 @@ ladder_json_error_t ladder_json_to_program(const char *prg, ladder_ctx_t *ladder
             load_ok = false;
             continue;
         }
-        uint32_t n = (uint32_t)id_json->valuedouble;
+        uint32_t n = (uint32_t) id_json->valuedouble;
         if (n >= ladder_ctx->ladder.quantity.networks) {
             load_ok = false;
             continue;
@@ -554,27 +554,46 @@ ladder_json_error_t ladder_json_to_program(const char *prg, ladder_ctx_t *ladder
         ladder_network_t *net = &ladder_ctx->network[n];
         net->enable = true;
 
+        // Free any pre-existing allocations using current rows/cols
+        for (uint32_t rr = 0; rr < net->rows; rr++) {
+            for (uint32_t cc = 0; cc < net->cols; cc++) {
+                if (net->cells[rr][cc].data_qty > 0 && net->cells[rr][cc].data) {
+                    for (uint8_t dd = 0; dd < net->cells[rr][cc].data_qty; dd++) {
+                        if (net->cells[rr][cc].data[dd].type == LADDER_REGISTER_S && net->cells[rr][cc].data[dd].value.cstr) {
+                            free((void*) net->cells[rr][cc].data[dd].value.cstr);
+                        }
+                    }
+                    free(net->cells[rr][cc].data);
+                }
+            }
+            free(net->cells[rr]);
+        }
+        free(net->cells);
+        net->cells = NULL;
+        net->rows = 0;
+        net->cols = 0;
+
         cJSON *rows_json = cJSON_GetObjectItemCaseSensitive(net_obj, "rows");
         if (!rows_json || !cJSON_IsNumber(rows_json)) {
             load_ok = false;
             continue;
         }
-        net->rows = (uint32_t)rows_json->valuedouble;
+        net->rows = (uint32_t) rows_json->valuedouble;
 
         cJSON *cols_json = cJSON_GetObjectItemCaseSensitive(net_obj, "cols");
         if (!cols_json || !cJSON_IsNumber(cols_json)) {
             load_ok = false;
             continue;
         }
-        net->cols = (uint32_t)cols_json->valuedouble;
+        net->cols = (uint32_t) cols_json->valuedouble;
 
         cJSON *network_data = cJSON_GetObjectItemCaseSensitive(net_obj, "networkData");
-        if (!network_data || !cJSON_IsArray(network_data) || (int)net->rows != cJSON_GetArraySize(network_data)) {
+        if (!network_data || !cJSON_IsArray(network_data) || (int) net->rows != cJSON_GetArraySize(network_data)) {
             load_ok = false;
             continue;
         }
 
-        net->cells = (ladder_cell_t **)calloc(net->rows, sizeof(ladder_cell_t *));
+        net->cells = (ladder_cell_t**) calloc(net->rows, sizeof(ladder_cell_t*));
         if (!net->cells) {
             load_ok = false;
             continue;
@@ -582,7 +601,7 @@ ladder_json_error_t ladder_json_to_program(const char *prg, ladder_ctx_t *ladder
 
         bool alloc_ok = true;
         for (uint32_t r = 0; r < net->rows && alloc_ok; r++) {
-            net->cells[r] = (ladder_cell_t *)calloc(net->cols, sizeof(ladder_cell_t));
+            net->cells[r] = (ladder_cell_t*) calloc(net->cols, sizeof(ladder_cell_t));
             if (!net->cells[r]) {
                 alloc_ok = false;
             }
@@ -604,7 +623,7 @@ ladder_json_error_t ladder_json_to_program(const char *prg, ladder_ctx_t *ladder
         bool parse_ok = true;
         for (uint32_t r = 0; r < net->rows && parse_ok; r++) {
             cJSON *row_array = cJSON_GetArrayItem(network_data, r);
-            if (!cJSON_IsArray(row_array) || (int)net->cols != cJSON_GetArraySize(row_array)) {
+            if (!cJSON_IsArray(row_array) || (int) net->cols != cJSON_GetArraySize(row_array)) {
                 parse_ok = false;
                 continue;
             }
@@ -644,17 +663,17 @@ ladder_json_error_t ladder_json_to_program(const char *prg, ladder_ctx_t *ladder
                     continue;
                 }
                 int data_qty = cJSON_GetArraySize(data_array);
-                if (data_qty != (int)ladder_fn_iocd[code].data_qty) {
+                if (data_qty != (int) ladder_fn_iocd[code].data_qty) {
                     parse_ok = false;
                     continue;
                 }
 
-                cell->data_qty = (uint8_t)data_qty;
+                cell->data_qty = (uint8_t) data_qty;
                 if (data_qty == 0) {
                     continue;
                 }
 
-                cell->data = (ladder_value_t *)malloc((size_t)data_qty * sizeof(ladder_value_t));
+                cell->data = (ladder_value_t*) malloc((size_t) data_qty * sizeof(ladder_value_t));
                 if (!cell->data) {
                     parse_ok = false;
                     continue;
@@ -693,7 +712,7 @@ ladder_json_error_t ladder_json_to_program(const char *prg, ladder_ctx_t *ladder
                     if ((code == LADDER_INS_TON || code == LADDER_INS_TOF || code == LADDER_INS_TP) && d == 1) {
                         // basetime
                         int bt_idx = -1;
-                        for (int k = 0; k < (int)(sizeof(str_basetime) / sizeof(str_basetime[0])); k++) {
+                        for (int k = 0; k < (int) (sizeof(str_basetime) / sizeof(str_basetime[0])); k++) {
                             if (strcmp(type_str, str_basetime[k]) == 0) {
                                 bt_idx = k;
                                 break;
@@ -703,14 +722,14 @@ ladder_json_error_t ladder_json_to_program(const char *prg, ladder_ctx_t *ladder
                             data_parse_ok = false;
                             continue;
                         }
-                        val->type = (ladder_register_t)bt_idx;
+                        val->type = (ladder_register_t) bt_idx;
                         char *endptr;
                         unsigned long tmp = strtoul(value_str, &endptr, 10);
                         if (*endptr != '\0') {
                             data_parse_ok = false;
                             continue;
                         }
-                        val->value.u32 = (uint32_t)tmp;
+                        val->value.u32 = (uint32_t) tmp;
                     } else {
                         ladder_register_t reg_type = get_register_code(type_str);
                         if (reg_type == LADDER_REGISTER_INV) {
@@ -742,7 +761,7 @@ ladder_json_error_t ladder_json_to_program(const char *prg, ladder_ctx_t *ladder
                                 data_parse_ok = false;
                                 continue;
                             }
-                            val->value.u32 = (uint32_t)tmp;
+                            val->value.u32 = (uint32_t) tmp;
                         }
                     }
                 }
@@ -763,7 +782,7 @@ ladder_json_error_t ladder_json_to_program(const char *prg, ladder_ctx_t *ladder
                     if (net->cells[rr][cc].data_qty > 0 && net->cells[rr][cc].data) {
                         for (uint8_t dd = 0; dd < net->cells[rr][cc].data_qty; dd++) {
                             if (net->cells[rr][cc].data[dd].type == LADDER_REGISTER_S && net->cells[rr][cc].data[dd].value.cstr) {
-                                free((void *)net->cells[rr][cc].data[dd].value.cstr);
+                                free((void*) net->cells[rr][cc].data[dd].value.cstr);
                             }
                         }
                         free(net->cells[rr][cc].data);

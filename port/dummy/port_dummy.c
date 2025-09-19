@@ -150,8 +150,9 @@ void dummy_read(ladder_ctx_t *ladder_ctx, uint32_t id) {
         ;
     tcsetattr(STDIN_FILENO, TCSANOW, &orig_term);
 
-    if (ch == 81 || ch == 113)
+    if (ch == 81 || ch == 113) {
         (*ladder_ctx).ladder.state = LADDER_ST_EXIT_TSK;
+    }
 
     if (ch > 47 && ch < 56)
         (*ladder_ctx).input[id].I[ch - 48] = (*ladder_ctx).input[id].I[ch - 48] > 0 ? 0 : 1;

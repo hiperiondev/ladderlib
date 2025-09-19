@@ -187,6 +187,8 @@ int main(void) {
     ///////////////////////////////////////////////////////
 
     end:
+    printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+
     // release context
     if (!ladder_ctx_deinit(&ladder_ctx)) {
         printf("ERROR Deinitializing\n");
