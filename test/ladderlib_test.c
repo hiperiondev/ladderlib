@@ -45,28 +45,88 @@
 #endif
 
 #define EP(x) [x] = #x
-const char *json_errors[] = { //
-        EP(JSON_ERROR_OK), //
-        EP(JSON_ERROR_OPENFILE), //
-        EP(JSON_ERROR_PARSE), //
-        EP(JSON_ERROR_ALLOC_STRING), //
-        EP(JSON_ERROR_ALLOC_NETWORK), //
-        EP(JSON_ERROR_INS_INV), //
-        EP(JSON_ERROR_TYPE_INV), //
-        EP(JSON_ERROR_CREATEARRAY), //
-        EP(JSON_ERROR_CREATENETOBJT), //
-        EP(JSON_ERROR_CREATENETDATA), //
-        EP(JSON_ERROR_CREATEROWARRAY), //
-        EP(JSON_ERROR_CREATECELLOBJ), //
-        EP(JSON_ERROR_CREATEDATAARRAY), //
-        EP(JSON_ERROR_CREATEDATAOBJ), //
-        EP(JSON_ERROR_PRINTOBJ), //
-        EP(JSON_ERROR_COMPACTFILE), //
-        EP(JSON_ERROR_WRITEFILE), //
-        EP(JSON_ERROR_INVALIDVALUE), //
-        EP(JSON_ERROR_SCHEMA), //
-        EP(JSON_ERROR_FAIL), //
-};
+const char *json_errors[] = {                   //
+                EP(JSON_ERROR_OK),              //
+                EP(JSON_ERROR_OPENFILE),        //
+                EP(JSON_ERROR_PARSE),           //
+                EP(JSON_ERROR_ALLOC_STRING),    //
+                EP(JSON_ERROR_ALLOC_NETWORK),   //
+                EP(JSON_ERROR_INS_INV),         //
+                EP(JSON_ERROR_TYPE_INV),        //
+                EP(JSON_ERROR_CREATEARRAY),     //
+                EP(JSON_ERROR_CREATENETOBJT),   //
+                EP(JSON_ERROR_CREATENETDATA),   //
+                EP(JSON_ERROR_CREATEROWARRAY),  //
+                EP(JSON_ERROR_CREATECELLOBJ),   //
+                EP(JSON_ERROR_CREATEDATAARRAY), //
+                EP(JSON_ERROR_CREATEDATAOBJ),   //
+                EP(JSON_ERROR_PRINTOBJ),        //
+                EP(JSON_ERROR_COMPACTFILE),     //
+                EP(JSON_ERROR_WRITEFILE),       //
+                EP(JSON_ERROR_INVALIDVALUE),    //
+                EP(JSON_ERROR_SCHEMA),          //
+                EP(JSON_ERROR_FAIL),            //
+        };
+
+const char *program_test_errors[] = {                       //
+                EP(LADDER_ERR_PRG_CHECK_OK),                //
+                EP(LADDER_ERR_PRG_CHECK_I_INV_MODULE),      //
+                EP(LADDER_ERR_PRG_CHECK_I_INV_PORT),        //
+                EP(LADDER_ERR_PRG_CHECK_Q_INV_MODULE),      //
+                EP(LADDER_ERR_PRG_CHECK_Q_INV_PORT),        //
+                EP(LADDER_ERR_PRG_CHECK_IW_INV_MODULE),     //
+                EP(LADDER_ERR_PRG_CHECK_IW_INV_PORT),       //
+                EP(LADDER_ERR_PRG_CHECK_QW_INV_MODULE),     //
+                EP(LADDER_ERR_PRG_CHECK_QW_INV_PORT),       //
+                EP(LADDER_ERR_PRG_CHECK_NO_INPUT_MODULES),  //
+                EP(LADDER_ERR_PRG_CHECK_NO_OUTPUT_MODULES), //
+                EP(LADDER_ERR_PRG_CHECK_T_INV_TYPE),        //
+                EP(LADDER_ERR_PRG_CHECK_T_INV_INDEX),       //
+                EP(LADDER_ERR_PRG_CHECK_INV_BASE_TIME),     //
+                EP(LADDER_ERR_PRG_CHECK_FAIL )              //
+        };
+
+const char *functions_str[] = {         //
+                EP(LADDER_INS_NOP),     //
+                EP(LADDER_INS_CONN),    //
+                EP(LADDER_INS_NEG),     //
+                EP(LADDER_INS_NO),      //
+                EP(LADDER_INS_NC),      //
+                EP(LADDER_INS_RE),      //
+                EP(LADDER_INS_FE),      //
+                EP(LADDER_INS_COIL),    //
+                EP(LADDER_INS_COILL),   //
+                EP(LADDER_INS_COILU),   //
+                EP(LADDER_INS_TON),     //
+                EP(LADDER_INS_TOF),     //
+                EP(LADDER_INS_TP),      //
+                EP(LADDER_INS_CTU),     //
+                EP(LADDER_INS_CTD),     //
+                EP(LADDER_INS_MOVE),    //
+                EP(LADDER_INS_SUB),     //
+                EP(LADDER_INS_ADD),     //
+                EP(LADDER_INS_MUL),     //
+                EP(LADDER_INS_DIV),     //
+                EP(LADDER_INS_MOD),     //
+                EP(LADDER_INS_SHL),     //
+                EP(LADDER_INS_SHR),     //
+                EP(LADDER_INS_ROL),     //
+                EP(LADDER_INS_ROR),     //
+                EP(LADDER_INS_AND),     //
+                EP(LADDER_INS_OR),      //
+                EP(LADDER_INS_XOR),     //
+                EP(LADDER_INS_NOT),     //
+                EP(LADDER_INS_EQ),      //
+                EP(LADDER_INS_GT),      //
+                EP(LADDER_INS_GE),      //
+                EP(LADDER_INS_LT),      //
+                EP(LADDER_INS_LE),      //
+                EP(LADDER_INS_NE),      //
+                EP(LADDER_INS_FOREIGN), //
+                EP(LADDER_INS_TMOVE),   //
+                EP(LADDER_INS_INV),     //
+                EP(LADDER_INS_MULTI),   //
+        };
 
 // registers quantity
 #define QTY_M  18
@@ -172,10 +232,10 @@ int main(void) {
 
     printf("\n");
 
-    err_prg_check = ladder_program_check(ladder_ctx);
+    err_prg_check = ladder_program_check(&ladder_ctx);
     if (err_prg_check.error != LADDER_ERR_PRG_CHECK_OK) {
-        printf("ERROR: Program not valid (%d) at network:%d [%d,%d] code: %d\n", err_prg_check.error, err_prg_check.network, err_prg_check.row,
-                err_prg_check.column, err_prg_check.code);
+        printf("ERROR: Program not valid (%d) %s at network:%d [%d,%d] code: (%d) %s\n", err_prg_check.error, program_test_errors[err_prg_check.error],
+                err_prg_check.network, err_prg_check.row, err_prg_check.column, err_prg_check.code, functions_str[err_prg_check.code]);
         goto end;
     }
 
