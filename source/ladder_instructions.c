@@ -38,7 +38,7 @@
 #include "ladder_instructions.h"
 
 static uint32_t basetime_factor[] = { 1, 10, 100, 1000, 60000 };
-static uint8_t error;
+static uint8_t error = 0;
 
 const ladder_instructions_iocd_t ladder_fn_iocd[] = { { 1, 1, 1, 0 }, // NOP
         { 1, 1, 1, 0 }, // CONN
@@ -163,7 +163,7 @@ ladder_ins_err_t fn_COILU(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t ro
 
     return LADDER_INS_ERR_OK;
 }
-#include <stdio.h>
+
 ladder_ins_err_t fn_TON(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row) {
     // timer is not active --> reset
     if (!CELL_STATE_LEFT(ladder_ctx, column, row)) {

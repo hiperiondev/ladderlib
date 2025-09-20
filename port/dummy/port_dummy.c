@@ -96,12 +96,15 @@ static const char *_fn_str[] = { "NOP", //
         "TMOVE", //
         };
 
-static const char *_fn_err_str[] = { "OK", //
+static const char *_fn_err_str[] = { //
+        "OK", //
         "GETPREVVAL", //
         "GETDATAVAL", //
+        "SETDATAVAL", //
         "NOFOREIGN", //
         "NOTABLE", //
         "OUTOFRANGE", //
+        "DIVBYZERO", //
         // [...] //
         "FAIL", //
         };

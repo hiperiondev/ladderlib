@@ -59,6 +59,9 @@
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#define LADDER_MAX_ROWS 32
+#define LADDER_MAX_COLS 255
+
 /**
  * @def OPTIONAL_CRON
  * @brief Include CRON
@@ -148,6 +151,7 @@ typedef enum LADDER_INS_ERROR {
     LADDER_INS_ERR_NOFOREIGN,  /**< Error foreign function not exist */
     LADDER_INS_ERR_NOTABLE,    /**< Table not exist or net not disabled */
     LADDER_INS_ERR_OUTOFRANGE, /**< Value out of range */
+    LADDER_INS_ERR_DIVBYZERO,  /**< Division by zero */
     //...//
     LADDER_INS_ERR_FAIL,       /**< Generic fail */
 } ladder_ins_err_t;
