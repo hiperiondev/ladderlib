@@ -39,17 +39,10 @@
 // ladder logic execution task
 void ladder_task(void *ladderctx) {
     ladder_ctx_t *ladder_ctx = (ladder_ctx_t*) ladderctx;
-    if ((*ladder_ctx).hw.time.millis == NULL || (*ladder_ctx).hw.time.delay == NULL || (*ladder_ctx).hw.io.read == NULL
-            || (*ladder_ctx).hw.io.write == NULL) {
+    if ((*ladder_ctx).hw.time.millis == NULL || (*ladder_ctx).hw.time.delay == NULL || (*ladder_ctx).hw.io.read == NULL || (*ladder_ctx).hw.io.write == NULL) {
         (*ladder_ctx).ladder.state = LADDER_ST_NULLFN;
         goto exit;
     }
-
-    for (uint32_t n=0;n<(*ladder_ctx).hw.io.fn_read_qty;n++)
-        (*ladder_ctx).hw.io.read[n](ladder_ctx, n);
-    for (uint32_t n=0;n<(*ladder_ctx).hw.io.fn_write_qty;n++)
-            (*ladder_ctx).hw.io.write[n](ladder_ctx, n);
-
 
     // task main loop
     while ((*ladder_ctx).ladder.state != LADDER_ST_EXIT_TSK) {
@@ -64,20 +57,22 @@ void ladder_task(void *ladderctx) {
         while ((*ladder_ctx).ladder.state != LADDER_ST_RUNNING) {
             if ((*ladder_ctx).ladder.state == LADDER_ST_EXIT_TSK)
                 return;
+            (*ladder_ctx).hw.time.delay(10);
         }
 
         // external function before scan
         if ((*ladder_ctx).on.task_before != NULL)
             (*ladder_ctx).on.task_before(ladder_ctx);
 
+        for (uint32_t n = 0; n < (*ladder_ctx).hw.io.fn_read_qty; n++)
+            (*ladder_ctx).hw.io.read[n](ladder_ctx, n);
+
         // ladder program scan
         ladder_scan(ladder_ctx);
         ladder_save_previous_values(ladder_ctx);
 
-        for (uint32_t n=0;n<(*ladder_ctx).hw.io.fn_read_qty;n++)
-            (*ladder_ctx).hw.io.read[n](ladder_ctx, n);
-        for (uint32_t n=0;n<(*ladder_ctx).hw.io.fn_write_qty;n++)
-                (*ladder_ctx).hw.io.write[n](ladder_ctx, n);
+        for (uint32_t n = 0; n < (*ladder_ctx).hw.io.fn_write_qty; n++)
+            (*ladder_ctx).hw.io.write[n](ladder_ctx, n);
 
         ladder_scan_time(ladder_ctx);
 
