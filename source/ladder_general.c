@@ -72,9 +72,21 @@ void ladder_clear_program(ladder_ctx_t *ladder_ctx) {
     for (uint32_t nt = 0; nt < (*ladder_ctx).ladder.quantity.networks; nt++) {
         for (uint32_t r = 0; r < (*ladder_ctx).network[nt].rows; r++) {
             for (uint32_t c = 0; c < (*ladder_ctx).network[nt].cols; c++) {
-                (*ladder_ctx).network[nt].cells[r][c].code = 0;
-                free((*ladder_ctx).network[nt].cells[r][c].data);
-                (*ladder_ctx).network[nt].cells[r][c].data = NULL;
+                (*ladder_ctx).network[nt].cells[r][c].code = LADDER_INS_NOP;
+                (*ladder_ctx).network[nt].cells[r][c].vertical_bar = false;
+                (*ladder_ctx).network[nt].cells[r][c].state = false;
+                if ((*ladder_ctx).network[nt].cells[r][c].data != NULL) {
+                    for (uint32_t d = 0; d < (*ladder_ctx).network[nt].cells[r][c].data_qty; d++) {
+                        if ((*ladder_ctx).network[nt].cells[r][c].data[d].type == LADDER_REGISTER_S&&
+                        (*ladder_ctx).network[nt].cells[r][c].data[d].value.cstr != NULL) {
+                            free((void*) (*ladder_ctx).network[nt].cells[r][c].data[d].value.cstr);
+                            (*ladder_ctx).network[nt].cells[r][c].data[d].value.cstr = NULL;
+                        }
+                    }
+                    free((*ladder_ctx).network[nt].cells[r][c].data);
+                    (*ladder_ctx).network[nt].cells[r][c].data = NULL;
+                    (*ladder_ctx).network[nt].cells[r][c].data_qty = 0;
+                }
             }
         }
     }
