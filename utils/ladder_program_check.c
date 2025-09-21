@@ -77,6 +77,11 @@ ladder_prg_check_t ladder_program_check(ladder_ctx_t *ladder_ctx) {
                     bool is_timer_data = false;
                     if (status.code == LADDER_INS_TON || status.code == LADDER_INS_TOF || status.code == LADDER_INS_TP) {
                         is_timer_data = true;
+                        // Check for sufficient data_qty to prevent out-of-bounds access
+                        if ((*ladder_ctx).network[nt].cells[row][column].data_qty < 2) {
+                            status.error = LADDER_ERR_PRG_CHECK_FAIL; // Insufficient data for timer instruction
+                            goto end;
+                        }
                         if (d == 0) { // Validate timer index
                             if (reg_type != LADDER_REGISTER_T) {
                                 status.error = LADDER_ERR_PRG_CHECK_T_INV_TYPE;
@@ -107,8 +112,14 @@ ladder_prg_check_t ladder_program_check(ladder_ctx_t *ladder_ctx) {
                         for (i = 0; i < num_checks; i++) {
                             if (reg_type == checks[i].type) {
                                 uint32_t fn_qty = checks[i].is_input ? (*ladder_ctx).hw.io.fn_read_qty : (*ladder_ctx).hw.io.fn_write_qty;
-                                uint32_t module = (*ladder_ctx).network[nt].cells[row][column].data[d].value.mp.module;
-                                uint32_t port = (*ladder_ctx).network[nt].cells[row][column].data[d].value.mp.port;
+                                // Handle negative indices safely before casting
+                                int32_t index = (*ladder_ctx).network[nt].cells[row][column].data[d].value.i32;
+                                if (index < 0) {
+                                    status.error = LADDER_ERR_PRG_CHECK_FAIL; // Negative index invalid
+                                    goto end;
+                                }
+                                uint32_t module = (uint32_t) (*ladder_ctx).network[nt].cells[row][column].data[d].value.mp.module;
+                                uint32_t port = (uint32_t) (*ladder_ctx).network[nt].cells[row][column].data[d].value.mp.port;
 
                                 if (fn_qty == 0) {
                                     status.error = checks[i].no_mod_err;
@@ -136,47 +147,54 @@ ladder_prg_check_t ladder_program_check(ladder_ctx_t *ladder_ctx) {
 
                         // validation for non-I/O register types to address incomplete coverage.
                         if (i == num_checks) { // Not an I/O register type
+                            // Handle negative indices safely before casting
                             int32_t index = (*ladder_ctx).network[nt].cells[row][column].data[d].value.i32;
                             if (index < 0) {
-                                status.error = LADDER_ERR_PRG_CHECK_FAIL;
+                                status.error = LADDER_ERR_PRG_CHECK_FAIL; // Negative index invalid
                                 goto end;
                             }
                             uint32_t uindex = (uint32_t) index;
+                            uint32_t qty = 0; // Will be set based on type
                             switch (reg_type) {
                                 case LADDER_REGISTER_NONE:
                                     // Constant value; no index check needed.
                                     break;
                                 case LADDER_REGISTER_M:
-                                    if ((*ladder_ctx).ladder.quantity.m > 0 && uindex >= (*ladder_ctx).ladder.quantity.m) {
-                                        status.error = LADDER_ERR_PRG_CHECK_FAIL;
+                                    qty = (*ladder_ctx).ladder.quantity.m;
+                                    if (uindex >= qty) {
+                                        status.error = LADDER_ERR_PRG_CHECK_FAIL; // Invalid index for M register
                                         goto end;
                                     }
                                     break;
                                 case LADDER_REGISTER_Cd:
                                 case LADDER_REGISTER_Cr:
                                 case LADDER_REGISTER_C:
-                                    if ((*ladder_ctx).ladder.quantity.c > 0 && uindex >= (*ladder_ctx).ladder.quantity.c) {
-                                        status.error = LADDER_ERR_PRG_CHECK_FAIL;
+                                    qty = (*ladder_ctx).ladder.quantity.c;
+                                    if (uindex >= qty) {
+                                        status.error = LADDER_ERR_PRG_CHECK_FAIL; // Invalid index for C register
                                         goto end;
                                     }
                                     break;
                                 case LADDER_REGISTER_Td:
                                 case LADDER_REGISTER_Tr:
                                 case LADDER_REGISTER_T:
-                                    if ((*ladder_ctx).ladder.quantity.t > 0 && uindex >= (*ladder_ctx).ladder.quantity.t) {
-                                        status.error = LADDER_ERR_PRG_CHECK_FAIL;
+                                    qty = (*ladder_ctx).ladder.quantity.t;
+                                    if (uindex >= qty) {
+                                        status.error = LADDER_ERR_PRG_CHECK_FAIL; // Invalid index for T register
                                         goto end;
                                     }
                                     break;
                                 case LADDER_REGISTER_D:
-                                    if ((*ladder_ctx).ladder.quantity.d > 0 && uindex >= (*ladder_ctx).ladder.quantity.d) {
-                                        status.error = LADDER_ERR_PRG_CHECK_FAIL;
+                                    qty = (*ladder_ctx).ladder.quantity.d;
+                                    if (uindex >= qty) {
+                                        status.error = LADDER_ERR_PRG_CHECK_FAIL; // Invalid index for D register
                                         goto end;
                                     }
                                     break;
                                 case LADDER_REGISTER_R:
-                                    if ((*ladder_ctx).ladder.quantity.r > 0 && uindex >= (*ladder_ctx).ladder.quantity.r) {
-                                        status.error = LADDER_ERR_PRG_CHECK_FAIL;
+                                    qty = (*ladder_ctx).ladder.quantity.r;
+                                    if (uindex >= qty) {
+                                        status.error = LADDER_ERR_PRG_CHECK_FAIL; // Invalid index for R register
                                         goto end;
                                     }
                                     break;
@@ -221,13 +239,63 @@ ladder_prg_check_t ladder_program_check(ladder_ctx_t *ladder_ctx) {
                         case LADDER_INS_TP:
                             valid_type = true;
                             break;
-                            // For other instructions, assume valid for now (expand as needed).
+                            // Modified: Expanded validation to cover arithmetic and comparison instructions, ensuring numeric types
+                        case LADDER_INS_ADD:
+                        case LADDER_INS_SUB:
+                        case LADDER_INS_MUL:
+                        case LADDER_INS_DIV:
+                        case LADDER_INS_MOD:
+                        case LADDER_INS_SHL:
+                        case LADDER_INS_SHR:
+                        case LADDER_INS_ROL:
+                        case LADDER_INS_ROR:
+                        case LADDER_INS_AND:
+                        case LADDER_INS_OR:
+                        case LADDER_INS_XOR:
+                        case LADDER_INS_NOT:
+                        case LADDER_INS_EQ:
+                        case LADDER_INS_GT:
+                        case LADDER_INS_GE:
+                        case LADDER_INS_LT:
+                        case LADDER_INS_LE:
+                        case LADDER_INS_NE:
+                            // Operands must be numeric types (e.g., D, R, constants, etc.)
+                            if (reg_type == LADDER_REGISTER_D || reg_type == LADDER_REGISTER_R || reg_type == LADDER_REGISTER_NONE
+                                    || reg_type == LADDER_REGISTER_C || reg_type == LADDER_REGISTER_IW || reg_type == LADDER_REGISTER_QW) {
+                                valid_type = true;
+                            }
+                            break;
+                        case LADDER_INS_MOVE:
+                        case LADDER_INS_TMOVE:
+                            // Similar to arithmetic, but allow string for TMOV if applicable
+                            if (reg_type == LADDER_REGISTER_D || reg_type == LADDER_REGISTER_R || reg_type == LADDER_REGISTER_NONE
+                                    || reg_type == LADDER_REGISTER_C || reg_type == LADDER_REGISTER_IW || reg_type == LADDER_REGISTER_QW
+                                    || reg_type == LADDER_REGISTER_S) {
+                                valid_type = true;
+                            }
+                            break;
+                        case LADDER_INS_CTU:
+                        case LADDER_INS_CTD:
+                            if (d == 0) {
+                                if (reg_type == LADDER_REGISTER_C) {
+                                    valid_type = true;
+                                }
+                            } else if (d == 1) {
+                                if (reg_type == LADDER_REGISTER_NONE || reg_type == LADDER_REGISTER_D) {
+                                    valid_type = true;
+                                }
+                            }
+                            break;
                         default:
-                            valid_type = true;
+                            if (status.code >= LADDER_INS_INV) {
+                                status.error = LADDER_ERR_PRG_CHECK_FAIL; // Invalid instruction code
+                                goto end;
+                            }
+                            valid_type = true; // Assume valid for unhandled instructions
                             break;
                     }
                     if (!valid_type) {
-                        status.error = LADDER_ERR_PRG_CHECK_FAIL;
+                        status.error = LADDER_ERR_PRG_CHECK_FAIL; // Invalid register type for instruction
                         goto end;
                     }
                 }
