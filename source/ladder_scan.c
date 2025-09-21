@@ -80,10 +80,7 @@ static ladder_fn_t const ladder_function[] = { //
         fn_TMOVE,   // 36
         };
 
-ladder_ins_err_t ins_err;
-
 void ladder_scan(ladder_ctx_t *ladder_ctx) {
-    ins_err = 0;
     uint32_t network = 0;
 
 #ifdef OPTIONAL_CRON
@@ -106,7 +103,7 @@ void ladder_scan(ladder_ctx_t *ladder_ctx) {
 
                 // save this execution
                 (*ladder_ctx).ladder.last.instr = (*(*ladder_ctx).exec_network).cells[row][column].code;
-                (*ladder_ctx).ladder.last.err = ins_err;
+                (*ladder_ctx).ladder.last.err = LADDER_INS_ERR_OK;
                 (*ladder_ctx).ladder.last.network = network;
                 (*ladder_ctx).ladder.last.cell_row = row;
                 (*ladder_ctx).ladder.last.cell_column = column;
@@ -115,20 +112,21 @@ void ladder_scan(ladder_ctx_t *ladder_ctx) {
                 if ((*(*ladder_ctx).exec_network).cells[row][column].code >= LADDER_INS_INV
                         && (*(*ladder_ctx).exec_network).cells[row][column].code != LADDER_INS_MULTI) {
                     (*ladder_ctx).ladder.state = LADDER_ST_INV;
+                    (*ladder_ctx).ladder.last.err = LADDER_INS_ERR_FAIL;
                     return;
                 }
 
                 // execute instruction
                 if ((*(*ladder_ctx).exec_network).cells[row][column].code != LADDER_INS_MULTI) {
-                    ins_err = ladder_function[(*(*ladder_ctx).exec_network).cells[row][column].code](ladder_ctx, column, row);
+                    (*ladder_ctx).ladder.last.err = ladder_function[(*(*ladder_ctx).exec_network).cells[row][column].code](ladder_ctx, column, row);
 
-                    if (ins_err != LADDER_INS_ERR_OK) {
+                    if ((*ladder_ctx).ladder.last.err != LADDER_INS_ERR_OK) {
                         (*ladder_ctx).ladder.state = LADDER_ST_INV;
                         return;
                     }
 
                     if ((*(*ladder_ctx).exec_network).cells[row][column].vertical_bar)
-                        (*(*ladder_ctx).exec_network).cells[row][column].state = row == 0 ? false : (*(*ladder_ctx).exec_network).cells[row - 1][column].state;
+                        (*(*ladder_ctx).exec_network).cells[row][column].state = row == 0 ? true : (*(*ladder_ctx).exec_network).cells[row - 1][column].state;
                 }
 
                 if ((*ladder_ctx).on.instruction != NULL)
@@ -139,9 +137,10 @@ void ladder_scan(ladder_ctx_t *ladder_ctx) {
 #ifdef OPTIONAL_CRON
         exit:
         // clean auto reset cron registers
-        for (uint32_t n = 0; n < ((ladderlib_cron_t*) (*ladder_ctx).cron)->used; n++)
-            if (((ladderlib_cron_t*) (*ladder_ctx).cron)->ctx[n].enabled && ((ladderlib_cron_t*) (*ladder_ctx).cron)->ctx[n].auto_reset)
-                (*ladder_ctx).memory.M[((ladderlib_cron_t*) (*ladder_ctx).cron)->ctx[n].flag_reg] = false;
+        if ((ladderlib_cron_t*) (*ladder_ctx).cron != NULL)
+            for (uint32_t n = 0; n < ((ladderlib_cron_t*) (*ladder_ctx).cron)->used; n++)
+                if (((ladderlib_cron_t*) (*ladder_ctx).cron)->ctx[n].enabled && ((ladderlib_cron_t*) (*ladder_ctx).cron)->ctx[n].auto_reset)
+                    (*ladder_ctx).memory.M[((ladderlib_cron_t*) (*ladder_ctx).cron)->ctx[n].flag_reg] = false;
 #endif
 
         if ((*ladder_ctx).on.scan_end != NULL)
