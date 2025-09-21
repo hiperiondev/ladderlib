@@ -161,49 +161,69 @@ bool ladder_ctx_deinit(ladder_ctx_t *ladder_ctx) {
     ladder_clear_memory(ladder_ctx);
     ladder_clear_program(ladder_ctx);
 
-    if (ladder_ctx->network != NULL) {
-        for (uint32_t nt = 0; nt < ladder_ctx->ladder.quantity.networks; nt++) {
-            if (ladder_ctx->network[nt].cells != NULL) {
-                for (uint32_t r = 0; r < ladder_ctx->network[nt].rows; r++) {
-                    // Add inner data free (though clear_program did; redundant safety).
-                    for (uint32_t c = 0; c < ladder_ctx->network[nt].cols; c++) {
-                        free(ladder_ctx->network[nt].cells[r][c].data);
-                        ladder_ctx->network[nt].cells[r][c].data = NULL;
+    // Free networks, including cells and their data
+    for (uint32_t nt = 0; nt < (*ladder_ctx).ladder.quantity.networks; nt++) {
+        for (uint32_t r = 0; r < (*ladder_ctx).network[nt].rows; r++) {
+            for (uint32_t c = 0; c < (*ladder_ctx).network[nt].cols; c++) {
+                if ((*ladder_ctx).network[nt].cells[r][c].data != NULL) {
+                    // Free any allocated strings (cstr) before freeing the data array
+                    // This prevents memory leaks from strdup calls in other parts of the code (e.g., JSON parsing)
+                    for (uint32_t d = 0; d < (*ladder_ctx).network[nt].cells[r][c].data_qty; d++) {
+                        if ((*ladder_ctx).network[nt].cells[r][c].data[d].type == LADDER_REGISTER_S&&
+                        (*ladder_ctx).network[nt].cells[r][c].data[d].value.cstr != NULL) {
+                            free((void*) (*ladder_ctx).network[nt].cells[r][c].data[d].value.cstr);
+                            (*ladder_ctx).network[nt].cells[r][c].data[d].value.cstr = NULL; // Prevent dangling pointer
+                        }
                     }
-                    free(ladder_ctx->network[nt].cells[r]);
+                    free((*ladder_ctx).network[nt].cells[r][c].data);
+                    (*ladder_ctx).network[nt].cells[r][c].data = NULL;
                 }
-                free(ladder_ctx->network[nt].cells);
-                ladder_ctx->network[nt].cells = NULL;
             }
+            free((*ladder_ctx).network[nt].cells[r]);
         }
-        free(ladder_ctx->network);
-        ladder_ctx->network = NULL;
+        free((*ladder_ctx).network[nt].cells);
     }
+    free((*ladder_ctx).network);
 
-    free(ladder_ctx->memory.M); ladder_ctx->memory.M = NULL;
-    free(ladder_ctx->memory.Cr); ladder_ctx->memory.Cr = NULL;
-    free(ladder_ctx->memory.Cd); ladder_ctx->memory.Cd = NULL;
-    free(ladder_ctx->memory.Tr); ladder_ctx->memory.Tr = NULL;
-    free(ladder_ctx->memory.Td); ladder_ctx->memory.Td = NULL;
+    free(ladder_ctx->memory.M);
+    ladder_ctx->memory.M = NULL;
+    free(ladder_ctx->memory.Cr);
+    ladder_ctx->memory.Cr = NULL;
+    free(ladder_ctx->memory.Cd);
+    ladder_ctx->memory.Cd = NULL;
+    free(ladder_ctx->memory.Tr);
+    ladder_ctx->memory.Tr = NULL;
+    free(ladder_ctx->memory.Td);
+    ladder_ctx->memory.Td = NULL;
 
-    free(ladder_ctx->prev_scan_vals.Mh); ladder_ctx->prev_scan_vals.Mh = NULL;
-    free(ladder_ctx->prev_scan_vals.Crh); ladder_ctx->prev_scan_vals.Crh = NULL;
-    free(ladder_ctx->prev_scan_vals.Cdh); ladder_ctx->prev_scan_vals.Cdh = NULL;
-    free(ladder_ctx->prev_scan_vals.Trh); ladder_ctx->prev_scan_vals.Trh = NULL;
-    free(ladder_ctx->prev_scan_vals.Tdh); ladder_ctx->prev_scan_vals.Tdh = NULL;
+    free(ladder_ctx->prev_scan_vals.Mh);
+    ladder_ctx->prev_scan_vals.Mh = NULL;
+    free(ladder_ctx->prev_scan_vals.Crh);
+    ladder_ctx->prev_scan_vals.Crh = NULL;
+    free(ladder_ctx->prev_scan_vals.Cdh);
+    ladder_ctx->prev_scan_vals.Cdh = NULL;
+    free(ladder_ctx->prev_scan_vals.Trh);
+    ladder_ctx->prev_scan_vals.Trh = NULL;
+    free(ladder_ctx->prev_scan_vals.Tdh);
+    ladder_ctx->prev_scan_vals.Tdh = NULL;
 
-    free(ladder_ctx->registers.C); ladder_ctx->registers.C = NULL;
-    free(ladder_ctx->registers.D); ladder_ctx->registers.D = NULL;
-    free(ladder_ctx->registers.R); ladder_ctx->registers.R = NULL;
+    free(ladder_ctx->registers.C);
+    ladder_ctx->registers.C = NULL;
+    free(ladder_ctx->registers.D);
+    ladder_ctx->registers.D = NULL;
+    free(ladder_ctx->registers.R);
+    ladder_ctx->registers.R = NULL;
 
-    free(ladder_ctx->timers); ladder_ctx->timers = NULL;
+    free(ladder_ctx->timers);
+    ladder_ctx->timers = NULL;
 
     for (uint32_t f = 0; f < ladder_ctx->foreign.qty; f++) {
         if (ladder_ctx->foreign.fn[f].deinit) {
             ladder_ctx->foreign.fn[f].deinit(&(ladder_ctx->foreign.fn[f]));
         }
     }
-    free(ladder_ctx->foreign.fn); ladder_ctx->foreign.fn = NULL;
+    free(ladder_ctx->foreign.fn);
+    ladder_ctx->foreign.fn = NULL;
 
     for (uint32_t f = 0; f < ladder_ctx->hw.io.fn_read_qty; f++) {
         if (ladder_ctx->hw.io.init_read[f]) {
@@ -216,17 +236,24 @@ bool ladder_ctx_deinit(ladder_ctx_t *ladder_ctx) {
         }
     }
 
-    free(ladder_ctx->hw.io.read); ladder_ctx->hw.io.read = NULL;
-    free(ladder_ctx->hw.io.write); ladder_ctx->hw.io.write = NULL;
-    free(ladder_ctx->hw.io.init_read); ladder_ctx->hw.io.init_read = NULL;
-    free(ladder_ctx->hw.io.init_write); ladder_ctx->hw.io.init_write = NULL;
-    free(ladder_ctx->input); ladder_ctx->input = NULL;
-    free(ladder_ctx->output); ladder_ctx->output = NULL;
+    free(ladder_ctx->hw.io.read);
+    ladder_ctx->hw.io.read = NULL;
+    free(ladder_ctx->hw.io.write);
+    ladder_ctx->hw.io.write = NULL;
+    free(ladder_ctx->hw.io.init_read);
+    ladder_ctx->hw.io.init_read = NULL;
+    free(ladder_ctx->hw.io.init_write);
+    ladder_ctx->hw.io.init_write = NULL;
+    free(ladder_ctx->input);
+    ladder_ctx->input = NULL;
+    free(ladder_ctx->output);
+    ladder_ctx->output = NULL;
 
 #ifdef OPTIONAL_CRON
-    if (((ladderlib_cron_t *) ladder_ctx->cron)->ctx != NULL)
+    if (((ladderlib_cron_t*) ladder_ctx->cron)->ctx != NULL)
         ladderlib_cron_deinit(ladder_ctx);
-    free(ladder_ctx->cron); ladder_ctx->cron = NULL;
+    free(ladder_ctx->cron);
+    ladder_ctx->cron = NULL;
 #endif
 
     return true;

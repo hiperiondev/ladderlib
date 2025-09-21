@@ -35,6 +35,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <string.h>
+#include <errno.h>
 
 #ifdef __linux__
 #include <cjson/cJSON.h>

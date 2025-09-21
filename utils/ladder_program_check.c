@@ -44,10 +44,11 @@ typedef struct {
 } check_info_t;
 
 ladder_prg_check_t ladder_program_check(ladder_ctx_t *ladder_ctx) {
-    if (ladder_ctx == NULL)
-        return LADDER_ERR_PRG_CHECK_FAIL;
-
     ladder_prg_check_t status;
+    if (ladder_ctx == NULL) {
+        status.error = LADDER_ERR_PRG_CHECK_FAIL;
+        return status;
+    }
 
     // Static table for all I/O register types, mapping to correct quantities and errors.
     // This eliminates duplication and makes it easy to add/maintain entries.
