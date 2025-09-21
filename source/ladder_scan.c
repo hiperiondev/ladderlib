@@ -126,11 +126,11 @@ void ladder_scan(ladder_ctx_t *ladder_ctx) {
                     }
 
                     if ((*(*ladder_ctx).exec_network).cells[row][column].vertical_bar)
-                        (*(*ladder_ctx).exec_network).cells[row][column].state = row == 0 ? true : (*(*ladder_ctx).exec_network).cells[row - 1][column].state;
-                }
+                        (*(*ladder_ctx).exec_network).cells[row][column].state |= row == 0 ? false : (*(*ladder_ctx).exec_network).cells[row - 1][column].state;
 
-                if ((*ladder_ctx).on.instruction != NULL)
-                    (*ladder_ctx).on.instruction(ladder_ctx);
+                    if ((*ladder_ctx).on.instruction != NULL)
+                        (*ladder_ctx).on.instruction(ladder_ctx);
+                }
             }
         }
 
