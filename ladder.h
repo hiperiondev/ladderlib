@@ -314,12 +314,13 @@ typedef struct ladder_s {
     } last;
 
     struct {
-        uint32_t m;           /**< Quantity of regular flags */
-        uint32_t c;           /**< Quantity of counters */
-        uint32_t t;           /**< Quantity of timers */
-        uint32_t d;           /**< Quantity of regular registers */
-        uint32_t r;           /**< Quantity of floating point registers */
-        uint32_t networks;    /**< Quantity of networks */
+        uint32_t m;             /**< Quantity of regular flags */
+        uint32_t c;             /**< Quantity of counters */
+        uint32_t t;             /**< Quantity of timers */
+        uint32_t d;             /**< Quantity of regular registers */
+        uint32_t r;             /**< Quantity of floating point registers */
+        uint32_t networks;      /**< Quantity of networks */
+        uint32_t delay_not_run; /**< Delay on task when not running state (ms) */
     } quantity;
 } ladder_t;
 
@@ -623,11 +624,12 @@ typedef struct ladder_ctx_s {
  * @param qty_t Memory Areas quantities. Timers.
  * @param qty_d Memory Areas quantities. Regular registers (16 bit signed).
  * @param qty_r Memory Areas quantities. Float or Real registers.
+ * @param delay_not_run Delay on task when not running state (ms).
  * @param init_netwok If false not initialize Networks
  * @return Error
  */
 bool ladder_ctx_init(ladder_ctx_t *ladder_ctx, uint8_t net_columns_qty, uint8_t net_rows_qty, uint32_t networks_qty, uint32_t qty_m, uint32_t qty_c,
-        uint32_t qty_t, uint32_t qty_d, uint32_t qty_r, bool init_netwok);
+        uint32_t qty_t, uint32_t qty_d, uint32_t qty_r, uint32_t delay_not_run, bool init_netwok);
 
 /**
  * @fn bool ladder_ctx_deinit(ladder_ctx_t *ladder_ctx)

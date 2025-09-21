@@ -60,7 +60,7 @@ void ladder_task(void *ladderctx) {
         while ((*ladder_ctx).ladder.state != LADDER_ST_RUNNING) {
             if ((*ladder_ctx).ladder.state == LADDER_ST_EXIT_TSK)
                 return;
-            (*ladder_ctx).hw.time.delay(10);
+            (*ladder_ctx).hw.time.delay((*ladder_ctx).ladder.quantity.delay_not_run);
         }
 
         // external function before scan
