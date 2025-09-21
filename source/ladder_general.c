@@ -335,14 +335,29 @@ bool ladder_ctx_deinit(ladder_ctx_t *ladder_ctx) {
 }
 
 bool ladder_add_read_fn(ladder_ctx_t *ladder_ctx, _io_read read, _io_init read_init) {
+    void *tmp_read = NULL;
+    void *tmp_init_read = NULL;
+    void *tmp_input = NULL;
+
     if ((*ladder_ctx).hw.io.fn_read_qty == 0) {
         (*ladder_ctx).hw.io.read = calloc(1, sizeof(_io_read*));
         (*ladder_ctx).hw.io.init_read = calloc(1, sizeof(_io_init*));
         (*ladder_ctx).input = calloc(1, sizeof(ladder_hw_input_vals_t));
     } else {
-        (*ladder_ctx).hw.io.read = realloc((*ladder_ctx).hw.io.read, ((*ladder_ctx).hw.io.fn_read_qty + 1) * sizeof(_io_read*));
-        (*ladder_ctx).hw.io.init_read = realloc((*ladder_ctx).hw.io.init_read, ((*ladder_ctx).hw.io.fn_read_qty + 1) * sizeof(_io_init*));
-        (*ladder_ctx).input = realloc((*ladder_ctx).input, ((*ladder_ctx).hw.io.fn_read_qty + 1) * sizeof(ladder_hw_input_vals_t));
+        tmp_read = realloc((*ladder_ctx).hw.io.read, ((*ladder_ctx).hw.io.fn_read_qty + 1) * sizeof(_io_read*));
+        if (!tmp_read)
+            return false;
+        (*ladder_ctx).hw.io.read = tmp_read;
+
+        tmp_init_read = realloc((*ladder_ctx).hw.io.init_read, ((*ladder_ctx).hw.io.fn_read_qty + 1) * sizeof(_io_init*));
+        if (!tmp_init_read)
+            return false;
+        (*ladder_ctx).hw.io.init_read = tmp_init_read;
+
+        tmp_input = realloc((*ladder_ctx).input, ((*ladder_ctx).hw.io.fn_read_qty + 1) * sizeof(ladder_hw_input_vals_t));
+        if (!tmp_input)
+            return false;
+        (*ladder_ctx).input = tmp_input;
     }
 
     if ((*ladder_ctx).hw.io.read == NULL || (*ladder_ctx).hw.io.init_read == NULL)
@@ -362,14 +377,29 @@ bool ladder_add_read_fn(ladder_ctx_t *ladder_ctx, _io_read read, _io_init read_i
 }
 
 bool ladder_add_write_fn(ladder_ctx_t *ladder_ctx, _io_write write, _io_init write_init) {
+    void *tmp_write = NULL;
+    void *tmp_init_write = NULL;
+    void *tmp_output = NULL;
+
     if ((*ladder_ctx).hw.io.fn_write_qty == 0) {
         (*ladder_ctx).hw.io.write = calloc(1, sizeof(_io_write*));
         (*ladder_ctx).hw.io.init_write = calloc(1, sizeof(_io_init*));
         (*ladder_ctx).output = calloc(1, sizeof(ladder_hw_output_vals_t));
     } else {
-        (*ladder_ctx).hw.io.write = realloc((*ladder_ctx).hw.io.write, ((*ladder_ctx).hw.io.fn_write_qty + 1) * sizeof(_io_write*));
-        (*ladder_ctx).hw.io.init_write = realloc((*ladder_ctx).hw.io.init_write, ((*ladder_ctx).hw.io.fn_write_qty + 1) * sizeof(_io_init*));
-        (*ladder_ctx).output = realloc((*ladder_ctx).output, ((*ladder_ctx).hw.io.fn_write_qty + 1) * sizeof(ladder_hw_output_vals_t));
+        tmp_write = realloc((*ladder_ctx).hw.io.write, ((*ladder_ctx).hw.io.fn_write_qty + 1) * sizeof(_io_write*));
+        if (!tmp_write)
+            return false;
+        (*ladder_ctx).hw.io.write = tmp_write;
+
+        tmp_init_write = realloc((*ladder_ctx).hw.io.init_write, ((*ladder_ctx).hw.io.fn_write_qty + 1) * sizeof(_io_init*));
+        if (!tmp_init_write)
+            return false;
+        (*ladder_ctx).hw.io.init_write = tmp_init_write;
+
+        tmp_output = realloc((*ladder_ctx).output, ((*ladder_ctx).hw.io.fn_write_qty + 1) * sizeof(ladder_hw_output_vals_t));
+        if (!tmp_output)
+            return false;
+        (*ladder_ctx).output = tmp_output;
     }
 
     if ((*ladder_ctx).hw.io.write == NULL || (*ladder_ctx).hw.io.init_write == NULL)
@@ -392,6 +422,7 @@ bool ladder_add_foreign(ladder_ctx_t *ladder_ctx, _foreign_fn_init fn_init, void
     if (fn_init == NULL)
         return false;
 
+    void *tmp_fn = NULL;
     ladder_foreign_function_t fn_new;
 
     memset(&fn_new, 0, sizeof(ladder_foreign_function_t));
@@ -402,7 +433,12 @@ bool ladder_add_foreign(ladder_ctx_t *ladder_ctx, _foreign_fn_init fn_init, void
 
     if ((*ladder_ctx).foreign.qty == 0)
         (*ladder_ctx).foreign.fn = malloc(sizeof(ladder_foreign_function_t));
-    else (*ladder_ctx).foreign.fn = realloc((*ladder_ctx).foreign.fn, ((*ladder_ctx).foreign.qty + 1) * sizeof(ladder_foreign_function_t));
+    else {
+        tmp_fn = realloc((*ladder_ctx).foreign.fn, ((*ladder_ctx).foreign.qty + 1) * sizeof(ladder_foreign_function_t));
+        if (!tmp_fn)
+            return false;
+        (*ladder_ctx).foreign.fn = tmp_fn;
+    }
 
     memcpy(&((*ladder_ctx).foreign.fn[(*ladder_ctx).foreign.qty]), &fn_new, sizeof(ladder_foreign_function_t));
     ++(*ladder_ctx).foreign.qty;

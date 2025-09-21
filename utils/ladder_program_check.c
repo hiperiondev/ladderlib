@@ -77,7 +77,6 @@ ladder_prg_check_t ladder_program_check(ladder_ctx_t *ladder_ctx) {
                     bool is_timer_data = false;
                     if (status.code == LADDER_INS_TON || status.code == LADDER_INS_TOF || status.code == LADDER_INS_TP) {
                         is_timer_data = true;
-                        // Check for sufficient data_qty to prevent out-of-bounds access
                         if ((*ladder_ctx).network[nt].cells[row][column].data_qty < 2) {
                             status.error = LADDER_ERR_PRG_CHECK_FAIL; // Insufficient data for timer instruction
                             goto end;
@@ -112,12 +111,8 @@ ladder_prg_check_t ladder_program_check(ladder_ctx_t *ladder_ctx) {
                         for (i = 0; i < num_checks; i++) {
                             if (reg_type == checks[i].type) {
                                 uint32_t fn_qty = checks[i].is_input ? (*ladder_ctx).hw.io.fn_read_qty : (*ladder_ctx).hw.io.fn_write_qty;
-                                // Handle negative indices safely before casting
-                                int32_t index = (*ladder_ctx).network[nt].cells[row][column].data[d].value.i32;
-                                if (index < 0) {
-                                    status.error = LADDER_ERR_PRG_CHECK_FAIL; // Negative index invalid
-                                    goto end;
-                                }
+                                // Directly access mp fields for I/O types to avoid reading uninitialized union bytes via i32
+                                // This prevents Valgrind errors from accessing larger union members when only smaller ones are initialized
                                 uint32_t module = (uint32_t) (*ladder_ctx).network[nt].cells[row][column].data[d].value.mp.module;
                                 uint32_t port = (uint32_t) (*ladder_ctx).network[nt].cells[row][column].data[d].value.mp.port;
 
@@ -147,7 +142,7 @@ ladder_prg_check_t ladder_program_check(ladder_ctx_t *ladder_ctx) {
 
                         // validation for non-I/O register types to address incomplete coverage.
                         if (i == num_checks) { // Not an I/O register type
-                            // Handle negative indices safely before casting
+                            // Handle negative indices safely before casting; this is appropriate here as non-I/O use i32
                             int32_t index = (*ladder_ctx).network[nt].cells[row][column].data[d].value.i32;
                             if (index < 0) {
                                 status.error = LADDER_ERR_PRG_CHECK_FAIL; // Negative index invalid
@@ -227,19 +222,17 @@ ladder_prg_check_t ladder_program_check(ladder_ctx_t *ladder_ctx) {
                         case LADDER_INS_COIL:
                         case LADDER_INS_COILL:
                         case LADDER_INS_COILU:
-                            if (d == 0) { // Operand for coil instructions
+                            if (d == 0) {
                                 if (reg_type == LADDER_REGISTER_Q || reg_type == LADDER_REGISTER_M) {
                                     valid_type = true;
                                 }
                             }
                             break;
-                            // For timers, already validated earlier; no additional check needed here.
                         case LADDER_INS_TON:
                         case LADDER_INS_TOF:
                         case LADDER_INS_TP:
                             valid_type = true;
                             break;
-                            // Modified: Expanded validation to cover arithmetic and comparison instructions, ensuring numeric types
                         case LADDER_INS_ADD:
                         case LADDER_INS_SUB:
                         case LADDER_INS_MUL:
@@ -295,7 +288,7 @@ ladder_prg_check_t ladder_program_check(ladder_ctx_t *ladder_ctx) {
                             break;
                     }
                     if (!valid_type) {
-                        status.error = LADDER_ERR_PRG_CHECK_FAIL; // Invalid register type for instruction
+                        status.error = LADDER_ERR_PRG_CHECK_FAIL;
                         goto end;
                     }
                 }
