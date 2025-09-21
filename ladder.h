@@ -611,7 +611,7 @@ typedef struct ladder_ctx_s {
 
 /**
  * @fn bool ladder_ctx_init(ladder_ctx_t *ladder_ctx, uint8_t net_columns_qty, uint8_t net_rows_qty, uint32_t networks_qty, uint32_t qty_m, uint32_t qty_c,
- *  uint32_t qty_t, uint32_t qty_d, uint32_t qty_r, bool init_netwok);
+ *  uint32_t qty_t, uint32_t qty_d, uint32_t qty_r, uint32_t delay_not_run, bool init_netwok);
  * @brief Initialize context.
  *
  *
