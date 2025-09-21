@@ -74,7 +74,12 @@
  * @brief Point to vertical bar flag
  *
  */
-#define LADDER_VERTICAL_BAR(lctx, n, r, c) ((*lctx).network[n].cells[r][c].vertical_bar)
+#define LADDER_VERTICAL_BAR(lctx, n, r, c)                                                    \
+        ((lctx != NULL                                                                        \
+                && n < (*lctx).ladder.quantity.networks                                       \
+                && r < (*lctx).network[n].rows                                                \
+                && c < (*lctx).network[n].cols) ? (*lctx).network[n].cells[r][c].vertical_bar \
+         : 0)
 
 /**
  * @enum LADDER_INSTRUCTIONS
