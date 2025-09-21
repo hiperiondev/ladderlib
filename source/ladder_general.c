@@ -82,7 +82,9 @@ void ladder_clear_program(ladder_ctx_t *ladder_ctx) {
 
 bool ladder_ctx_init(ladder_ctx_t *ladder_ctx, uint8_t net_columns_qty, uint8_t net_rows_qty, uint32_t networks_qty, uint32_t qty_m, uint32_t qty_c,
         uint32_t qty_t, uint32_t qty_d, uint32_t qty_r, bool init_netwok) {
-    if (net_rows_qty > 32)
+    if (ladder_ctx == NULL)
+        return false;
+    if (net_rows_qty > LADDER_MAX_ROWS)
         return false;
 
     (*ladder_ctx).hw.io.fn_read_qty = 0;
@@ -106,13 +108,25 @@ bool ladder_ctx_init(ladder_ctx_t *ladder_ctx, uint8_t net_columns_qty, uint8_t 
 
     if (init_netwok) {
         (*ladder_ctx).network = calloc(networks_qty, sizeof(ladder_network_t));
+        if ((*ladder_ctx).network == NULL)
+            return false;
+        (*ladder_ctx).ladder.quantity.networks = networks_qty;
 
         for (uint32_t nt = 0; nt < networks_qty; nt++) {
             (*ladder_ctx).network[nt].rows = net_rows_qty;
             (*ladder_ctx).network[nt].cols = net_columns_qty;
             (*ladder_ctx).network[nt].cells = malloc(net_rows_qty * sizeof(ladder_cell_t*));
-            for (uint32_t cl = 0; cl < net_rows_qty; cl++)
+            if ((*ladder_ctx).network[nt].cells == NULL) {
+                ladder_ctx_deinit(ladder_ctx);
+                return false;
+            }
+            for (uint32_t cl = 0; cl < net_rows_qty; cl++) {
                 (*ladder_ctx).network[nt].cells[cl] = calloc(net_columns_qty, sizeof(ladder_cell_t));
+                if ((*ladder_ctx).network[nt].cells[cl] == NULL) {
+                    ladder_ctx_deinit(ladder_ctx);
+                    return false;
+                }
+            }
 
             for (uint32_t column = 0; column < net_columns_qty; column++) {
                 for (uint32_t row = 0; row < net_rows_qty; row++) {
@@ -126,32 +140,91 @@ bool ladder_ctx_init(ladder_ctx_t *ladder_ctx, uint8_t net_columns_qty, uint8_t 
         }
     }
     (*ladder_ctx).memory.M = calloc(qty_m, sizeof(uint8_t));
+    if ((*ladder_ctx).memory.M == NULL) {
+        ladder_ctx_deinit(ladder_ctx);
+        return false;
+    }
     (*ladder_ctx).memory.Cr = calloc(qty_c, sizeof(bool));
+    if ((*ladder_ctx).memory.Cr == NULL) {
+        ladder_ctx_deinit(ladder_ctx);
+        return false;
+    }
     (*ladder_ctx).memory.Cd = calloc(qty_c, sizeof(bool));
+    if ((*ladder_ctx).memory.Cd == NULL) {
+        ladder_ctx_deinit(ladder_ctx);
+        return false;
+    }
     (*ladder_ctx).memory.Tr = calloc(qty_t, sizeof(bool));
+    if ((*ladder_ctx).memory.Tr == NULL) {
+        ladder_ctx_deinit(ladder_ctx);
+        return false;
+    }
     (*ladder_ctx).memory.Td = calloc(qty_t, sizeof(bool));
+    if ((*ladder_ctx).memory.Td == NULL) {
+        ladder_ctx_deinit(ladder_ctx);
+        return false;
+    }
 
     (*ladder_ctx).prev_scan_vals.Mh = calloc(qty_m, sizeof(uint8_t));
+    if ((*ladder_ctx).prev_scan_vals.Mh == NULL) {
+        ladder_ctx_deinit(ladder_ctx);
+        return false;
+    }
     (*ladder_ctx).prev_scan_vals.Crh = calloc(qty_c, sizeof(bool));
+    if ((*ladder_ctx).prev_scan_vals.Crh == NULL) {
+        ladder_ctx_deinit(ladder_ctx);
+        return false;
+    }
     (*ladder_ctx).prev_scan_vals.Cdh = calloc(qty_c, sizeof(bool));
+    if ((*ladder_ctx).prev_scan_vals.Cdh == NULL) {
+        ladder_ctx_deinit(ladder_ctx);
+        return false;
+    }
     (*ladder_ctx).prev_scan_vals.Trh = calloc(qty_t, sizeof(bool));
+    if ((*ladder_ctx).prev_scan_vals.Trh == NULL) {
+        ladder_ctx_deinit(ladder_ctx);
+        return false;
+    }
     (*ladder_ctx).prev_scan_vals.Tdh = calloc(qty_t, sizeof(bool));
+    if ((*ladder_ctx).prev_scan_vals.Tdh == NULL) {
+        ladder_ctx_deinit(ladder_ctx);
+        return false;
+    }
 
     (*ladder_ctx).registers.C = calloc(qty_c, sizeof(uint32_t));
+    if ((*ladder_ctx).registers.C == NULL) {
+        ladder_ctx_deinit(ladder_ctx);
+        return false;
+    }
     (*ladder_ctx).registers.D = calloc(qty_d, sizeof(int32_t));
+    if ((*ladder_ctx).registers.D == NULL) {
+        ladder_ctx_deinit(ladder_ctx);
+        return false;
+    }
     (*ladder_ctx).registers.R = calloc(qty_r, sizeof(float));
+    if ((*ladder_ctx).registers.R == NULL) {
+        ladder_ctx_deinit(ladder_ctx);
+        return false;
+    }
 
     (*ladder_ctx).timers = calloc(qty_t, sizeof(ladder_timer_t));
+    if ((*ladder_ctx).timers == NULL) {
+        ladder_ctx_deinit(ladder_ctx);
+        return false;
+    }
 
-    (*ladder_ctx).ladder.quantity.m = 0;
+    (*ladder_ctx).ladder.quantity.m = qty_m;
     (*ladder_ctx).ladder.quantity.c = qty_c;
     (*ladder_ctx).ladder.quantity.t = qty_t;
     (*ladder_ctx).ladder.quantity.d = qty_d;
     (*ladder_ctx).ladder.quantity.r = qty_r;
-    (*ladder_ctx).ladder.quantity.networks = networks_qty;
 
 #ifdef OPTIONAL_CRON
     (*ladder_ctx).cron = (ladderlib_cron_t*) calloc(1, sizeof(ladderlib_cron_t));
+    if ((*ladder_ctx).cron == NULL) {
+        ladder_ctx_deinit(ladder_ctx);
+        return false;
+    }
 #endif
 
     return true;

@@ -49,64 +49,66 @@
 #define DUMMY_QTY_IW 8
 #define DUMMY_QTY_QW 8
 
-static const char *_ladder_status_str[] = { "STOPPED", //
-        "RUNNING", //
-        "ERROR", //
+static const char *_ladder_status_str[] = { //
+        "STOPPED",  //
+        "RUNNING",  //
+        "ERROR",    //
         "EXIT_TSK", //
-        "NULLFN", //
-        "INVALID", //
+        "NULLFN",   //
+        "INVALID",  //
         };
 
-static const char *_fn_str[] = { "NOP", //
-        "CONN", //
-        "NEG", //
-        "NO", //
-        "NC", //
-        "RE", //
-        "FE", //
-        "COIL", //
-        "COILL", //
-        "COILU", //
-        "TON", //
-        "TOF", //
-        "TP", //
-        "CTU", //
-        "CTD", //
-        "MOVE", //
-        "SUB", //
-        "ADD", //
-        "MUL", //
-        "DIV", //
-        "MOD", //
-        "SHL", //
-        "SHR", //
-        "ROL", //
-        "ROR", //
-        "AND", //
-        "OR", //
-        "XOR", //
-        "NOT", //
-        "EQ", //
-        "GT", //
-        "GE", //
-        "LT", //
-        "LE", //
-        "NE", //
+static const char *_fn_str[] = { //
+        "NOP",     //
+        "CONN",    //
+        "NEG",     //
+        "NO",      //
+        "NC",      //
+        "RE",      //
+        "FE",      //
+        "COIL",    //
+        "COILL",   //
+        "COILU",   //
+        "TON",     //
+        "TOF",     //
+        "TP",      //
+        "CTU",     //
+        "CTD",     //
+        "MOVE",    //
+        "SUB",     //
+        "ADD",     //
+        "MUL",     //
+        "DIV",     //
+        "MOD",     //
+        "SHL",     //
+        "SHR",     //
+        "ROL",     //
+        "ROR",     //
+        "AND",     //
+        "OR",      //
+        "XOR",     //
+        "NOT",     //
+        "EQ",      //
+        "GT",      //
+        "GE",      //
+        "LT",      //
+        "LE",      //
+        "NE",      //
         "FOREIGN", //
-        "TMOVE", //
+        "TMOVE",   //
         };
 
 static const char *_fn_err_str[] = { //
-        "OK", //
+        "OK",         //
         "GETPREVVAL", //
         "GETDATAVAL", //
         "SETDATAVAL", //
-        "NOFOREIGN", //
-        "NOTABLE", //
+        "NOFOREIGN",  //
+        "NOTABLE",    //
         "OUTOFRANGE", //
-        "DIVBYZERO", //
-        // [...] //
-        "FAIL", //
+        "DIVBYZERO",  //
+        //    [...]   //
+        "FAIL",       //
         };
 
 void dummy_delay(long msec) {
@@ -228,7 +230,7 @@ void dummy_write(ladder_ctx_t *ladder_ctx, uint32_t id) {
         for (uint32_t r = 0; r < (*ladder_ctx).network[nt].rows - 1; r++) {
             printf("|");
             for (uint32_t c = 0; c < (*ladder_ctx).network[nt].cols; c++) {
-                printf("%s|", (*ladder_ctx).network[nt].cells[r][c].state == 1 ? "#" : "-");
+                printf("%s|", (*ladder_ctx).network[nt].cells[r][c].state == true ? "#" : "-");
             }
             printf("\n");
             ++rets;

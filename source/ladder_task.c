@@ -38,10 +38,11 @@
 
 // ladder logic execution task
 void ladder_task(void *ladderctx) {
+    ladder_ctx_t *ladder_ctx = NULL;
     if (ladderctx == NULL)
         goto exit;
 
-    ladder_ctx_t *ladder_ctx = (ladder_ctx_t*) ladderctx;
+    ladder_ctx = (ladder_ctx_t*) ladderctx;
     if ((*ladder_ctx).hw.time.millis == NULL || (*ladder_ctx).hw.time.delay == NULL || (*ladder_ctx).hw.io.read == NULL || (*ladder_ctx).hw.io.write == NULL) {
         (*ladder_ctx).ladder.state = LADDER_ST_NULLFN;
         goto exit;
