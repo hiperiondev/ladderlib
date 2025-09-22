@@ -112,7 +112,95 @@ static const char *str_basetime[] = { "MS", //
         "MIN" //
         };
 
+static const char* get_data_name(ladder_instruction_t code, uint8_t d) {
+    switch (code) {
+        case LADDER_INS_NO:
+        case LADDER_INS_NC:
+        case LADDER_INS_RE:
+        case LADDER_INS_FE:
+        case LADDER_INS_COIL:
+        case LADDER_INS_COILL:
+        case LADDER_INS_COILU:
+        case LADDER_INS_NEG:
+        case LADDER_INS_NOT:
+        case LADDER_INS_SHL:
+        case LADDER_INS_SHR:
+        case LADDER_INS_ROL:
+        case LADDER_INS_ROR:
+            if (d == 0)
+                return "value";
+            if (d == 1 && (code == LADDER_INS_SHL || code == LADDER_INS_SHR))
+                return "n";
+            if (d == 1 && (code == LADDER_INS_NOT || code == LADDER_INS_ROL || code == LADDER_INS_ROR))
+                return "result";
+            if (d == 2)
+                return "result";
+            break;
+        case LADDER_INS_TON:
+        case LADDER_INS_TOF:
+        case LADDER_INS_TP:
+            if (d == 0)
+                return "timer";
+            if (d == 1)
+                return "basetime";
+            break;
+        case LADDER_INS_CTU:
+        case LADDER_INS_CTD:
+            if (d == 0)
+                return "counter";
+            if (d == 1)
+                return "preset value";
+            break;
+        case LADDER_INS_MOVE:
+            if (d == 0)
+                return "value";
+            if (d == 1)
+                return "to";
+            break;
+        case LADDER_INS_SUB:
+        case LADDER_INS_ADD:
+        case LADDER_INS_MUL:
+        case LADDER_INS_DIV:
+        case LADDER_INS_MOD:
+        case LADDER_INS_AND:
+        case LADDER_INS_OR:
+        case LADDER_INS_XOR:
+            if (d == 0)
+                return "value1";
+            if (d == 1)
+                return "value2";
+            if (d == 2)
+                return "result";
+            break;
+        case LADDER_INS_EQ:
+        case LADDER_INS_GT:
+        case LADDER_INS_GE:
+        case LADDER_INS_LT:
+        case LADDER_INS_LE:
+        case LADDER_INS_NE:
+            if (d == 0)
+                return "value1";
+            if (d == 1)
+                return "value2";
+            break;
+        case LADDER_INS_TMOVE:
+            if (d == 0)
+                return "value1";
+            if (d == 1)
+                return "value2";
+            if (d == 2)
+                return "to";
+            break;
+        default:
+            return "value";
+    }
+    return "value"; // Fallback for unmatched cases
+}
+
 static bool parse_module_port(const char *str, moduleport_t *result) {
+    if (!str)
+        return false;
+
     unsigned int n;
     unsigned int module_temp, port_temp;
     int ret = sscanf(str, "%u.%u%n", &module_temp, &port_temp, &n);
@@ -674,7 +762,7 @@ ladder_json_error_t ladder_json_to_program(const char *prg, ladder_ctx_t *ladder
                     continue;
                 }
 
-                cell->data = (ladder_value_t*) malloc((size_t) data_qty * sizeof(ladder_value_t));
+                cell->data = (ladder_value_t*) calloc((size_t) data_qty, sizeof(ladder_value_t));
                 if (!cell->data) {
                     parse_ok = false;
                     continue;
@@ -768,6 +856,11 @@ ladder_json_error_t ladder_json_to_program(const char *prg, ladder_ctx_t *ladder
                 }
 
                 if (!data_parse_ok) {
+                    for (uint8_t dd = 0; dd < cell->data_qty; dd++) {
+                        if (cell->data[dd].type == LADDER_REGISTER_S && cell->data[dd].value.cstr) {
+                            free((void*) cell->data[dd].value.cstr);
+                        }
+                    }
                     free(cell->data);
                     cell->data = NULL;
                     cell->data_qty = 0;
@@ -890,89 +983,7 @@ ladder_json_error_t ladder_program_to_json(const char *prg, ladder_ctx_t *ladder
                         return JSON_ERROR_CREATEDATAOBJ;
                     }
 
-                    const char *name = "";
-                    switch (cell->code) {
-                        case LADDER_INS_NO:
-                        case LADDER_INS_NC:
-                        case LADDER_INS_RE:
-                        case LADDER_INS_FE:
-                        case LADDER_INS_COIL:
-                        case LADDER_INS_COILL:
-                        case LADDER_INS_COILU:
-                        case LADDER_INS_NEG:
-                        case LADDER_INS_NOT:
-                        case LADDER_INS_SHL:
-                        case LADDER_INS_SHR:
-                        case LADDER_INS_ROL:
-                        case LADDER_INS_ROR:
-                            if (d == 0)
-                                name = "value";
-                            if (d == 1 && (cell->code == LADDER_INS_SHL || cell->code == LADDER_INS_SHR))
-                                name = "n";
-                            if (d == 1 && (cell->code == LADDER_INS_NOT || cell->code == LADDER_INS_ROL || cell->code == LADDER_INS_ROR))
-                                name = "result";
-                            if (d == 2)
-                                name = "result";
-                            break;
-                        case LADDER_INS_TON:
-                        case LADDER_INS_TOF:
-                        case LADDER_INS_TP:
-                            if (d == 0)
-                                name = "timer";
-                            if (d == 1)
-                                name = "basetime";
-                            break;
-                        case LADDER_INS_CTU:
-                        case LADDER_INS_CTD:
-                            if (d == 0)
-                                name = "counter";
-                            if (d == 1)
-                                name = "preset value";
-                            break;
-                        case LADDER_INS_MOVE:
-                            if (d == 0)
-                                name = "value";
-                            if (d == 1)
-                                name = "to";
-                            break;
-                        case LADDER_INS_SUB:
-                        case LADDER_INS_ADD:
-                        case LADDER_INS_MUL:
-                        case LADDER_INS_DIV:
-                        case LADDER_INS_MOD:
-                        case LADDER_INS_AND:
-                        case LADDER_INS_OR:
-                        case LADDER_INS_XOR:
-                            if (d == 0)
-                                name = "value1";
-                            if (d == 1)
-                                name = "value2";
-                            if (d == 2)
-                                name = "result";
-                            break;
-                        case LADDER_INS_EQ:
-                        case LADDER_INS_GT:
-                        case LADDER_INS_GE:
-                        case LADDER_INS_LT:
-                        case LADDER_INS_LE:
-                        case LADDER_INS_NE:
-                            if (d == 0)
-                                name = "value1";
-                            if (d == 1)
-                                name = "value2";
-                            break;
-                        case LADDER_INS_TMOVE:
-                            if (d == 0)
-                                name = "value1";
-                            if (d == 1)
-                                name = "value2";
-                            if (d == 2)
-                                name = "to";
-                            break;
-                        default:
-                            name = "value";
-                            break;
-                    }
+                    const char *name = get_data_name(cell->code, d);
                     cJSON_AddStringToObject(data_obj, "name", name);
 
                     const char *type_str;
@@ -999,15 +1010,18 @@ ladder_json_error_t ladder_program_to_json(const char *prg, ladder_ctx_t *ladder
                             case LADDER_REGISTER_I:
                             case LADDER_REGISTER_Q:
                                 snprintf(value_str, sizeof(value_str), "%u.%u", val->value.mp.module, val->value.mp.port);
+                                cJSON_AddStringToObject(data_obj, "value", value_str);
                                 break;
                             case LADDER_REGISTER_S:
-                                snprintf(value_str, sizeof(value_str), "%s", val->value.cstr ? val->value.cstr : "");
+                                cJSON_AddStringToObject(data_obj, "value", val->value.cstr ? val->value.cstr : "");
                                 break;
                             case LADDER_REGISTER_R:
                                 snprintf(value_str, sizeof(value_str), "%f", val->value.real);
+                                cJSON_AddStringToObject(data_obj, "value", value_str);
                                 break;
                             default:
                                 snprintf(value_str, sizeof(value_str), "%lu", (unsigned long) val->value.u32);
+                                cJSON_AddStringToObject(data_obj, "value", value_str);
                                 break;
                         }
                     }
@@ -1042,33 +1056,41 @@ ladder_json_error_t ladder_program_to_json(const char *prg, ladder_ctx_t *ladder
 }
 
 ladder_json_error_t ladder_compact_json_file(const char *input_path, const char *output_path) {
-    char *json_str = read_file(input_path);
+    ladder_json_error_t status = JSON_ERROR_FAIL;
+    char *json_str = NULL;
+    cJSON *root = NULL;
+    char *compact_json = NULL;
+
+    json_str = read_file(input_path);
     if (!json_str) {
-        return JSON_ERROR_OPENFILE;
-    }
-    cJSON *root = cJSON_Parse(json_str);
-    if (!root) {
-        free(json_str);
-        return JSON_ERROR_PARSE;
-    }
-    char *compact_json = cJSON_PrintUnformatted(root);
-    if (!compact_json) {
-        cJSON_Delete(root);
-        free(json_str);
-        return JSON_ERROR_COMPACTFILE;
-    }
-    if (!write_file(output_path, compact_json)) {
-        free(compact_json);
-        cJSON_Delete(root);
-        free(json_str);
-        return JSON_ERROR_WRITEFILE;
+        status = JSON_ERROR_OPENFILE;
+        goto cleanup;
     }
 
+    root = cJSON_Parse(json_str);
+    if (!root) {
+        status = JSON_ERROR_PARSE;
+        goto cleanup;
+    }
+
+    compact_json = cJSON_PrintUnformatted(root);
+    if (!compact_json) {
+        status = JSON_ERROR_COMPACTFILE;
+        goto cleanup;
+    }
+
+    if (!write_file(output_path, compact_json)) {
+        status = JSON_ERROR_WRITEFILE;
+        goto cleanup;
+    }
+
+    status = JSON_ERROR_OK;
+
+    cleanup:
     free(compact_json);
     cJSON_Delete(root);
     free(json_str);
-
-    return JSON_ERROR_OK;
+    return status;
 }
 
 bool ladder_validate_json_file(const char *json_file, const char *schema_file) {

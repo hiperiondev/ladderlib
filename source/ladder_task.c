@@ -38,9 +38,10 @@
 
 // ladder logic execution task
 void ladder_task(void *ladderctx) {
-    ladder_ctx_t *ladder_ctx = NULL;
     if (ladderctx == NULL)
-        goto exit;
+        return;
+
+    ladder_ctx_t *ladder_ctx = NULL;
 
     ladder_ctx = (ladder_ctx_t*) ladderctx;
     if ((*ladder_ctx).hw.time.millis == NULL || (*ladder_ctx).hw.time.delay == NULL || (*ladder_ctx).hw.io.read == NULL || (*ladder_ctx).hw.io.write == NULL) {
@@ -90,6 +91,6 @@ void ladder_task(void *ladderctx) {
     }
 
     exit:
-    if ((*ladder_ctx).on.end_task != NULL)
+    if (ladder_ctx != NULL && (*ladder_ctx).on.end_task != NULL)
         (*ladder_ctx).on.end_task(ladder_ctx);
 }

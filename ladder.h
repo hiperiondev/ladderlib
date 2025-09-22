@@ -563,7 +563,7 @@ typedef bool (*_foreign_fn_deinit)(ladder_foreign_function_t *function);
 #pragma pack(push, 1)
 typedef struct ladder_foreign_function_s {
                       uint32_t id;          /**< Foreign function id */
-                          char name[4];     /**< Foreign function name */
+                          char name[7];     /**< Foreign function name */
     ladder_instructions_iocd_t description; /**< Foreign function description */
                    ladder_fn_t exec;        /**< Foreign functions pointers */
             _foreign_fn_deinit deinit;      /**< Foreign functions deinitializer pointers */
