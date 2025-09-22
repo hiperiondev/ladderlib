@@ -252,9 +252,10 @@ static void fn_to_str(ladder_ctx_t ladder_ctx, uint32_t net, char (*cells)[6][32
                 memset(strtmp, 0, sizeof(strtmp));
                 if (ladder_ctx.network[net].cells[row][column].code == LADDER_INS_TON || ladder_ctx.network[net].cells[row][column].code == LADDER_INS_TOF
                         || ladder_ctx.network[net].cells[row][column].code == LADDER_INS_TP) {
-                    const char *bt_str = ((int)ladder_ctx.network[net].cells[row][column].data[1].type >= (int)LADDER_BASETIME_MS &&
-                                          (int)ladder_ctx.network[net].cells[row][column].data[1].type <= (int)LADDER_BASETIME_MIN) ?
-                                         basetime_graph[ladder_ctx.network[net].cells[row][column].data[1].type] : "INV   ";
+                    const char *bt_str =
+                            ((int) ladder_ctx.network[net].cells[row][column].data[1].type >= (int) LADDER_BASETIME_MS
+                                    && (int) ladder_ctx.network[net].cells[row][column].data[1].type <= (int) LADDER_BASETIME_MIN) ?
+                                    basetime_graph[ladder_ctx.network[net].cells[row][column].data[1].type] : "INV   ";
 
                     snprintf((*cells)[2], sizeof((*cells)[0]), "%s| %04d %s |%s", actual_ioc.inputs == 1 ? "   " : "---",
                             (int) ladder_ctx.network[net].cells[row][column].data[1].value.i32, bt_str,
@@ -392,7 +393,7 @@ void ladder_print(ladder_ctx_t ladder_ctx) {
 
         if (rows > LADDER_MAX_ROWS || cols > LADDER_MAX_COLS) {
             printf("Error: Network %d dimensions (%u rows, %u cols) exceed maximum limits (%d rows, %d cols). Skipping print.\n", (int) n, rows, cols,
-                    LADDER_MAX_ROWS, LADDER_MAX_COLS);
+            LADDER_MAX_ROWS, LADDER_MAX_COLS);
             continue;
         }
 

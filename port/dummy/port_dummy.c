@@ -227,7 +227,7 @@ void dummy_write(ladder_ctx_t *ladder_ctx, uint32_t id) {
     for (uint32_t nt = 0; nt < (*ladder_ctx).ladder.quantity.networks; nt++) {
         printf("network %d:\n", nt);
         ++rets;
-        for (uint32_t r = 0; r < (*ladder_ctx).network[nt].rows - 1; r++) {
+        for (uint32_t r = 0; r < (*ladder_ctx).network[nt].rows; r++) {
             printf("|");
             for (uint32_t c = 0; c < (*ladder_ctx).network[nt].cols; c++) {
                 printf("%s|", (*ladder_ctx).network[nt].cells[r][c].state == true ? "#" : "-");
@@ -235,7 +235,7 @@ void dummy_write(ladder_ctx_t *ladder_ctx, uint32_t id) {
             printf("\n");
             ++rets;
         }
-        printf("\n");
+        printf("\n"); // Optional separator
         ++rets;
     }
 
@@ -284,9 +284,46 @@ void dummy_on_end_task(ladder_ctx_t *ladder_ctx) {
 
 bool dummy_init_read(ladder_ctx_t *ladder_ctx, uint32_t id, bool init) {
     if (init) {
+        if ((*ladder_ctx).input[id].I != NULL) {
+            free((*ladder_ctx).input[id].I);
+            (*ladder_ctx).input[id].I = NULL;
+        }
+        if ((*ladder_ctx).input[id].IW != NULL) {
+            free((*ladder_ctx).input[id].IW);
+            (*ladder_ctx).input[id].IW = NULL;
+        }
+        if ((*ladder_ctx).input[id].Ih != NULL) {
+            free((*ladder_ctx).input[id].Ih);
+            (*ladder_ctx).input[id].Ih = NULL;
+        }
+
         (*ladder_ctx).input[id].I = calloc(DUMMY_QTY_I, sizeof(uint8_t));
+        if ((*ladder_ctx).input[id].I == NULL) {
+            (*ladder_ctx).input[id].i_qty = 0;
+            (*ladder_ctx).input[id].iw_qty = 0;
+            return false;
+        }
+
         (*ladder_ctx).input[id].IW = calloc(DUMMY_QTY_IW, sizeof(int32_t));
+        if ((*ladder_ctx).input[id].IW == NULL) {
+            free((*ladder_ctx).input[id].I);
+            (*ladder_ctx).input[id].I = NULL;
+            (*ladder_ctx).input[id].i_qty = 0;
+            (*ladder_ctx).input[id].iw_qty = 0;
+            return false;
+        }
+
         (*ladder_ctx).input[id].Ih = calloc(DUMMY_QTY_I, sizeof(uint8_t));
+        if ((*ladder_ctx).input[id].Ih == NULL) {
+            free((*ladder_ctx).input[id].I);
+            free((*ladder_ctx).input[id].IW);
+            (*ladder_ctx).input[id].I = NULL;
+            (*ladder_ctx).input[id].IW = NULL;
+            (*ladder_ctx).input[id].i_qty = 0;
+            (*ladder_ctx).input[id].iw_qty = 0;
+            return false;
+        }
+
         (*ladder_ctx).input[id].i_qty = DUMMY_QTY_I;
         (*ladder_ctx).input[id].iw_qty = DUMMY_QTY_IW;
 
@@ -298,9 +335,18 @@ bool dummy_init_read(ladder_ctx_t *ladder_ctx, uint32_t id, bool init) {
             (*ladder_ctx).input[id].IW[n] = 0;
         }
     } else {
-        free((*ladder_ctx).input[id].I);
-        free((*ladder_ctx).input[id].IW);
-        free((*ladder_ctx).input[id].Ih);
+        if ((*ladder_ctx).input[id].I != NULL) {
+            free((*ladder_ctx).input[id].I);
+            (*ladder_ctx).input[id].I = NULL;
+        }
+        if ((*ladder_ctx).input[id].IW != NULL) {
+            free((*ladder_ctx).input[id].IW);
+            (*ladder_ctx).input[id].IW = NULL;
+        }
+        if ((*ladder_ctx).input[id].Ih != NULL) {
+            free((*ladder_ctx).input[id].Ih);
+            (*ladder_ctx).input[id].Ih = NULL;
+        }
         (*ladder_ctx).input[id].i_qty = 0;
         (*ladder_ctx).input[id].iw_qty = 0;
     }
@@ -310,15 +356,61 @@ bool dummy_init_read(ladder_ctx_t *ladder_ctx, uint32_t id, bool init) {
 
 bool dummy_init_write(ladder_ctx_t *ladder_ctx, uint32_t id, bool init) {
     if (init) {
+        if ((*ladder_ctx).output[id].Q != NULL) {
+            free((*ladder_ctx).output[id].Q);
+            (*ladder_ctx).output[id].Q = NULL;
+        }
+        if ((*ladder_ctx).output[id].QW != NULL) {
+            free((*ladder_ctx).output[id].QW);
+            (*ladder_ctx).output[id].QW = NULL;
+        }
+        if ((*ladder_ctx).output[id].Qh != NULL) {
+            free((*ladder_ctx).output[id].Qh);
+            (*ladder_ctx).output[id].Qh = NULL;
+        }
+
         (*ladder_ctx).output[id].Q = calloc(DUMMY_QTY_Q, sizeof(uint8_t));
+        if ((*ladder_ctx).output[id].Q == NULL) {
+            (*ladder_ctx).output[id].q_qty = 0;
+            (*ladder_ctx).output[id].qw_qty = 0;
+            return false;
+        }
+
         (*ladder_ctx).output[id].QW = calloc(DUMMY_QTY_QW, sizeof(int32_t));
+        if ((*ladder_ctx).output[id].QW == NULL) {
+            free((*ladder_ctx).output[id].Q);
+            (*ladder_ctx).output[id].Q = NULL;
+            (*ladder_ctx).output[id].q_qty = 0;
+            (*ladder_ctx).output[id].qw_qty = 0;
+            return false;
+        }
+
         (*ladder_ctx).output[id].Qh = calloc(DUMMY_QTY_Q, sizeof(uint8_t));
+        if ((*ladder_ctx).output[id].Qh == NULL) {
+            free((*ladder_ctx).output[id].Q);
+            free((*ladder_ctx).output[id].QW);
+            (*ladder_ctx).output[id].Q = NULL;
+            (*ladder_ctx).output[id].QW = NULL;
+            (*ladder_ctx).output[id].q_qty = 0;
+            (*ladder_ctx).output[id].qw_qty = 0;
+            return false;
+        }
+
         (*ladder_ctx).output[id].q_qty = DUMMY_QTY_Q;
         (*ladder_ctx).output[id].qw_qty = DUMMY_QTY_QW;
     } else {
-        free((*ladder_ctx).output[id].Q);
-        free((*ladder_ctx).output[id].QW);
-        free((*ladder_ctx).output[id].Qh);
+        if ((*ladder_ctx).output[id].Q != NULL) {
+            free((*ladder_ctx).output[id].Q);
+            (*ladder_ctx).output[id].Q = NULL;
+        }
+        if ((*ladder_ctx).output[id].QW != NULL) {
+            free((*ladder_ctx).output[id].QW);
+            (*ladder_ctx).output[id].QW = NULL;
+        }
+        if ((*ladder_ctx).output[id].Qh != NULL) {
+            free((*ladder_ctx).output[id].Qh);
+            (*ladder_ctx).output[id].Qh = NULL;
+        }
         (*ladder_ctx).output[id].q_qty = 0;
         (*ladder_ctx).output[id].qw_qty = 0;
     }
