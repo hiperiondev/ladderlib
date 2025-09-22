@@ -56,6 +56,9 @@ typedef enum LADDER_ERR_PRG_CHECK {
     LADDER_ERR_PRG_CHECK_T_INV_TYPE,        //
     LADDER_ERR_PRG_CHECK_T_INV_INDEX,       //
     LADDER_ERR_PRG_CHECK_INV_BASE_TIME,     //
+    LADDER_ERR_PRG_CHECK_MISSING_MULTI,     //
+    LADDER_ERR_PRG_CHECK_MULTI_HAS_DATA,    //
+    LADDER_ERR_PRG_CHECK_DANGLING_MULTI,    //
     //////////////////////////////////////////
     LADDER_ERR_PRG_CHECK_FAIL               //
 } ladder_err_prg_check_t;

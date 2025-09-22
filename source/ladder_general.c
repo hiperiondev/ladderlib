@@ -498,7 +498,6 @@ bool ladder_add_foreign(ladder_ctx_t *ladder_ctx, _foreign_fn_init fn_init, void
 
     void *tmp_fn = NULL;
     ladder_foreign_function_t fn_new;
-
     memset(&fn_new, 0, sizeof(ladder_foreign_function_t));
     fn_new.id = (*ladder_ctx).foreign.qty;
 
@@ -506,14 +505,17 @@ bool ladder_add_foreign(ladder_ctx_t *ladder_ctx, _foreign_fn_init fn_init, void
         return false;
 
     if ((*ladder_ctx).foreign.qty == 0)
-        (*ladder_ctx).foreign.fn = malloc(sizeof(ladder_foreign_function_t));
-    else {
+        tmp_fn = malloc(sizeof(ladder_foreign_function_t));
+    else
         tmp_fn = realloc((*ladder_ctx).foreign.fn, ((*ladder_ctx).foreign.qty + 1) * sizeof(ladder_foreign_function_t));
-        if (!tmp_fn)
-            return false;
-        (*ladder_ctx).foreign.fn = tmp_fn;
+
+    if (!tmp_fn) {
+        if (fn_new.deinit)
+            fn_new.deinit(&fn_new);
+        return false;
     }
 
+    (*ladder_ctx).foreign.fn = tmp_fn;
     memcpy(&((*ladder_ctx).foreign.fn[(*ladder_ctx).foreign.qty]), &fn_new, sizeof(ladder_foreign_function_t));
     ++(*ladder_ctx).foreign.qty;
 
@@ -533,8 +535,16 @@ bool ladder_fn_cell(ladder_ctx_t *ladder_ctx, uint32_t network, uint32_t row, ui
     if ((*ladder_ctx).network[network].rows < actual_ioc.cells + row)
         return false;
 
-    if ((*ladder_ctx).network[network].cells[row][column].data != NULL)
+    if ((*ladder_ctx).network[network].cells[row][column].data != NULL) {
+        for (uint32_t d = 0; d < (*ladder_ctx).network[network].cells[row][column].data_qty; d++) {
+            if ((*ladder_ctx).network[network].cells[row][column].data[d].type == LADDER_REGISTER_S&&
+            (*ladder_ctx).network[network].cells[row][column].data[d].value.cstr != NULL) {
+                free((void*) (*ladder_ctx).network[network].cells[row][column].data[d].value.cstr);
+                (*ladder_ctx).network[network].cells[row][column].data[d].value.cstr = NULL;
+            }
+        }
         free((*ladder_ctx).network[network].cells[row][column].data);
+    }
 
     (*ladder_ctx).network[network].cells[row][column].code = function;
     (*ladder_ctx).network[network].cells[row][column].data_qty = actual_ioc.data_qty;

@@ -83,6 +83,9 @@ const char *program_test_errors[] = {                       //
                 EP(LADDER_ERR_PRG_CHECK_T_INV_TYPE),        //
                 EP(LADDER_ERR_PRG_CHECK_T_INV_INDEX),       //
                 EP(LADDER_ERR_PRG_CHECK_INV_BASE_TIME),     //
+                EP(LADDER_ERR_PRG_CHECK_MISSING_MULTI),     //
+                EP(LADDER_ERR_PRG_CHECK_MULTI_HAS_DATA),    //
+                EP(LADDER_ERR_PRG_CHECK_DANGLING_MULTI),    //
                 EP(LADDER_ERR_PRG_CHECK_FAIL )              //
         };
 
