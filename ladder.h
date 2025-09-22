@@ -70,18 +70,6 @@
 #define OPTIONAL_CRON 1
 
 /**
- * @def LADDER_VERTICAL_BAR
- * @brief Point to vertical bar flag
- *
- */
-#define LADDER_VERTICAL_BAR(lctx, n, r, c)                                                    \
-        ((lctx != NULL                                                                        \
-                && n < (*lctx).ladder.quantity.networks                                       \
-                && r < (*lctx).network[n].rows                                                \
-                && c < (*lctx).network[n].cols) ? (*lctx).network[n].cells[r][c].vertical_bar \
-         : 0)
-
-/**
  * @enum LADDER_INSTRUCTIONS
  * @brief Ladder Instructions codes
  * Must match with array of functions in TaskLadder
@@ -608,6 +596,21 @@ typedef struct ladder_ctx_s {
                       void *cron;           /*< Cron list */
            #endif
 } ladder_ctx_t;
+
+/**
+ * @fn bool LADDER_VERTICAL_BAR(const ladder_ctx_t*, uint32_t, uint32_t, uint32_t)
+ * @brief  Point to vertical bar flag
+ *
+ * @param lctx Ladder context
+ * @param n Network
+ * @param r Row
+ * @param c Column
+ * @return State
+ */
+static inline bool LADDER_VERTICAL_BAR(const ladder_ctx_t *lctx, uint32_t n, uint32_t r, uint32_t c) {
+    return (lctx && n < lctx->ladder.quantity.networks && r < lctx->network[n].rows && c < lctx->network[n].cols) ?
+            lctx->network[n].cells[r][c].vertical_bar : false;
+}
 
 /**
  * @fn bool ladder_ctx_init(ladder_ctx_t *ladder_ctx, uint8_t net_columns_qty, uint8_t net_rows_qty, uint32_t networks_qty, uint32_t qty_m, uint32_t qty_c,

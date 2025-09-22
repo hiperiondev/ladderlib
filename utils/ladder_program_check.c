@@ -153,12 +153,12 @@ ladder_prg_check_t ladder_program_check(ladder_ctx_t *ladder_ctx) {
 
                                 uint32_t port_qty;
                                 if (checks[i].is_input) {
-                                    port_qty = (reg_type == LADDER_REGISTER_I ? (*ladder_ctx).input[module].i_qty : (*ladder_ctx).input[module].iw_qty) - 1;
+                                    port_qty = (reg_type == LADDER_REGISTER_I ? (*ladder_ctx).input[module].i_qty : (*ladder_ctx).input[module].iw_qty);
                                 } else {
-                                    port_qty = (reg_type == LADDER_REGISTER_Q ? (*ladder_ctx).output[module].q_qty : (*ladder_ctx).output[module].qw_qty) - 1;
+                                    port_qty = (reg_type == LADDER_REGISTER_Q ? (*ladder_ctx).output[module].q_qty : (*ladder_ctx).output[module].qw_qty);
                                 }
 
-                                if (port > port_qty) {
+                                if (port >= port_qty) {
                                     status.error = checks[i].inv_port_err;
                                     goto end;
                                 }
