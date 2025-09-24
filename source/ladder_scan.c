@@ -99,11 +99,11 @@ void ladder_scan(ladder_ctx_t *ladder_ctx) {
 
         // Clear all cell states to ensure fresh evaluation each scan cycle
         // This prevents retention of states from previous scans, which could lead to incorrect power flow
-        //for (uint32_t column = 0; column < (*ladder_ctx).exec_network->cols; column++) {
-        //    for (uint32_t row = 0; row < (*ladder_ctx).exec_network->rows; row++) {
-        //        (*ladder_ctx).exec_network->cells[row][column].state = false;
-        //    }
-        //}
+        for (uint32_t column = 0; column < (*ladder_ctx).exec_network->cols; column++) {
+            for (uint32_t row = 0; row < (*ladder_ctx).exec_network->rows; row++) {
+                (*ladder_ctx).exec_network->cells[row][column].state = false;
+           }
+        }
 
         // call ladder instructions
         for (uint32_t column = 0; column < (*ladder_ctx).exec_network->cols; column++) {
