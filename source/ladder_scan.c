@@ -114,14 +114,46 @@ void ladder_scan(ladder_ctx_t *ladder_ctx) {
                 bool group_input = (column == 0) ? true : (*ladder_ctx).exec_network->cells[group_start][column - 1].state;
 
                 // Find group end: consecutive rows with vertical_bar=true after start
+                // Explicit cap to prevent group_end >= rows (off-by-one safety)
                 uint32_t group_end = group_start;
                 while (group_end < (*ladder_ctx).exec_network->rows - 1 && (*ladder_ctx).exec_network->cells[group_end + 1][column].vertical_bar) {
                     group_end++;
+                    // Early break if somehow exceeds (redundant but defensive)
+                    if (group_end >= (*ladder_ctx).exec_network->rows) {
+                        group_end = (*ladder_ctx).exec_network->rows - 1;
+                        break;
+                    }
+                }
+
+                // Explicit bounds check before execution to prevent segfault if group_end invalid
+                if (group_end >= (*ladder_ctx).exec_network->rows) {
+                    (*ladder_ctx).ladder.state = LADDER_ST_INV;
+                    (*ladder_ctx).ladder.last.err = LADDER_INS_ERR_OUTOFRANGE;
+                    return;
                 }
 
                 // Execute instructions in group (using uniform group_input as left where needed)
                 bool group_output = false;
                 bool group_error = false;
+
+                // Use batch override array for efficiency; fixed-size with explicit bounds check
+                bool original_lefts[LADDER_MAX_ROWS];
+                uint32_t num_saved = 0;
+                if (column > 0) {
+                    // Save originals for batch override
+                    for (uint32_t gr = group_start; gr <= group_end; gr++) {
+                        if (num_saved >= LADDER_MAX_ROWS) { // Bounds check: prevent overflow (safe but explicit)
+                            group_error = true;
+                            (*ladder_ctx).ladder.last.err = LADDER_INS_ERR_OUTOFRANGE;
+                            break;
+                        }
+                        original_lefts[num_saved++] = (*ladder_ctx).exec_network->cells[gr][column - 1].state;
+                        (*ladder_ctx).exec_network->cells[gr][column - 1].state = group_input;
+                    }
+                    if (group_error)
+                        break;
+                }
+
                 for (uint32_t gr = group_start; gr <= group_end; gr++) {
                     // Set current row for last instr tracking
                     uint32_t current_row_for_exec = gr;
@@ -145,19 +177,7 @@ void ladder_scan(ladder_ctx_t *ladder_ctx) {
 
                     // execute instruction
                     if (code != LADDER_INS_MULTI) {
-                        // Tight per-row override only for executing rows and column > 0.
-                        // This ensures uniform group_input during exec without group-wide mutation.
-                        // For top row (gr == group_start), group_input matches original, so no effective change.
-                        // For parallel lowers: sets to group_input temporarily.
-                        // For multi-row lowers: skipped, no override.
-                        if (column > 0) {
-                            bool original_left = (*ladder_ctx).exec_network->cells[gr][column - 1].state;
-                            (*ladder_ctx).exec_network->cells[gr][column - 1].state = group_input;
-                            (*ladder_ctx).ladder.last.err = ladder_function[code](ladder_ctx, column, current_row_for_exec);
-                            (*ladder_ctx).exec_network->cells[gr][column - 1].state = original_left;
-                        } else {
-                            (*ladder_ctx).ladder.last.err = ladder_function[code](ladder_ctx, column, current_row_for_exec);
-                        }
+                        (*ladder_ctx).ladder.last.err = ladder_function[code](ladder_ctx, column, current_row_for_exec);
 
                         if ((*ladder_ctx).ladder.last.err != LADDER_INS_ERR_OK) {
                             group_error = true;
@@ -172,7 +192,15 @@ void ladder_scan(ladder_ctx_t *ladder_ctx) {
                     }
                 }
 
-                // On group error, propagate error (no restore needed, as overrides are now per-exec)
+                // Restore batch overrides only if no error (and only if column > 0)
+                if (column > 0 && !group_error) {
+                    uint32_t restore_idx = 0;
+                    for (uint32_t gr = group_start; gr <= group_end; gr++) {
+                        (*ladder_ctx).exec_network->cells[gr][column - 1].state = original_lefts[restore_idx++];
+                    }
+                }
+
+                // On group error, propagate error
                 if (group_error) {
                     (*ladder_ctx).ladder.state = LADDER_ST_INV;
                     return;
