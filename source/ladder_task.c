@@ -32,6 +32,7 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+#include <string.h>
 
 #include "ladder.h"
 #include "ladder_internals.h"
@@ -76,6 +77,15 @@ void ladder_task(void *ladderctx) {
         if ((*ladder_ctx).ladder.state == LADDER_ST_INV) {
             (*ladder_ctx).ladder.state = LADDER_ST_EXIT_TSK;
             goto exit;
+        }
+
+        // Add copies for I/O previous values post-scan (before internals save)
+        // This captures updated Q from scan and stable I from read, enabling correct RE/FE on I/Q
+        for (uint32_t n = 0; n < (*ladder_ctx).hw.io.fn_read_qty; n++) {
+            memcpy((*ladder_ctx).input[n].Ih, (*ladder_ctx).input[n].I, (*ladder_ctx).input[n].i_qty * sizeof(uint8_t));
+        }
+        for (uint32_t n = 0; n < (*ladder_ctx).hw.io.fn_write_qty; n++) {
+            memcpy((*ladder_ctx).output[n].Qh, (*ladder_ctx).output[n].Q, (*ladder_ctx).output[n].q_qty * sizeof(uint8_t));
         }
 
         ladder_save_previous_values(ladder_ctx);

@@ -442,10 +442,14 @@ bool ladder_add_read_fn(ladder_ctx_t *ladder_ctx, _io_read read, _io_init read_i
 }
 
 bool ladder_add_write_fn(ladder_ctx_t *ladder_ctx, _io_write write, _io_init write_init) {
+    if (ladder_ctx == NULL || write == NULL || write_init == NULL)
+        return false;
+
     void *tmp_write = NULL;
     void *tmp_init_write = NULL;
     void *tmp_output = NULL;
 
+    // Atomic allocation check preserved, but failure path fixed below
     if (ladder_ctx->hw.io.fn_write_qty == 0) {
         tmp_write = calloc(1, sizeof(_io_write*));
         tmp_init_write = calloc(1, sizeof(_io_init*));
@@ -485,14 +489,14 @@ bool ladder_add_write_fn(ladder_ctx_t *ladder_ctx, _io_write write, _io_init wri
         if (ladder_ctx->hw.io.fn_write_qty == 0) {
             free(ladder_ctx->hw.io.write);
             free(ladder_ctx->hw.io.init_write);
-            free(ladder_ctx->input);
+            free(ladder_ctx->output);
             ladder_ctx->hw.io.write = NULL;
             ladder_ctx->hw.io.init_write = NULL;
-            ladder_ctx->input = NULL;
+            ladder_ctx->output = NULL;
         } else {
             ladder_ctx->hw.io.write = realloc(ladder_ctx->hw.io.write, ladder_ctx->hw.io.fn_write_qty * sizeof(_io_write*));
             ladder_ctx->hw.io.init_write = realloc(ladder_ctx->hw.io.init_write, ladder_ctx->hw.io.fn_write_qty * sizeof(_io_init*));
-            ladder_ctx->input = realloc(ladder_ctx->input, ladder_ctx->hw.io.fn_write_qty * sizeof(ladder_hw_input_vals_t));
+            ladder_ctx->output = realloc(ladder_ctx->output, ladder_ctx->hw.io.fn_write_qty * sizeof(ladder_hw_output_vals_t));
         }
         return false;
     }
