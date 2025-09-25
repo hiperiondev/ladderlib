@@ -80,6 +80,31 @@ const ladder_instructions_iocd_t ladder_fn_iocd[] = { { 1, 1, 1, 0 }, // NOP
         { 1, 1, 1, 0 }, // INV
         };
 
+static int32_t ladder_get_table_i32(ladder_ctx_t *ladder_ctx, uint32_t table_net, uint32_t flat_pos) {
+    if (table_net >= ladder_ctx->ladder.quantity.networks) return 0;
+    ladder_network_t *net = &ladder_ctx->network[table_net];
+    uint32_t r = flat_pos / net->cols;
+    uint32_t c = flat_pos % net->cols;
+    if (r >= net->rows || c >= net->cols || net->cells[r][c].data_qty < 1) return 0;
+    return (int32_t)net->cells[r][c].data[0].value.i32;
+}
+
+static void ladder_set_table_i32(ladder_ctx_t *ladder_ctx, uint32_t table_net, uint32_t flat_pos, int32_t val, uint8_t *err) {
+    *err = LADDER_INS_ERR_OK;
+    if (table_net >= ladder_ctx->ladder.quantity.networks) {
+        *err = LADDER_INS_ERR_OUTOFRANGE;
+        return;
+    }
+    ladder_network_t *net = &ladder_ctx->network[table_net];
+    uint32_t r = flat_pos / net->cols;
+    uint32_t c = flat_pos % net->cols;
+    if (r >= net->rows || c >= net->cols || net->cells[r][c].data_qty < 1) {
+        *err = LADDER_INS_ERR_OUTOFRANGE;
+        return;
+    }
+    net->cells[r][c].data[0].value.i32 = val;
+}
+
 ladder_ins_err_t fn_NOP(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row) {
     return LADDER_INS_ERR_OK;
 }
@@ -611,34 +636,37 @@ ladder_ins_err_t fn_FOREIGN(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t 
 
 ladder_ins_err_t fn_TMOVE(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row) {
     CELL_STATE(ladder_ctx, column, row) = CELL_STATE_LEFT(ladder_ctx, column, row);
+    if (!CELL_STATE(ladder_ctx, column, row))
+        return LADDER_INS_ERR_OK;
 
-    if (CELL_STATE_LEFT(ladder_ctx, column, row)) {
-        uint32_t table = to_integer(ladder_get_data_value(ladder_ctx, row, column, 0), 0);
-        if (table > (*ladder_ctx).ladder.quantity.networks || (*ladder_ctx).exec_network[table].enable)
-            return LADDER_INS_ERR_NOTABLE;
-
-        // from table to value
-        if (ladder_get_type(ladder_ctx, row + 1, column, 0) == LADDER_REGISTER_NONE) {
-            uint32_t pos = to_integer(ladder_get_data_value(ladder_ctx, row, column, 1), 1);
-            uint32_t val = ladder_get_table_i32(ladder_ctx, table, pos);
-            ladder_set_data_value(ladder_ctx, row, column, 1, (void*) &val, &error);
-
-            return error;
-        }
-
-        // from value to table
-        if (ladder_get_type(ladder_ctx, row + 2, column, 0) == LADDER_REGISTER_NONE) {
-            uint32_t pos = to_integer(ladder_get_data_value(ladder_ctx, row, column, 2), 1);
-            (*ladder_ctx).network[table].cells[ladder_table_pos_row(ladder_ctx, pos)][ladder_table_pos_column(ladder_ctx, pos)].data[0].value.i32 = to_integer(
-                    ladder_get_data_value(ladder_ctx, row, column, 0), 1);
-
-            return LADDER_INS_ERR_OK;
-        }
-
-        return LADDER_INS_ERR_OUTOFRANGE;
+    uint32_t table = (uint32_t) ladder_get_data_value(ladder_ctx, row, column, 0); // data[0]: table_id
+    if (table >= ladder_ctx->ladder.quantity.networks || ladder_ctx->network[table].enable) {
+        return LADDER_INS_ERR_NOTABLE; // Must be disabled data net
     }
 
-    return LADDER_INS_ERR_OK;
+    uint32_t table_size = ladder_ctx->network[table].rows * ladder_ctx->network[table].cols;
+    uint8_t mode_err = LADDER_INS_ERR_OK;
+
+    ladder_value_t *d = exnet(ladder_ctx).cells[row][column].data;
+    if (d[1].type == LADDER_REGISTER_NONE) { // Read mode: const pos → table[pos] → data[2]
+        uint32_t pos = d[1].value.i32; // Direct const access
+        if (pos >= table_size) {
+            mode_err = LADDER_INS_ERR_OUTOFRANGE;
+        } else {
+            int32_t val = ladder_get_table_i32(ladder_ctx, table, pos);
+            ladder_set_data_value(ladder_ctx, row, column, 2, (void*) &val, &mode_err); // To data[2] dest reg
+        }
+    } else { // Write mode: pos reg → data[2] src → table[pos]
+        uint32_t pos = (uint32_t) ladder_get_data_value(ladder_ctx, row, column, 1); // Resolve pos reg
+        if (pos >= table_size) {
+            mode_err = LADDER_INS_ERR_OUTOFRANGE;
+        } else {
+            int32_t src_val = (int32_t) ladder_get_data_value(ladder_ctx, row, column, 2); // Resolve src reg
+            ladder_set_table_i32(ladder_ctx, table, pos, src_val, &mode_err);
+        }
+    }
+
+    return mode_err ? mode_err : LADDER_INS_ERR_OK;
 }
 
 void ladder_set_data_value(ladder_ctx_t *ladder_ctx, uint32_t row, uint32_t column, uint32_t pos, void *value, uint8_t *error) {
