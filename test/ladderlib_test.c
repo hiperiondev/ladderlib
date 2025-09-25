@@ -40,6 +40,8 @@
 #include "fn_dummy.h"
 #include "ladder_program_json.h"
 #include "ladder_program_check.h"
+#include "ladderlib_test_functions.h"
+
 #ifdef OPTIONAL_CRON
 #include "ladderlib_cron.h"
 #endif
@@ -143,6 +145,10 @@ int main(void) {
     const char prg_save[] = "ladder_networks_save.json";
     uint8_t err = 0;
     ladder_prg_check_t err_prg_check;
+
+    if (!test_ladder_instructions()) {
+        exit(1);
+    }
 
     // main context
     ladder_ctx_t ladder_ctx;

@@ -646,48 +646,114 @@ ladder_ins_err_t fn_TMOVE(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t ro
 void ladder_set_data_value(ladder_ctx_t *ladder_ctx, uint32_t row, uint32_t column, uint32_t pos, void *value, uint8_t *error) {
     *error = LADDER_INS_ERR_OK;
 
-    switch (ladder_cell_data_exec(ladder_ctx, row, column, pos).type) {
+    ladder_register_t __type = ladder_cell_data_exec(ladder_ctx, row, column, pos).type;
+    uint32_t __idx = ladder_cell_data_exec(ladder_ctx, row, column, pos).value.i32; /* For registers */
+    uint8_t __port = ladder_cell_data_exec(ladder_ctx, row, column, pos).value.mp.port; /* For modules */
+    uint32_t __module = ladder_cell_data_exec(ladder_ctx, row, column, pos).value.mp.module;
+    uint32_t __qty = 0;
+    size_t __data_size = 0;
+    uint32_t __index = 0;
+
+    switch (__type) {
         case LADDER_REGISTER_M:
-            (*ladder_ctx).memory.M[ladder_cell_data_exec(ladder_ctx, row, column, pos).value.i32] = *((uint8_t*) value);
+            __qty = ladder_ctx->ladder.quantity.m;
+            __data_size = sizeof(uint8_t);
+            __index = __idx;
             break;
         case LADDER_REGISTER_Q:
-            (*ladder_ctx).output[ladder_cell_data_exec(ladder_ctx, row, column, pos).value.mp.module].Q[ladder_cell_data_exec(ladder_ctx, row, column, pos).value.mp.port] =
-                    *((uint8_t*) value);
+            __qty = ladder_ctx->output[__module].q_qty;
+            __data_size = sizeof(uint8_t);
+            __index = __port;
             break;
         case LADDER_REGISTER_I:
-            (*ladder_ctx).input[ladder_cell_data_exec(ladder_ctx, row, column, pos).value.mp.module].I[ladder_cell_data_exec(ladder_ctx, row, column, pos).value.mp.port] =
-                    *((uint8_t*) value);
+            __qty = ladder_ctx->input[__module].i_qty;
+            __data_size = sizeof(uint8_t);
+            __index = __port;
             break;
         case LADDER_REGISTER_Cd:
-            (*ladder_ctx).memory.Cd[ladder_cell_data_exec(ladder_ctx, row, column, pos).value.i32] = *((int32_t*) value);
-            break;
         case LADDER_REGISTER_Cr:
-            (*ladder_ctx).memory.Cr[ladder_cell_data_exec(ladder_ctx, row, column, pos).value.i32] = *((int32_t*) value);
+            __qty = ladder_ctx->ladder.quantity.c;
+            __data_size = sizeof(bool);
+            __index = __idx;
             break;
         case LADDER_REGISTER_Td:
-            (*ladder_ctx).memory.Td[ladder_cell_data_exec(ladder_ctx, row, column, pos).value.i32] = *((int32_t*) value);
-            break;
         case LADDER_REGISTER_Tr:
-            (*ladder_ctx).memory.Tr[ladder_cell_data_exec(ladder_ctx, row, column, pos).value.i32] = *((int32_t*) value);
+            __qty = ladder_ctx->ladder.quantity.t;
+            __data_size = sizeof(bool);
+            __index = __idx;
             break;
         case LADDER_REGISTER_IW:
-            (*ladder_ctx).input[ladder_cell_data_exec(ladder_ctx, row, column, pos).value.mp.module].IW[ladder_cell_data_exec(ladder_ctx, row, column, pos).value.mp.port] =
-                    *((int32_t*) value);
+            __qty = ladder_ctx->input[__module].iw_qty;
+            __data_size = sizeof(int32_t);
+            __index = __port;
             break;
         case LADDER_REGISTER_QW:
-            (*ladder_ctx).output[ladder_cell_data_exec(ladder_ctx, row, column, pos).value.mp.module].QW[ladder_cell_data_exec(ladder_ctx, row, column, pos).value.mp.port] =
-                    *((uint8_t*) value);
+            __qty = ladder_ctx->output[__module].qw_qty;
+            __data_size = sizeof(int32_t);
+            __index = __port;
             break;
         case LADDER_REGISTER_C:
-            (*ladder_ctx).registers.C[ladder_cell_data_exec(ladder_ctx, row, column, pos).value.i32] = *((uint32_t*) value);
+            __qty = ladder_ctx->ladder.quantity.c;
+            __data_size = sizeof(uint32_t);
+            __index = __idx;
             break;
         case LADDER_REGISTER_D:
-            (*ladder_ctx).registers.D[ladder_cell_data_exec(ladder_ctx, row, column, pos).value.i32] = *((int32_t*) value);
+            __qty = ladder_ctx->ladder.quantity.d;
+            __data_size = sizeof(int32_t);
+            __index = __idx;
             break;
         case LADDER_REGISTER_R:
-            ladder_cell_data_exec(ladder_ctx, row, column, pos).value.real = *((float*) value);
+            __qty = ladder_ctx->ladder.quantity.r;
+            __data_size = sizeof(float);
+            __index = __idx;
             break;
+        default:
+            *error = LADDER_INS_ERR_SETDATAVAL;
+            return;
+    }
 
+    if (__index >= __qty) {
+        *error = LADDER_INS_ERR_OUTOFRANGE;
+        return;
+    }
+
+    switch (__type) {
+        case LADDER_REGISTER_M:
+            memcpy(&ladder_ctx->memory.M[__idx], value, __data_size);
+            break;
+        case LADDER_REGISTER_Q:
+            memcpy(&ladder_ctx->output[__module].Q[__port], value, __data_size);
+            break;
+        case LADDER_REGISTER_I:
+            memcpy(&ladder_ctx->input[__module].I[__port], value, __data_size);
+            break;
+        case LADDER_REGISTER_Cd:
+            memcpy(&ladder_ctx->memory.Cd[__idx], value, __data_size);
+            break;
+        case LADDER_REGISTER_Cr:
+            memcpy(&ladder_ctx->memory.Cr[__idx], value, __data_size);
+            break;
+        case LADDER_REGISTER_Td:
+            memcpy(&ladder_ctx->memory.Td[__idx], value, __data_size);
+            break;
+        case LADDER_REGISTER_Tr:
+            memcpy(&ladder_ctx->memory.Tr[__idx], value, __data_size);
+            break;
+        case LADDER_REGISTER_IW:
+            memcpy(&ladder_ctx->input[__module].IW[__port], value, __data_size); /* MODIFIED: Use __port */
+            break;
+        case LADDER_REGISTER_QW:
+            memcpy(&ladder_ctx->output[__module].QW[__port], value, __data_size); /* MODIFIED: Use __port */
+            break;
+        case LADDER_REGISTER_C:
+            memcpy(&ladder_ctx->registers.C[__idx], value, __data_size);
+            break;
+        case LADDER_REGISTER_D:
+            memcpy(&ladder_ctx->registers.D[__idx], value, __data_size);
+            break;
+        case LADDER_REGISTER_R:
+            memcpy(&ladder_ctx->registers.R[__idx], value, __data_size);
+            break;
         default:
             *error = LADDER_INS_ERR_SETDATAVAL;
             break;

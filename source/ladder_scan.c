@@ -102,43 +102,104 @@ void ladder_scan(ladder_ctx_t *ladder_ctx) {
         for (uint32_t column = 0; column < (*ladder_ctx).exec_network->cols; column++) {
             for (uint32_t row = 0; row < (*ladder_ctx).exec_network->rows; row++) {
                 (*ladder_ctx).exec_network->cells[row][column].state = false;
-           }
+            }
         }
 
-        // call ladder instructions
+        // Detect vertical groups per column, uniform input from top, OR outputs uniformly
         for (uint32_t column = 0; column < (*ladder_ctx).exec_network->cols; column++) {
-            for (uint32_t row = 0; row < (*ladder_ctx).exec_network->rows; row++) {
+            uint32_t row = 0;
+            while (row < (*ladder_ctx).exec_network->rows) {
+                uint32_t group_start = row;
+                // Compute group input from top row's left (power rail or prev col top state)
+                bool group_input = (column == 0) ? true : (*ladder_ctx).exec_network->cells[group_start][column - 1].state;
 
-                // save this execution
-                (*ladder_ctx).ladder.last.instr = (*(*ladder_ctx).exec_network).cells[row][column].code;
-                (*ladder_ctx).ladder.last.err = LADDER_INS_ERR_OK;
-                (*ladder_ctx).ladder.last.network = network;
-                (*ladder_ctx).ladder.last.cell_row = row;
-                (*ladder_ctx).ladder.last.cell_column = column;
+                // Find group end: consecutive rows with vertical_bar=true after start
+                uint32_t group_end = group_start;
+                while (group_end < (*ladder_ctx).exec_network->rows - 1 && (*ladder_ctx).exec_network->cells[group_end + 1][column].vertical_bar) {
+                    group_end++;
+                }
 
-                // evaluation for an invalid code if the cell is not part of an instruction that uses more than one cell
-                if ((*(*ladder_ctx).exec_network).cells[row][column].code >= LADDER_INS_INV
-                        && (*(*ladder_ctx).exec_network).cells[row][column].code != LADDER_INS_MULTI) {
+                // Save original left states for lower group rows (to override temporarily)
+                bool original_lefts[LADDER_MAX_ROWS]; // Fixed-size; safe as rows <=32
+                uint32_t num_saved = 0;
+                if (column > 0 && group_start < group_end) { // Only if multi-row and not col0
+                    for (uint32_t gr = group_start + 1; gr <= group_end; gr++) {
+                        original_lefts[num_saved] = (*ladder_ctx).exec_network->cells[gr][column - 1].state;
+                        // Override: Set left to group_input for uniform input
+                        (*ladder_ctx).exec_network->cells[gr][column - 1].state = group_input;
+                        num_saved++;
+                    }
+                }
+
+                // Execute instructions in group (using uniform group_input as left)
+                bool group_output = false;
+                bool group_error = false;
+                for (uint32_t gr = group_start; gr <= group_end; gr++) {
+                    // Set current row for last instr tracking
+                    uint32_t current_row_for_exec = gr;
+
+                    // save this execution
+                    (*ladder_ctx).ladder.last.instr = (*(*ladder_ctx).exec_network).cells[current_row_for_exec][column].code;
+                    (*ladder_ctx).ladder.last.err = LADDER_INS_ERR_OK;
+                    (*ladder_ctx).ladder.last.network = network;
+                    (*ladder_ctx).ladder.last.cell_row = current_row_for_exec;
+                    (*ladder_ctx).ladder.last.cell_column = column;
+
+                    ladder_instruction_t code = (*(*ladder_ctx).exec_network).cells[current_row_for_exec][column].code;
+
+                    // evaluation for an invalid code if the cell is not part of an instruction that uses more than one cell
+                    if (code >= LADDER_INS_INV && code != LADDER_INS_MULTI) {
+                        (*ladder_ctx).ladder.state = LADDER_ST_INV;
+                        (*ladder_ctx).ladder.last.err = LADDER_INS_ERR_FAIL;
+                        group_error = true;
+                        break; // Break group exec on error
+                    }
+
+                    // execute instruction
+                    if (code != LADDER_INS_MULTI) {
+                        (*ladder_ctx).ladder.last.err = ladder_function[code](ladder_ctx, column, current_row_for_exec);
+
+                        if ((*ladder_ctx).ladder.last.err != LADDER_INS_ERR_OK) {
+                            group_error = true;
+                            break; // Break on exec error
+                        }
+
+                        if ((*ladder_ctx).on.instruction != NULL)
+                            (*ladder_ctx).on.instruction(ladder_ctx);
+
+                        // Collect individual output for OR
+                        group_output |= (*(*ladder_ctx).exec_network).cells[current_row_for_exec][column].state;
+                    }
+                }
+
+                // On group error, restore and propagate error
+                if (group_error) {
+                    // Restore overrides
+                    if (column > 0 && num_saved > 0) {
+                        uint32_t idx = 0;
+                        for (uint32_t gr = group_start + 1; gr <= group_end; gr++) {
+                            (*ladder_ctx).exec_network->cells[gr][column - 1].state = original_lefts[idx++];
+                        }
+                    }
                     (*ladder_ctx).ladder.state = LADDER_ST_INV;
-                    (*ladder_ctx).ladder.last.err = LADDER_INS_ERR_FAIL;
                     return;
                 }
 
-                // execute instruction
-                if ((*(*ladder_ctx).exec_network).cells[row][column].code != LADDER_INS_MULTI) {
-                    (*ladder_ctx).ladder.last.err = ladder_function[(*(*ladder_ctx).exec_network).cells[row][column].code](ladder_ctx, column, row);
-
-                    if ((*ladder_ctx).ladder.last.err != LADDER_INS_ERR_OK) {
-                        (*ladder_ctx).ladder.state = LADDER_ST_INV;
-                        return;
-                    }
-
-                    if ((*ladder_ctx).on.instruction != NULL)
-                        (*ladder_ctx).on.instruction(ladder_ctx);
+                // Set uniform group output to all rows in group (ORed flow to right)
+                for (uint32_t gr = group_start; gr <= group_end; gr++) {
+                    (*(*ladder_ctx).exec_network).cells[gr][column].state = group_output;
                 }
 
-                if ((*(*ladder_ctx).exec_network).cells[row][column].vertical_bar)
-                    (*(*ladder_ctx).exec_network).cells[row][column].state |= row == 0 ? false : (*(*ladder_ctx).exec_network).cells[row - 1][column].state;
+                // Restore original left states
+                if (column > 0 && num_saved > 0) {
+                    uint32_t idx = 0;
+                    for (uint32_t gr = group_start + 1; gr <= group_end; gr++) {
+                        (*ladder_ctx).exec_network->cells[gr][column - 1].state = original_lefts[idx++];
+                    }
+                }
+
+                // Advance to next group
+                row = group_end + 1;
             }
         }
 

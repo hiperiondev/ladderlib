@@ -35,6 +35,7 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+#include <string.h>
 
 #include "ladder.h"
 
@@ -66,6 +67,7 @@
 (exnet(lctx).cells[r][c].data[i].type == LADDER_REGISTER_C)    ? (uint32_t)((*lctx).registers.C[exnet(lctx).cells[r][c].data[i].value.i32]) : \
 (exnet(lctx).cells[r][c].data[i].type == LADDER_REGISTER_T)    ? (uint64_t)((*lctx).timers[exnet(lctx).cells[r][c].data[i].value.i32].acc)  : \
 (exnet(lctx).cells[r][c].data[i].type == LADDER_REGISTER_D)    ? (int32_t)((*lctx).registers.D[exnet(lctx).cells[r][c].data[i].value.i32])  : \
+(exnet(lctx).cells[r][c].data[i].type == LADDER_REGISTER_R)    ? (int32_t)((*lctx).registers.R[exnet(lctx).cells[r][c].data[i].value.i32])  : \
 (exnet(lctx).cells[r][c].data[i].type == LADDER_REGISTER_INV)  ? 0                                                                          : \
 0                                                                                                                                             \
 )
@@ -85,6 +87,18 @@
 (exnet(lctx).cells[r][c].data[i].type == LADDER_REGISTER_Td) ? (bool)((*lctx).prev_scan_vals.Tdh[exnet(lctx).cells[r][c].data[i].value.i32])   : \
 (exnet(lctx).cells[r][c].data[i].type == LADDER_REGISTER_Tr) ? (bool)((*lctx).prev_scan_vals.Trh[exnet(lctx).cells[r][c].data[i].value.i32])   : \
 0                                                                                                                                                \
+)
+
+/**
+ * @def ladder_get_data_int32
+ * @brief Get int32
+ *
+ */
+#define ladder_get_data_int32(lctx, r, c, i)                                                                                              \
+(                                                                                                                                         \
+(exnet(lctx).cells[r][c].data[i].type == LADDER_REGISTER_R) ? (int32_t)((*lctx).registers.R[exnet(lctx).cells[r][c].data[i].value.i32]) : \
+(exnet(lctx).cells[r][c].data[i].type == LADDER_REGISTER_NONE) ? (int32_t)(exnet(lctx).cells[r][c].data[i].value.i32) :                   \
+ladder_get_data_value(lctx, r, c, i)                                                                                                      \
 )
 
 /**
