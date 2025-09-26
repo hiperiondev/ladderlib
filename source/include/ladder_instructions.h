@@ -39,14 +39,18 @@
 
 #include "ladder.h"
 
-#define to_integer(val, type)      \
-    (                              \
-    (val == 0) ? (uint32_t)(val) : \
-    (val == 1) ? (int32_t)(val)  : \
-    0                              \
-    )
+static inline int32_t to_integer(int32_t val, ladder_data_type_t type) {
+    (void)type;  // Unused; suppress warning (original behavior preserved)
+    if (val == 0) {
+        return (int32_t)(uint32_t)val;  // Explicit cast as in original
+    } else if (val == 1) {
+        return (int32_t)val;
+    }
+    return 0;
+}
 
 #define exnet(lctx)  (*(*lctx).exec_network)
+
 /**
  * @def ladder_get_data_value
  * @brief Get data values

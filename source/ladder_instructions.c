@@ -38,7 +38,6 @@
 #include "ladder_instructions.h"
 
 static uint32_t basetime_factor[] = { 1, 10, 100, 1000, 60000 };
-static uint8_t error = 0;
 
 const ladder_instructions_iocd_t ladder_fn_iocd[] = { { 1, 1, 1, 0 }, // NOP
         { 1, 1, 1, 0 }, // CONN
@@ -80,17 +79,30 @@ const ladder_instructions_iocd_t ladder_fn_iocd[] = { { 1, 1, 1, 0 }, // NOP
         { 1, 1, 1, 0 }, // INV
         };
 
-static int32_t ladder_get_table_i32(ladder_ctx_t *ladder_ctx, uint32_t table_net, uint32_t flat_pos) {
-    if (table_net >= ladder_ctx->ladder.quantity.networks)
+static int32_t ladder_get_table_i32(ladder_ctx_t *ladder_ctx, uint32_t table_net, uint32_t flat_pos, uint8_t *err) {
+    *err = LADDER_INS_ERR_OK;
+    if (table_net >= ladder_ctx->ladder.quantity.networks) {
+        *err = LADDER_INS_ERR_NOTABLE;
         return 0;
+    }
     ladder_network_t *net = &ladder_ctx->network[table_net];
 
-    if (flat_pos >= net->rows * net->cols)
+    if (flat_pos >= net->rows * net->cols) {
+        *err = LADDER_INS_ERR_OUTOFRANGE;
         return 0;
+    }
     uint32_t r = flat_pos / net->cols;
     uint32_t c = flat_pos % net->cols;
-    if (r >= net->rows || c >= net->cols || net->cells[r][c].data_qty < 1)
+    if (r >= net->rows || c >= net->cols || net->cells[r][c].data_qty < 1) {
+        *err = LADDER_INS_ERR_OUTOFRANGE;
         return 0;
+    }
+    // Check type for i32 compatibility (D/IW/QW as proxy)
+    if (net->cells[r][c].data[0].type != LADDER_REGISTER_D && net->cells[r][c].data[0].type != LADDER_REGISTER_IW
+            && net->cells[r][c].data[0].type != LADDER_REGISTER_QW) {
+        *err = LADDER_INS_ERR_TYPEMISMATCH;
+        return 0;
+    }
     return (int32_t) net->cells[r][c].data[0].value.i32;
 }
 
@@ -110,6 +122,12 @@ static void ladder_set_table_i32(ladder_ctx_t *ladder_ctx, uint32_t table_net, u
     uint32_t c = flat_pos % net->cols;
     if (r >= net->rows || c >= net->cols || net->cells[r][c].data_qty < 1) {
         *err = LADDER_INS_ERR_OUTOFRANGE;
+        return;
+    }
+    // Check dest type for i32 compatibility
+    if (net->cells[r][c].data[0].type != LADDER_REGISTER_D && net->cells[r][c].data[0].type != LADDER_REGISTER_IW
+            && net->cells[r][c].data[0].type != LADDER_REGISTER_QW) {
+        *err = LADDER_INS_ERR_TYPEMISMATCH;
         return;
     }
     net->cells[r][c].data[0].value.i32 = val;
@@ -162,6 +180,7 @@ ladder_ins_err_t fn_FE(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row) 
 
 ladder_ins_err_t fn_COIL(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row) {
     uint32_t val = 0;
+    static uint8_t error = 0;
 
     CELL_STATE(ladder_ctx, column, row) = CELL_STATE_LEFT(ladder_ctx, column, row);
 
@@ -174,6 +193,8 @@ ladder_ins_err_t fn_COIL(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row
 }
 
 ladder_ins_err_t fn_COILL(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row) {
+    static uint8_t error = 0;
+
     bool state = CELL_STATE_LEFT(ladder_ctx, column, row);
     bool prev = ladder_get_previous_value(ladder_ctx, row, column, 0); // From history (Mh/Qh)
     uint32_t val = (prev || state) ? 1 : 0;
@@ -186,6 +207,8 @@ ladder_ins_err_t fn_COILL(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t ro
 }
 
 ladder_ins_err_t fn_COILU(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row) {
+    static uint8_t error = 0;
+
     bool state = CELL_STATE_LEFT(ladder_ctx, column, row);
     bool prev = ladder_get_previous_value(ladder_ctx, row, column, 0); // From history (Mh/Qh)
     uint32_t val = (prev && !state) ? 1 : 0;
@@ -415,6 +438,8 @@ ladder_ins_err_t fn_CTD(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row)
 }
 
 ladder_ins_err_t fn_MOVE(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row) {
+    static uint8_t error = 0;
+
     CELL_STATE(ladder_ctx, column, row) = CELL_STATE_LEFT(ladder_ctx, column, row);
 
     if (CELL_STATE_LEFT(ladder_ctx, column, row)) {
@@ -426,6 +451,8 @@ ladder_ins_err_t fn_MOVE(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row
 }
 
 ladder_ins_err_t fn_SUB(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row) {
+    static uint8_t error = 0;
+
     CELL_STATE(ladder_ctx, column, row) = CELL_STATE_LEFT(ladder_ctx, column, row);
     int32_t auxValue1 = ladder_get_data_value(ladder_ctx, row, column, 0);
     int32_t auxValue2 = ladder_get_data_value(ladder_ctx, row, column, 1);
@@ -447,6 +474,8 @@ ladder_ins_err_t fn_SUB(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row)
 }
 
 ladder_ins_err_t fn_ADD(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row) {
+    static uint8_t error = 0;
+
     CELL_STATE(ladder_ctx, column, row) = CELL_STATE_LEFT(ladder_ctx, column, row);
 
     if (CELL_STATE_LEFT(ladder_ctx, column, row)) {
@@ -458,6 +487,8 @@ ladder_ins_err_t fn_ADD(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row)
 }
 
 ladder_ins_err_t fn_MUL(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row) {
+    static uint8_t error = 0;
+
     CELL_STATE(ladder_ctx, column, row) = CELL_STATE_LEFT(ladder_ctx, column, row);
 
     if (CELL_STATE_LEFT(ladder_ctx, column, row)) {
@@ -469,6 +500,8 @@ ladder_ins_err_t fn_MUL(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row)
 }
 
 ladder_ins_err_t fn_DIV(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row) {
+    static uint8_t error = 0;
+
     CELL_STATE(ladder_ctx, column, row) = CELL_STATE_LEFT(ladder_ctx, column, row);
     if (CELL_STATE_LEFT(ladder_ctx, column, row)) {
         if (ladder_get_data_value(ladder_ctx, row +1, column, 0) == 0) {
@@ -483,6 +516,8 @@ ladder_ins_err_t fn_DIV(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row)
 }
 
 ladder_ins_err_t fn_MOD(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row) {
+    static uint8_t error = 0;
+
     CELL_STATE(ladder_ctx, column, row) = CELL_STATE_LEFT(ladder_ctx, column, row);
 
     if (CELL_STATE_LEFT(ladder_ctx, column, row)) {
@@ -494,6 +529,8 @@ ladder_ins_err_t fn_MOD(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row)
 }
 
 ladder_ins_err_t fn_SHL(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row) {
+    static uint8_t error = 0;
+
     CELL_STATE(ladder_ctx, column, row) = CELL_STATE_LEFT(ladder_ctx, column, row);
 
     if (CELL_STATE_LEFT(ladder_ctx, column, row)) {
@@ -505,6 +542,8 @@ ladder_ins_err_t fn_SHL(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row)
 }
 
 ladder_ins_err_t fn_SHR(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row) {
+    static uint8_t error = 0;
+
     CELL_STATE(ladder_ctx, column, row) = CELL_STATE_LEFT(ladder_ctx, column, row);
 
     if (CELL_STATE_LEFT(ladder_ctx, column, row)) {
@@ -516,6 +555,8 @@ ladder_ins_err_t fn_SHR(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row)
 }
 
 ladder_ins_err_t fn_ROL(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row) {
+    static uint8_t error = 0;
+
     CELL_STATE(ladder_ctx, column, row) = CELL_STATE_LEFT(ladder_ctx, column, row);
 
     if (CELL_STATE_LEFT(ladder_ctx, column, row)) {
@@ -534,6 +575,8 @@ ladder_ins_err_t fn_ROL(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row)
 }
 
 ladder_ins_err_t fn_ROR(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row) {
+    static uint8_t error = 0;
+
     CELL_STATE(ladder_ctx, column, row) = CELL_STATE_LEFT(ladder_ctx, column, row);
 
     if (CELL_STATE_LEFT(ladder_ctx, column, row)) {
@@ -552,6 +595,8 @@ ladder_ins_err_t fn_ROR(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row)
 }
 
 ladder_ins_err_t fn_AND(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row) {
+    static uint8_t error = 0;
+
     CELL_STATE(ladder_ctx, column, row) = CELL_STATE_LEFT(ladder_ctx, column, row);
 
     if (CELL_STATE_LEFT(ladder_ctx, column, row)) {
@@ -563,6 +608,8 @@ ladder_ins_err_t fn_AND(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row)
 }
 
 ladder_ins_err_t fn_OR(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row) {
+    static uint8_t error = 0;
+
     CELL_STATE(ladder_ctx, column, row) = CELL_STATE_LEFT(ladder_ctx, column, row);
 
     if (CELL_STATE_LEFT(ladder_ctx, column, row)) {
@@ -574,6 +621,8 @@ ladder_ins_err_t fn_OR(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row) 
 }
 
 ladder_ins_err_t fn_XOR(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row) {
+    static uint8_t error = 0;
+
     CELL_STATE(ladder_ctx, column, row) = CELL_STATE_LEFT(ladder_ctx, column, row);
 
     if (CELL_STATE_LEFT(ladder_ctx, column, row)) {
@@ -585,6 +634,8 @@ ladder_ins_err_t fn_XOR(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row)
 }
 
 ladder_ins_err_t fn_NOT(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row) {
+    static uint8_t error = 0;
+
     CELL_STATE(ladder_ctx, column, row) = CELL_STATE_LEFT(ladder_ctx, column, row);
 
     if (CELL_STATE_LEFT(ladder_ctx, column, row)) {
@@ -645,29 +696,27 @@ ladder_ins_err_t fn_FOREIGN(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t 
 }
 
 ladder_ins_err_t fn_TMOVE(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row) {
-    if (!CELL_STATE_LEFT(ladder_ctx, column, row)) {
-        CELL_STATE(ladder_ctx, column, row) = false;
+    // MAX_MOVE=1024 (safe for 32x255=8160, but cap low)
+#define MAX_MOVE 1024
+    int32_t dest_net = ladder_get_data_value(ladder_ctx, row, column, 0);
+    int32_t dest_pos = ladder_get_data_value(ladder_ctx, row, column, 1);
+    int32_t src_net = ladder_get_data_value(ladder_ctx, row, column, 2);
+    int32_t src_pos = ladder_get_data_value(ladder_ctx, row, column, 3);
+    int32_t qty_raw = ladder_get_data_value(ladder_ctx, row, column, 4);
+    uint32_t qty = (qty_raw < 0 || qty_raw > MAX_MOVE) ? 0 : (uint32_t) qty_raw; // Handle negative as 0, cap
+
+    if (qty == 0) {
+        CELL_STATE(ladder_ctx, column, row) = CELL_STATE_LEFT(ladder_ctx, column, row); // Success for zero
         return LADDER_INS_ERR_OK;
     }
 
-    // Resolve parameters (supports constants or register values).
-    uint32_t dest_net = (uint32_t) ladder_get_data_value(ladder_ctx, row, column, 0);
-    uint32_t dest_pos = (uint32_t) ladder_get_data_value(ladder_ctx, row, column, 1);
-    uint32_t src_net = (uint32_t) ladder_get_data_value(ladder_ctx, row, column, 2);
-    uint32_t src_pos = (uint32_t) ladder_get_data_value(ladder_ctx, row, column, 3);
-    uint32_t qty = (uint32_t) ladder_get_data_value(ladder_ctx, row, column, 4);
-
-    // Validate tables: must exist and be disabled (data-only nets).
-    if (dest_net >= ladder_ctx->ladder.quantity.networks || ladder_ctx->network[dest_net].enable) {
-        CELL_STATE(ladder_ctx, column, row) = false;
-        return LADDER_INS_ERR_NOTABLE;
-    }
-    if (src_net >= ladder_ctx->ladder.quantity.networks || ladder_ctx->network[src_net].enable) {
+    // Check table enables (disabled for data tables)
+    if (ladder_ctx->network[dest_net].enable || ladder_ctx->network[src_net].enable) {
         CELL_STATE(ladder_ctx, column, row) = false;
         return LADDER_INS_ERR_NOTABLE;
     }
 
-    // Pre-validate bounds (qty=0 is allowed, no move but success).
+    // Bounds: Ensure full range fits
     uint32_t dest_size = ladder_ctx->network[dest_net].rows * ladder_ctx->network[dest_net].cols;
     uint32_t src_size = ladder_ctx->network[src_net].rows * ladder_ctx->network[src_net].cols;
     if (dest_pos + qty > dest_size || src_pos + qty > src_size) {
@@ -675,19 +724,35 @@ ladder_ins_err_t fn_TMOVE(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t ro
         return LADDER_INS_ERR_OUTOFRANGE;
     }
 
-    // Execute block move.
-    uint8_t err = LADDER_INS_ERR_OK;
-    for (uint32_t k = 0; k < qty; k++) {
-        int32_t val = ladder_get_table_i32(ladder_ctx, src_net, src_pos + k);
-        ladder_set_table_i32(ladder_ctx, dest_net, dest_pos + k, val, &err);
-        if (err != LADDER_INS_ERR_OK) {
+    // Atomic via temp buffer (all read or err, all write or none)
+    int32_t temp[MAX_MOVE];
+    uint8_t read_err = LADDER_INS_ERR_OK;
+    for (uint32_t k = 0; k < qty; ++k) {
+        temp[k] = ladder_get_table_i32(ladder_ctx, src_net, src_pos + k, &read_err);
+        if (read_err != LADDER_INS_ERR_OK) {
             break;
         }
     }
+    if (read_err != LADDER_INS_ERR_OK) {
+        CELL_STATE(ladder_ctx, column, row) = false;
+        return read_err;
+    }
 
-    // Set done flag: true only on full success.
-    CELL_STATE(ladder_ctx, column, row) = (err == LADDER_INS_ERR_OK);
-    return err;
+    uint8_t write_err = LADDER_INS_ERR_OK;
+    for (uint32_t k = 0; k < qty; ++k) {
+        ladder_set_table_i32(ladder_ctx, dest_net, dest_pos + k, temp[k], &write_err);
+        if (write_err != LADDER_INS_ERR_OK) {
+            break;
+        }
+    }
+    if (write_err != LADDER_INS_ERR_OK) {
+        CELL_STATE(ladder_ctx, column, row) = false;
+        return write_err;
+    }
+
+    // Success: Propagate power
+    CELL_STATE(ladder_ctx, column, row) = CELL_STATE_LEFT(ladder_ctx, column, row);
+    return LADDER_INS_ERR_OK;
 }
 
 void ladder_set_data_value(ladder_ctx_t *ladder_ctx, uint32_t row, uint32_t column, uint32_t pos, void *value, uint8_t *error) {

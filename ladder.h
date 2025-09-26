@@ -137,16 +137,17 @@ typedef enum LADDER_STATE {
  *
  */
 typedef enum LADDER_INS_ERROR {
-    LADDER_INS_ERR_OK,         /**< OK */
-    LADDER_INS_ERR_GETPREVVAL, /**< Error get previous value */
-    LADDER_INS_ERR_GETDATAVAL, /**< Error get data value */
-    LADDER_INS_ERR_SETDATAVAL, /**< Error set data value */
-    LADDER_INS_ERR_NOFOREIGN,  /**< Error foreign function not exist */
-    LADDER_INS_ERR_NOTABLE,    /**< Table not exist or net not disabled */
-    LADDER_INS_ERR_OUTOFRANGE, /**< Value out of range */
-    LADDER_INS_ERR_DIVBYZERO,  /**< Division by zero */
+    LADDER_INS_ERR_OK,           /**< OK */
+    LADDER_INS_ERR_GETPREVVAL,   /**< Error get previous value */
+    LADDER_INS_ERR_GETDATAVAL,   /**< Error get data value */
+    LADDER_INS_ERR_SETDATAVAL,   /**< Error set data value */
+    LADDER_INS_ERR_NOFOREIGN,    /**< Error foreign function not exist */
+    LADDER_INS_ERR_NOTABLE,      /**< Table not exist or net not disabled */
+    LADDER_INS_ERR_OUTOFRANGE,   /**< Value out of range */
+    LADDER_INS_ERR_DIVBYZERO,    /**< Division by zero */
+    LADDER_INS_ERR_TYPEMISMATCH, /**< Type mismatch */
     //...//
-    LADDER_INS_ERR_FAIL,       /**< Generic fail */
+    LADDER_INS_ERR_FAIL,         /**< Generic fail */
 } ladder_ins_err_t;
 
 /**
