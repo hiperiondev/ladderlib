@@ -45,6 +45,10 @@ void ladder_scan_time(ladder_ctx_t *ladder_ctx) {
     uint64_t scanTimeMillis = ladder_ctx->hw.time.millis();
     ladder_ctx->scan_internals.actual_scan_time = scanTimeMillis - ladder_ctx->scan_internals.start_time;
     ladder_ctx->scan_internals.start_time = scanTimeMillis;
+
+    if (ladder_ctx->ladder.quantity.watchdog_ms > 0 && ladder_ctx->scan_internals.actual_scan_time > ladder_ctx->ladder.quantity.watchdog_ms) {
+        ladder_ctx->ladder.state = LADDER_ST_ERROR;
+    }
 }
 
 void ladder_save_previous_values(ladder_ctx_t *ladder_ctx) {
@@ -101,7 +105,7 @@ void ladder_clear_program(ladder_ctx_t *ladder_ctx) {
 }
 
 bool ladder_ctx_init(ladder_ctx_t *ladder_ctx, uint8_t net_columns_qty, uint8_t net_rows_qty, uint32_t networks_qty, uint32_t qty_m, uint32_t qty_c,
-        uint32_t qty_t, uint32_t qty_d, uint32_t qty_r, uint32_t delay_not_run, bool init_netwok) {
+        uint32_t qty_t, uint32_t qty_d, uint32_t qty_r, uint32_t delay_not_run, uint32_t watchdog_ms, bool init_netwok) {
     if (ladder_ctx == NULL)
         return false;
     if (net_rows_qty > LADDER_MAX_ROWS)
@@ -267,6 +271,7 @@ bool ladder_ctx_init(ladder_ctx_t *ladder_ctx, uint8_t net_columns_qty, uint8_t 
     ladder_ctx->ladder.quantity.d = qty_d;
     ladder_ctx->ladder.quantity.r = qty_r;
     ladder_ctx->ladder.quantity.delay_not_run = delay_not_run == 0 ? 1 : delay_not_run;
+    ladder_ctx->ladder.quantity.watchdog_ms = watchdog_ms;
     ladder_ctx->ladder.state = LADDER_ST_STOPPED;
 
     return true;

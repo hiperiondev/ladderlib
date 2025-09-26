@@ -315,6 +315,7 @@ typedef struct ladder_s {
         uint32_t r;             /**< Quantity of floating point registers */
         uint32_t networks;      /**< Quantity of networks */
         uint32_t delay_not_run; /**< Delay on task when not running state (ms) */
+        uint32_t watchdog_ms;   /**< Watchdog threshold in ms */
     } quantity;
 } ladder_t;
 
@@ -622,7 +623,7 @@ static inline bool LADDER_VERTICAL_BAR(const ladder_ctx_t *lctx, uint32_t n, uin
 
 /**
  * @fn bool ladder_ctx_init(ladder_ctx_t *ladder_ctx, uint8_t net_columns_qty, uint8_t net_rows_qty, uint32_t networks_qty, uint32_t qty_m, uint32_t qty_c,
- *  uint32_t qty_t, uint32_t qty_d, uint32_t qty_r, uint32_t delay_not_run, bool init_netwok);
+ *  uint32_t qty_t, uint32_t qty_d, uint32_t qty_r, uint32_t delay_not_run, uint32_t watchdog_ms, bool init_netwok);
  * @brief Initialize context.
  *
  *
@@ -636,11 +637,12 @@ static inline bool LADDER_VERTICAL_BAR(const ladder_ctx_t *lctx, uint32_t n, uin
  * @param qty_d Memory Areas quantities. Regular registers (16 bit signed).
  * @param qty_r Memory Areas quantities. Float or Real registers.
  * @param delay_not_run Delay on task when not running state (ms).
+ * @param watchdog_ms
  * @param init_netwok If false not initialize Networks
  * @return Error
  */
 bool ladder_ctx_init(ladder_ctx_t *ladder_ctx, uint8_t net_columns_qty, uint8_t net_rows_qty, uint32_t networks_qty, uint32_t qty_m, uint32_t qty_c,
-        uint32_t qty_t, uint32_t qty_d, uint32_t qty_r, uint32_t delay_not_run, bool init_netwok);
+        uint32_t qty_t, uint32_t qty_d, uint32_t qty_r, uint32_t delay_not_run, uint32_t watchdog_ms, bool init_netwok);
 
 /**
  * @fn bool ladder_ctx_deinit(ladder_ctx_t *ladder_ctx)

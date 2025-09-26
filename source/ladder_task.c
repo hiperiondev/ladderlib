@@ -65,6 +65,9 @@ void ladder_task(void *ladderctx) {
             (*ladder_ctx).hw.time.delay((*ladder_ctx).ladder.quantity.delay_not_run);
         }
 
+        // Set start_time here to capture full cycle time (before pre-hook, reads, scan, writes)
+        (*ladder_ctx).scan_internals.start_time = (*ladder_ctx).hw.time.millis();
+
         // external function before scan
         if ((*ladder_ctx).on.task_before != NULL)
             (*ladder_ctx).on.task_before(ladder_ctx);
