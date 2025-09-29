@@ -171,13 +171,12 @@ void ladder_scan(ladder_ctx_t *ladder_ctx) {
                         if (num_saved >= LADDER_MAX_ROWS) { // Bounds check: prevent overflow (safe but explicit)
                             group_error = true;
                             (*ladder_ctx).ladder.last.err = LADDER_INS_ERR_OUTOFRANGE;
-                            break;
+                            // Jump to cleanup on bounds error to ensure left states are restored before error propagation
+                            goto cleanup;
                         }
                         original_lefts[num_saved++] = (*ladder_ctx).exec_network->cells[gr][column - 1].state;
                         (*ladder_ctx).exec_network->cells[gr][column - 1].state = group_input;
                     }
-                    if (group_error)
-                        break;
                 }
 
                 for (uint32_t gr = group_start; gr <= group_end; gr++) {
@@ -198,7 +197,8 @@ void ladder_scan(ladder_ctx_t *ladder_ctx) {
                         (*ladder_ctx).ladder.state = LADDER_ST_INV;
                         (*ladder_ctx).ladder.last.err = LADDER_INS_ERR_FAIL;
                         group_error = true;
-                        break; // Break group exec on error
+                        // Jump to cleanup on invalid code to restore left states immediately
+                        goto cleanup;
                     }
 
                     // execute instruction
@@ -207,7 +207,8 @@ void ladder_scan(ladder_ctx_t *ladder_ctx) {
 
                         if ((*ladder_ctx).ladder.last.err != LADDER_INS_ERR_OK) {
                             group_error = true;
-                            break; // Break on exec error
+                            // Jump to cleanup on execution error to ensure restoration before halting
+                            goto cleanup;
                         }
 
                         if ((*ladder_ctx).on.instruction != NULL)
@@ -218,6 +219,7 @@ void ladder_scan(ladder_ctx_t *ladder_ctx) {
                     }
                 }
 
+                cleanup:
                 // Always restore left states after execution, regardless of error, to prevent corruption for next groups/columns
                 // This ensures overrides are isolated to the current group, fixing cascading errors in parallel rungs
                 if (column > 0) {
