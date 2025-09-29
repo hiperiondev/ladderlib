@@ -87,7 +87,7 @@ void ladder_scan(ladder_ctx_t *ladder_ctx) {
     // evaluate cron for actual time
     if (ladderlib_cron_eval(ladder_ctx) != LADDER_INS_ERR_OK) {
         (*ladder_ctx).ladder.state = LADDER_ST_INV;
-        goto exit;
+        return;  // Modified: Early return on cron eval failure to avoid partial scan.
     }
 #endif
 
@@ -253,16 +253,15 @@ void ladder_scan(ladder_ctx_t *ladder_ctx) {
             }
         }
 
-#ifdef OPTIONAL_CRON
-        exit:
-        // clean auto reset cron registers
-        if ((ladderlib_cron_t*) (*ladder_ctx).cron != NULL)
-            for (uint32_t n = 0; n < ((ladderlib_cron_t*) (*ladder_ctx).cron)->used; n++)
-                if (((ladderlib_cron_t*) (*ladder_ctx).cron)->ctx[n].enabled && ((ladderlib_cron_t*) (*ladder_ctx).cron)->ctx[n].auto_reset)
-                    (*ladder_ctx).memory.M[((ladderlib_cron_t*) (*ladder_ctx).cron)->ctx[n].flag_reg] = false;
-#endif
-
         if ((*ladder_ctx).on.scan_end != NULL)
             (*ladder_ctx).on.scan_end(ladder_ctx);
     }
+
+#ifdef OPTIONAL_CRON
+    // clean auto reset cron registers
+    if ((ladderlib_cron_t*) (*ladder_ctx).cron != NULL)
+        for (uint32_t n = 0; n < ((ladderlib_cron_t*) (*ladder_ctx).cron)->used; n++)
+            if (((ladderlib_cron_t*) (*ladder_ctx).cron)->ctx[n].enabled && ((ladderlib_cron_t*) (*ladder_ctx).cron)->ctx[n].auto_reset)
+                (*ladder_ctx).memory.M[((ladderlib_cron_t*) (*ladder_ctx).cron)->ctx[n].flag_reg] = false;
+#endif
 }
