@@ -87,7 +87,7 @@ void ladder_scan(ladder_ctx_t *ladder_ctx) {
     // evaluate cron for actual time
     if (ladderlib_cron_eval(ladder_ctx) != LADDER_INS_ERR_OK) {
         (*ladder_ctx).ladder.state = LADDER_ST_INV;
-        return;  // Modified: Early return on cron eval failure to avoid partial scan.
+        return;
     }
 #endif
 
@@ -149,13 +149,6 @@ void ladder_scan(ladder_ctx_t *ladder_ctx) {
                 uint32_t group_end = group_start;
                 while (group_end + 1 < (*ladder_ctx).exec_network->rows && (*ladder_ctx).exec_network->cells[group_end + 1][column].vertical_bar) {
                     group_end++;
-                }
-
-                // Defensive assert/check (should never trigger post-fix).
-                if (group_end >= (*ladder_ctx).exec_network->rows) {
-                    (*ladder_ctx).ladder.state = LADDER_ST_INV;
-                    (*ladder_ctx).ladder.last.err = LADDER_INS_ERR_OUTOFRANGE;
-                    return;
                 }
 
                 // Execute instructions in group (using uniform group_input as left where needed)
