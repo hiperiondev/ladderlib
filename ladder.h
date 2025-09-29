@@ -718,4 +718,13 @@ bool ladder_add_foreign(ladder_ctx_t *ladder_ctx, _foreign_fn_init fn_init, void
  */
 bool ladder_fn_cell(ladder_ctx_t *ladder_ctx, uint32_t network, uint32_t row, uint32_t column, ladder_instruction_t function, uint32_t foreign_id);
 
+/**
+ * @fn bool ladder_fault_clear(ladder_ctx_t *ladder_ctx)
+ * @brief Clear fault state and reset to running, for watchdog recovery.
+ *
+ * @param ladder_ctx Ladder context
+ * @return True if cleared (was in ERROR), false otherwise
+ */
+bool ladder_fault_clear(ladder_ctx_t *ladder_ctx);
+
 #endif /* LADDER_H */

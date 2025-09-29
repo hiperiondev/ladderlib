@@ -47,8 +47,32 @@ void ladder_scan_time(ladder_ctx_t *ladder_ctx) {
     ladder_ctx->scan_internals.start_time = scanTimeMillis;
 
     if (ladder_ctx->ladder.quantity.watchdog_ms > 0 && ladder_ctx->scan_internals.actual_scan_time > ladder_ctx->ladder.quantity.watchdog_ms) {
+        // Set error and invoke panic immediately for synchronous fault handling.
         ladder_ctx->ladder.state = LADDER_ST_ERROR;
+        if (ladder_ctx->on.panic != NULL) {
+            ladder_ctx->on.panic(ladder_ctx);
+        }
     }
+}
+
+bool ladder_fault_clear(ladder_ctx_t *ladder_ctx) {
+    if (ladder_ctx == NULL || ladder_ctx->ladder.state != LADDER_ST_ERROR) {
+        return false;  // Only clear if actually in error state.
+    }
+
+    // Reset state to running.
+    ladder_ctx->ladder.state = LADDER_ST_RUNNING;
+
+    // Clear scan accumulators to prevent carryover effects.
+    ladder_ctx->scan_internals.actual_scan_time = 0;
+    ladder_ctx->scan_internals.start_time = ladder_ctx->hw.time.millis();
+
+    // Optional: Invoke a clear hook if registered (for logging recovery).
+    if (ladder_ctx->on.end_task != NULL) {  // Reuse end_task as clear notifier, or add dedicated if needed.
+        ladder_ctx->on.end_task(ladder_ctx);
+    }
+
+    return true;
 }
 
 void ladder_save_previous_values(ladder_ctx_t *ladder_ctx) {

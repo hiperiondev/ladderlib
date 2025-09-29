@@ -72,6 +72,7 @@ static inline int32_t to_integer(int32_t val, ladder_data_type_t type) {
 (exnet(lctx).cells[r][c].data[i].type == LADDER_REGISTER_T)    ? (uint64_t)((*lctx).timers[exnet(lctx).cells[r][c].data[i].value.i32].acc)  : \
 (exnet(lctx).cells[r][c].data[i].type == LADDER_REGISTER_D)    ? (int32_t)((*lctx).registers.D[exnet(lctx).cells[r][c].data[i].value.i32])  : \
 (exnet(lctx).cells[r][c].data[i].type == LADDER_REGISTER_R)    ? (int32_t)((*lctx).registers.R[exnet(lctx).cells[r][c].data[i].value.i32])  : \
+(exnet(lctx).cells[r][c].data[i].type == LADDER_REGISTER_S)    ? 0                                                                          : \
 (exnet(lctx).cells[r][c].data[i].type == LADDER_REGISTER_INV)  ? 0                                                                          : \
 0                                                                                                                                             \
 )

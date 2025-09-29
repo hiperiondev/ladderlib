@@ -828,6 +828,11 @@ void ladder_set_data_value(ladder_ctx_t *ladder_ctx, uint32_t row, uint32_t colu
     size_t __data_size = 0;
     uint32_t __index = 0;
 
+    if (__type == LADDER_REGISTER_S) {
+        *error = LADDER_INS_ERR_SETDATAVAL;
+        return;
+    }
+
     switch (__type) {
         case LADDER_REGISTER_M:
             __qty = ladder_ctx->ladder.quantity.m;
