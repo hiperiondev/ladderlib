@@ -105,27 +105,53 @@ void ladder_scan(ladder_ctx_t *ladder_ctx) {
             }
         }
 
+        // Power rail tracking to enable short-circuiting of columns with no incoming power.
+        // Initialize to true, simulating the energized left power rail.
+        bool has_power = true;
+
         // Detect vertical groups per column, uniform input from top, OR outputs uniformly
         for (uint32_t column = 0; column < (*ladder_ctx).exec_network->cols; column++) {
+            // Check if safe to skip before breaking. Scan column for instructions without side effects on false input.
+            bool skip_safe = true;
+            for (uint32_t r = 0; r < (*ladder_ctx).exec_network->rows; r++) {
+                ladder_instruction_t code = (*ladder_ctx).exec_network->cells[r][column].code;
+                if (code == LADDER_INS_MULTI) {
+                    // Treat MULTI as potentially unsafe (part of multi-cell like timers/counters).
+                    skip_safe = false;
+                    break;
+                }
+                if (code == LADDER_INS_COIL || // Sets value=false on in=false
+                        code == LADDER_INS_TON || // Resets acc, flags on in=false
+                        code == LADDER_INS_TOF || // Times on false
+                        code == LADDER_INS_TP || // Similar
+                        code == LADDER_INS_CTU || // Sets Cr=false on cu=false
+                        code == LADDER_INS_CTD || // Similar
+                        code == LADDER_INS_FOREIGN || // Unknown sides
+                        code == LADDER_INS_TMOVE) { // Potential sides
+                    skip_safe = false;
+                    break;
+                }
+            }
+
+            // Short-circuit only if no power and column is safe to skip (no side effects on false).
+            if (!has_power && skip_safe) {
+                continue;
+            }
+
             uint32_t row = 0;
             while (row < (*ladder_ctx).exec_network->rows) {
                 uint32_t group_start = row;
                 // Compute group input from top row's left (power rail or prev col top state)
                 bool group_input = (column == 0) ? true : (*ladder_ctx).exec_network->cells[group_start][column - 1].state;
 
-                // Find group end: consecutive rows with vertical_bar=true after start
-                // Explicit cap to prevent group_end >= rows (off-by-one safety)
+                // Tightened loop condition to prevent OOB access to cells[rows][column].
+                // Checks group_end + 1 < rows before deref, ensuring group_end never >= rows.
                 uint32_t group_end = group_start;
-                while (group_end < (*ladder_ctx).exec_network->rows - 1 && (*ladder_ctx).exec_network->cells[group_end + 1][column].vertical_bar) {
+                while (group_end + 1 < (*ladder_ctx).exec_network->rows && (*ladder_ctx).exec_network->cells[group_end + 1][column].vertical_bar) {
                     group_end++;
-                    // Early break if somehow exceeds (redundant but defensive)
-                    if (group_end >= (*ladder_ctx).exec_network->rows) {
-                        group_end = (*ladder_ctx).exec_network->rows - 1;
-                        break;
-                    }
                 }
 
-                // Explicit bounds check before execution to prevent segfault if group_end invalid
+                // Defensive assert/check (should never trigger post-fix).
                 if (group_end >= (*ladder_ctx).exec_network->rows) {
                     (*ladder_ctx).ladder.state = LADDER_ST_INV;
                     (*ladder_ctx).ladder.last.err = LADDER_INS_ERR_OUTOFRANGE;
@@ -192,10 +218,11 @@ void ladder_scan(ladder_ctx_t *ladder_ctx) {
                     }
                 }
 
-                // Restore batch overrides only if no error (and only if column > 0)
-                if (column > 0 && !group_error) {
+                // Always restore left states after execution, regardless of error, to prevent corruption for next groups/columns
+                // This ensures overrides are isolated to the current group, fixing cascading errors in parallel rungs
+                if (column > 0) {
                     uint32_t restore_idx = 0;
-                    for (uint32_t gr = group_start; gr <= group_end; gr++) {
+                    for (uint32_t gr = group_start; gr <= group_end && restore_idx < num_saved; gr++) {
                         (*ladder_ctx).exec_network->cells[gr][column - 1].state = original_lefts[restore_idx++];
                     }
                 }
@@ -213,6 +240,14 @@ void ladder_scan(ladder_ctx_t *ladder_ctx) {
 
                 // Advance to next group
                 row = group_end + 1;
+            }
+
+            // Recompute has_power for the next column as the OR of all cell states in this column.
+            // This aggregates outflow from all groups/rungs, enabling short-circuit if no power propagates.
+            // Note: This may skip stateful instructions on false, trading fidelity for speed—debated in PLCs.
+            has_power = false;
+            for (uint32_t r = 0; r < (*ladder_ctx).exec_network->rows; r++) {
+                has_power |= (*ladder_ctx).exec_network->cells[r][column].state;
             }
         }
 
