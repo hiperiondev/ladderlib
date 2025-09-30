@@ -84,6 +84,13 @@ void ladder_scan(ladder_ctx_t *ladder_ctx) {
     uint32_t network = 0;
 
 #ifdef OPTIONAL_CRON
+    // Auto_reset clearing before evaluation to prevent race conditions where set flags are immediately cleared, ensuring triggers are not missed in fast scans.
+    // clean auto reset cron registers
+    if ((ladderlib_cron_t*) (*ladder_ctx).cron != NULL)
+        for (uint32_t n = 0; n < ((ladderlib_cron_t*) (*ladder_ctx).cron)->used; n++)
+            if (((ladderlib_cron_t*) (*ladder_ctx).cron)->ctx[n].enabled && ((ladderlib_cron_t*) (*ladder_ctx).cron)->ctx[n].auto_reset)
+                (*ladder_ctx).memory.M[((ladderlib_cron_t*) (*ladder_ctx).cron)->ctx[n].flag_reg] = false;
+
     // evaluate cron for actual time
     if (ladderlib_cron_eval(ladder_ctx) != LADDER_INS_ERR_OK) {
         (*ladder_ctx).ladder.state = LADDER_ST_INV;
@@ -151,13 +158,6 @@ void ladder_scan(ladder_ctx_t *ladder_ctx) {
                     group_end++;
                 }
 
-                // Explicit bounds check after loop to handle edge cases (e.g., rows == 0 or overflow).
-                if (group_end >= (*ladder_ctx).exec_network->rows) {
-                    (*ladder_ctx).ladder.last.err = LADDER_INS_ERR_OUTOFRANGE;
-                    (*ladder_ctx).ladder.state = LADDER_ST_INV;
-                    return;
-                }
-
                 // Execute instructions in group (using uniform group_input as left where needed)
                 bool group_output = false;
                 bool group_error = false;
@@ -198,14 +198,6 @@ void ladder_scan(ladder_ctx_t *ladder_ctx) {
                         (*ladder_ctx).ladder.last.err = LADDER_INS_ERR_FAIL;
                         group_error = true;
                         // Jump to cleanup on invalid code to restore left states immediately
-                        goto cleanup;
-                    }
-
-                    // Centralized NULL check before execution if instruction requires data.
-                    ladder_cell_t *cell = &(*(*ladder_ctx).exec_network).cells[current_row_for_exec][column];
-                    if (code != LADDER_INS_MULTI && cell->data_qty > 0 && cell->data == NULL) {
-                        (*ladder_ctx).ladder.last.err = LADDER_INS_ERR_GETDATAVAL;
-                        group_error = true;
                         goto cleanup;
                     }
 
@@ -252,24 +244,8 @@ void ladder_scan(ladder_ctx_t *ladder_ctx) {
                 row = group_end + 1;
             }
 
-            // Recompute has_power for the next column as the OR of all cell states in this column.
-            // This aggregates outflow from all groups/rungs, enabling short-circuit if no power propagates.
-            // Note: This may skip stateful instructions on false, trading fidelity for speed—debated in PLCs.
-            has_power = false;
-            for (uint32_t r = 0; r < (*ladder_ctx).exec_network->rows; r++) {
-                has_power |= (*ladder_ctx).exec_network->cells[r][column].state;
-            }
+            if ((*ladder_ctx).on.scan_end != NULL)
+                (*ladder_ctx).on.scan_end(ladder_ctx);
         }
-
-        if ((*ladder_ctx).on.scan_end != NULL)
-            (*ladder_ctx).on.scan_end(ladder_ctx);
     }
-
-#ifdef OPTIONAL_CRON
-    // clean auto reset cron registers
-    if ((ladderlib_cron_t*) (*ladder_ctx).cron != NULL)
-        for (uint32_t n = 0; n < ((ladderlib_cron_t*) (*ladder_ctx).cron)->used; n++)
-            if (((ladderlib_cron_t*) (*ladder_ctx).cron)->ctx[n].enabled && ((ladderlib_cron_t*) (*ladder_ctx).cron)->ctx[n].auto_reset)
-                (*ladder_ctx).memory.M[((ladderlib_cron_t*) (*ladder_ctx).cron)->ctx[n].flag_reg] = false;
-#endif
 }
