@@ -49,9 +49,6 @@ void ladder_scan_time(ladder_ctx_t *ladder_ctx) {
     if (ladder_ctx->ladder.quantity.watchdog_ms > 0 && ladder_ctx->scan_internals.actual_scan_time > ladder_ctx->ladder.quantity.watchdog_ms) {
         // Set error and invoke panic immediately for synchronous fault handling.
         ladder_ctx->ladder.state = LADDER_ST_ERROR;
-        if (ladder_ctx->on.panic != NULL) {
-            ladder_ctx->on.panic(ladder_ctx);
-        }
     }
 }
 
@@ -129,7 +126,7 @@ void ladder_clear_program(ladder_ctx_t *ladder_ctx) {
 }
 
 bool ladder_ctx_init(ladder_ctx_t *ladder_ctx, uint8_t net_columns_qty, uint8_t net_rows_qty, uint32_t networks_qty, uint32_t qty_m, uint32_t qty_c,
-        uint32_t qty_t, uint32_t qty_d, uint32_t qty_r, uint32_t delay_not_run, uint32_t watchdog_ms, bool init_netwok) {
+        uint32_t qty_t, uint32_t qty_d, uint32_t qty_r, uint32_t delay_not_run, uint32_t watchdog_ms, bool init_netwok, bool write_on_fault) {
     if (ladder_ctx == NULL)
         return false;
     if (net_rows_qty > LADDER_MAX_ROWS)
@@ -157,6 +154,7 @@ bool ladder_ctx_init(ladder_ctx_t *ladder_ctx, uint8_t net_columns_qty, uint8_t 
     ladder_ctx->hw.time.delay = NULL;
     ladder_ctx->on.panic = NULL;
     ladder_ctx->on.end_task = NULL;
+    ladder_ctx->ladder.write_on_fault = write_on_fault ? true : false;
 
     if (init_netwok) {
         if (networks_qty > SIZE_MAX / sizeof(ladder_network_t)) {

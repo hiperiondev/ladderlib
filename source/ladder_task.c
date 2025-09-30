@@ -37,7 +37,6 @@
 #include "ladder.h"
 #include "ladder_internals.h"
 
-// ladder logic execution task
 void ladder_task(void *ladderctx) {
     if (ladderctx == NULL)
         return;
@@ -45,7 +44,10 @@ void ladder_task(void *ladderctx) {
     ladder_ctx_t *ladder_ctx = NULL;
 
     ladder_ctx = (ladder_ctx_t*) ladderctx;
-    if ((*ladder_ctx).hw.time.millis == NULL || (*ladder_ctx).hw.time.delay == NULL || (*ladder_ctx).hw.io.read == NULL || (*ladder_ctx).hw.io.write == NULL) {
+    /* MODIFIED: Conditional checks for read/write arrays only if fn_read_qty/fn_write_qty > 0. */
+    if ((*ladder_ctx).hw.time.millis == NULL || (*ladder_ctx).hw.time.delay == NULL ||
+        ( (*ladder_ctx).hw.io.fn_read_qty > 0 && (*ladder_ctx).hw.io.read == NULL ) ||
+        ( (*ladder_ctx).hw.io.fn_write_qty > 0 && (*ladder_ctx).hw.io.write == NULL ) ) {
         (*ladder_ctx).ladder.state = LADDER_ST_NULLFN;
         goto exit;
     }
@@ -77,8 +79,29 @@ void ladder_task(void *ladderctx) {
 
         // ladder program scan
         ladder_scan(ladder_ctx);
+        /* MODIFIED: On INV, check write_on_fault before exit; if true, complete post-scan steps. */
         if ((*ladder_ctx).ladder.state == LADDER_ST_INV) {
             (*ladder_ctx).ladder.state = LADDER_ST_EXIT_TSK;
+            if ((*ladder_ctx).ladder.write_on_fault) {
+                // Perform writes even on INV for continuity.
+                for (uint32_t n = 0; n < (*ladder_ctx).hw.io.fn_read_qty; n++) {
+                    memcpy((*ladder_ctx).input[n].Ih, (*ladder_ctx).input[n].I, (*ladder_ctx).input[n].i_qty * sizeof(uint8_t));
+                }
+                for (uint32_t n = 0; n < (*ladder_ctx).hw.io.fn_write_qty; n++) {
+                    memcpy((*ladder_ctx).output[n].Qh, (*ladder_ctx).output[n].Q, (*ladder_ctx).output[n].q_qty * sizeof(uint8_t));
+                }
+
+                ladder_save_previous_values(ladder_ctx);
+
+                for (uint32_t n = 0; n < (*ladder_ctx).hw.io.fn_write_qty; n++)
+                    (*ladder_ctx).hw.io.write[n](ladder_ctx, n);
+
+                ladder_scan_time(ladder_ctx);
+
+                // external function after scan
+                if ((*ladder_ctx).on.task_after != NULL)
+                    (*ladder_ctx).on.task_after(ladder_ctx);
+            }
             goto exit;
         }
 
