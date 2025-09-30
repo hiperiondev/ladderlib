@@ -43,10 +43,12 @@
 
 void ladder_scan_time(ladder_ctx_t *ladder_ctx) {
     uint64_t scanTimeMillis = ladder_ctx->hw.time.millis();
-    ladder_ctx->scan_internals.actual_scan_time = scanTimeMillis - ladder_ctx->scan_internals.start_time;
+    // Use explicit unsigned subtraction for overflow-safe comparison.
+    uint64_t diff = scanTimeMillis - ladder_ctx->scan_internals.start_time;
+    ladder_ctx->scan_internals.actual_scan_time = diff;
     ladder_ctx->scan_internals.start_time = scanTimeMillis;
 
-    if (ladder_ctx->ladder.quantity.watchdog_ms > 0 && ladder_ctx->scan_internals.actual_scan_time > ladder_ctx->ladder.quantity.watchdog_ms) {
+    if (ladder_ctx->ladder.quantity.watchdog_ms > 0 && diff > ladder_ctx->ladder.quantity.watchdog_ms) {
         // Set error and invoke panic immediately for synchronous fault handling.
         ladder_ctx->ladder.state = LADDER_ST_ERROR;
     }
@@ -63,6 +65,32 @@ bool ladder_fault_clear(ladder_ctx_t *ladder_ctx) {
     // Clear scan accumulators to prevent carryover effects.
     ladder_ctx->scan_internals.actual_scan_time = 0;
     ladder_ctx->scan_internals.start_time = ladder_ctx->hw.time.millis();
+
+    // Resets for timers and outputs to ensure safe recovery.
+    // Reset timers: Clear accumulators and flags.
+    if (ladder_ctx->ladder.quantity.t > 0 && ladder_ctx->timers != NULL) {
+        for (uint32_t i = 0; i < ladder_ctx->ladder.quantity.t; ++i) {
+            ladder_ctx->timers[i].acc = 0;
+            ladder_ctx->memory.Td[i] = false;
+            ladder_ctx->memory.Tr[i] = false;
+        }
+    }
+
+    // Reset outputs: Set to safe state (e.g., all false/0) for each module.
+    if (ladder_ctx->hw.io.fn_write_qty > 0 && ladder_ctx->output != NULL) {
+        for (uint32_t n = 0; n < ladder_ctx->hw.io.fn_write_qty; ++n) {
+            if (ladder_ctx->output[n].q_qty > 0 && ladder_ctx->output[n].Q != NULL) {
+                memset(ladder_ctx->output[n].Q, 0, ladder_ctx->output[n].q_qty * sizeof(uint8_t));
+            }
+            if (ladder_ctx->output[n].qw_qty > 0 && ladder_ctx->output[n].QW != NULL) {
+                memset(ladder_ctx->output[n].QW, 0, ladder_ctx->output[n].qw_qty * sizeof(int32_t));
+            }
+            // Also update history to match.
+            if (ladder_ctx->output[n].Qh != NULL) {
+                memcpy(ladder_ctx->output[n].Qh, ladder_ctx->output[n].Q, ladder_ctx->output[n].q_qty * sizeof(uint8_t));
+            }
+        }
+    }
 
     // Optional: Invoke a clear hook if registered (for logging recovery).
     if (ladder_ctx->on.end_task != NULL) {  // Reuse end_task as clear notifier, or add dedicated if needed.
@@ -126,7 +154,7 @@ void ladder_clear_program(ladder_ctx_t *ladder_ctx) {
 }
 
 bool ladder_ctx_init(ladder_ctx_t *ladder_ctx, uint8_t net_columns_qty, uint8_t net_rows_qty, uint32_t networks_qty, uint32_t qty_m, uint32_t qty_c,
-        uint32_t qty_t, uint32_t qty_d, uint32_t qty_r, uint32_t delay_not_run, uint32_t watchdog_ms, bool init_netwok, bool write_on_fault) {
+        uint32_t qty_t, uint32_t qty_d, uint32_t qty_r, uint32_t delay_not_run, uint32_t watchdog_ms, bool init_network, bool write_on_fault) {
     if (ladder_ctx == NULL)
         return false;
     if (net_rows_qty > LADDER_MAX_ROWS)
@@ -156,7 +184,7 @@ bool ladder_ctx_init(ladder_ctx_t *ladder_ctx, uint8_t net_columns_qty, uint8_t 
     ladder_ctx->on.end_task = NULL;
     ladder_ctx->ladder.write_on_fault = write_on_fault ? true : false;
 
-    if (init_netwok) {
+    if (init_network) {
         if (networks_qty > SIZE_MAX / sizeof(ladder_network_t)) {
             return false;
         }

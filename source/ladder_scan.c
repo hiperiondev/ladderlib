@@ -151,6 +151,13 @@ void ladder_scan(ladder_ctx_t *ladder_ctx) {
                     group_end++;
                 }
 
+                // Explicit bounds check after loop to handle edge cases (e.g., rows == 0 or overflow).
+                if (group_end >= (*ladder_ctx).exec_network->rows) {
+                    (*ladder_ctx).ladder.last.err = LADDER_INS_ERR_OUTOFRANGE;
+                    (*ladder_ctx).ladder.state = LADDER_ST_INV;
+                    return;
+                }
+
                 // Execute instructions in group (using uniform group_input as left where needed)
                 bool group_output = false;
                 bool group_error = false;
@@ -191,6 +198,14 @@ void ladder_scan(ladder_ctx_t *ladder_ctx) {
                         (*ladder_ctx).ladder.last.err = LADDER_INS_ERR_FAIL;
                         group_error = true;
                         // Jump to cleanup on invalid code to restore left states immediately
+                        goto cleanup;
+                    }
+
+                    // Centralized NULL check before execution if instruction requires data.
+                    ladder_cell_t *cell = &(*(*ladder_ctx).exec_network).cells[current_row_for_exec][column];
+                    if (code != LADDER_INS_MULTI && cell->data_qty > 0 && cell->data == NULL) {
+                        (*ladder_ctx).ladder.last.err = LADDER_INS_ERR_GETDATAVAL;
+                        group_error = true;
                         goto cleanup;
                     }
 
