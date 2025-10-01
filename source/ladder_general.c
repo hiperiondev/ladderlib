@@ -76,6 +76,21 @@ bool ladder_fault_clear(ladder_ctx_t *ladder_ctx) {
         }
     }
 
+    if (ladder_ctx->ladder.quantity.c > 0) {
+        if (ladder_ctx->registers.C != NULL) {
+            memset(ladder_ctx->registers.C, 0, ladder_ctx->ladder.quantity.c * sizeof(uint32_t));
+        }
+        memset(ladder_ctx->memory.Cd, 0, ladder_ctx->ladder.quantity.c * sizeof(bool));
+        memset(ladder_ctx->memory.Cr, 0, ladder_ctx->ladder.quantity.c * sizeof(bool));
+    }
+
+    if (ladder_ctx->ladder.quantity.d > 0 && ladder_ctx->registers.D != NULL) {
+        memset(ladder_ctx->registers.D, 0, ladder_ctx->ladder.quantity.d * sizeof(int32_t));
+    }
+    if (ladder_ctx->ladder.quantity.r > 0 && ladder_ctx->registers.R != NULL) {
+        memset(ladder_ctx->registers.R, 0, ladder_ctx->ladder.quantity.r * sizeof(float));
+    }
+
     // Reset outputs: Set to safe state (e.g., all false/0) for each module.
     if (ladder_ctx->hw.io.fn_write_qty > 0 && ladder_ctx->output != NULL) {
         for (uint32_t n = 0; n < ladder_ctx->hw.io.fn_write_qty; ++n) {
@@ -565,7 +580,6 @@ bool ladder_add_foreign(ladder_ctx_t *ladder_ctx, _foreign_fn_init fn_init, void
     if (fn_init == NULL)
         return false;
 
-    void *tmp_fn = NULL;
     ladder_foreign_function_t fn_new;
     memset(&fn_new, 0, sizeof(ladder_foreign_function_t));
     fn_new.id = ladder_ctx->foreign.qty;
@@ -573,6 +587,7 @@ bool ladder_add_foreign(ladder_ctx_t *ladder_ctx, _foreign_fn_init fn_init, void
     if (!fn_init(&fn_new, init_data, qty))
         return false;
 
+    void *tmp_fn = NULL;
     if (ladder_ctx->foreign.qty == 0)
         tmp_fn = malloc(sizeof(ladder_foreign_function_t));
     else
@@ -592,6 +607,10 @@ bool ladder_add_foreign(ladder_ctx_t *ladder_ctx, _foreign_fn_init fn_init, void
 }
 
 bool ladder_fn_cell(ladder_ctx_t *ladder_ctx, uint32_t network, uint32_t row, uint32_t column, ladder_instruction_t function, uint32_t foreign_id) {
+    if (function == LADDER_INS_FOREIGN && foreign_id >= ladder_ctx->foreign.qty) {
+        return false;
+    }
+
     ladder_instructions_iocd_t actual_ioc;
 
     if (function == LADDER_INS_FOREIGN) {
@@ -606,8 +625,8 @@ bool ladder_fn_cell(ladder_ctx_t *ladder_ctx, uint32_t network, uint32_t row, ui
 
     if (ladder_ctx->network[network].cells[row][column].data != NULL) {
         for (uint32_t d = 0; d < ladder_ctx->network[network].cells[row][column].data_qty; d++) {
-            if (ladder_ctx->network[network].cells[row][column].data[d].type == LADDER_REGISTER_S&&
-            ladder_ctx->network[network].cells[row][column].data[d].value.cstr != NULL) {
+            if (ladder_ctx->network[network].cells[row][column].data[d].type == LADDER_REGISTER_S &&
+                ladder_ctx->network[network].cells[row][column].data[d].value.cstr != NULL) {
                 free((void*) ladder_ctx->network[network].cells[row][column].data[d].value.cstr);
                 ladder_ctx->network[network].cells[row][column].data[d].value.cstr = NULL;
             }
@@ -634,8 +653,8 @@ bool ladder_fn_cell(ladder_ctx_t *ladder_ctx, uint32_t network, uint32_t row, ui
 
         if (ladder_ctx->network[network].cells[row + r][column].data != NULL) {
             for (uint32_t d = 0; d < ladder_ctx->network[network].cells[row + r][column].data_qty; d++) {
-                if (ladder_ctx->network[network].cells[row + r][column].data[d].type == LADDER_REGISTER_S&&
-                ladder_ctx->network[network].cells[row + r][column].data[d].value.cstr != NULL) {
+                if (ladder_ctx->network[network].cells[row + r][column].data[d].type == LADDER_REGISTER_S &&
+                    ladder_ctx->network[network].cells[row + r][column].data[d].value.cstr != NULL) {
                     free((void*) ladder_ctx->network[network].cells[row + r][column].data[d].value.cstr);
                     ladder_ctx->network[network].cells[row + r][column].data[d].value.cstr = NULL;
                 }

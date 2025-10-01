@@ -591,69 +591,75 @@ ladder_ins_err_t fn_MOD(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row)
 }
 
 ladder_ins_err_t fn_SHL(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row) {
-    static uint8_t error = 0;
+    int32_t val = ladder_get_data_value(ladder_ctx, row, column, 0);
+    int32_t amount = ladder_get_data_value(ladder_ctx, row, column, 1);
+    uint32_t uval = (uint32_t) val;
+    amount %= 32;
+    if (amount < 0)
+        amount += 32;
+    uval <<= amount;
+    val = (int32_t) uval;
+
+    uint8_t err = LADDER_INS_ERR_OK;
+    ladder_set_data_value(ladder_ctx, row, column, 0, &val, &err);
 
     CELL_STATE(ladder_ctx, column, row) = CELL_STATE_LEFT(ladder_ctx, column, row);
 
-    if (CELL_STATE_LEFT(ladder_ctx, column, row)) {
-        uint32_t val = to_integer(ladder_get_data_value(ladder_ctx, row, column, 0), 1) << 1;
-        ladder_set_data_value(ladder_ctx, row, column, 1, (void*) &val, &error);
-    }
-
-    return LADDER_INS_ERR_OK;
+    return err;
 }
 
 ladder_ins_err_t fn_SHR(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row) {
-    static uint8_t error = 0;
+    int32_t val = ladder_get_data_value(ladder_ctx, row, column, 0);
+    int32_t amount = ladder_get_data_value(ladder_ctx, row, column, 1);
+    uint32_t uval = (uint32_t) val;
+    amount %= 32;
+    if (amount < 0)
+        amount += 32;
+    uval >>= amount;
+    val = (int32_t) uval;
+
+    uint8_t err = LADDER_INS_ERR_OK;
+    ladder_set_data_value(ladder_ctx, row, column, 0, &val, &err);
 
     CELL_STATE(ladder_ctx, column, row) = CELL_STATE_LEFT(ladder_ctx, column, row);
 
-    if (CELL_STATE_LEFT(ladder_ctx, column, row)) {
-        uint32_t val = to_integer(ladder_get_data_value(ladder_ctx, row, column, 0), 1) >> 1;
-        ladder_set_data_value(ladder_ctx, row, column, 1, (void*) &val, &error);
-    }
-
-    return LADDER_INS_ERR_OK;
+    return err;
 }
 
 ladder_ins_err_t fn_ROL(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row) {
-    static uint8_t error = 0;
+    int32_t val = ladder_get_data_value(ladder_ctx, row, column, 0);
+    int32_t amount = ladder_get_data_value(ladder_ctx, row, column, 1);
+    uint32_t uval = (uint32_t) val;
+    amount %= 32;
+    if (amount < 0)
+        amount += 32;
+    uval = (uval << amount) | (uval >> (32 - amount));
+    val = (int32_t) uval;
+
+    uint8_t err = LADDER_INS_ERR_OK;
+    ladder_set_data_value(ladder_ctx, row, column, 0, &val, &err);
 
     CELL_STATE(ladder_ctx, column, row) = CELL_STATE_LEFT(ladder_ctx, column, row);
 
-    if (CELL_STATE_LEFT(ladder_ctx, column, row)) {
-        uint32_t auxCarryBit, auxValue;
-
-        auxValue = ladder_get_data_value(ladder_ctx, row, column, 0);
-        auxCarryBit = auxValue & 0x8000;
-        auxValue = auxValue << 1;
-        if (auxCarryBit) {
-            auxValue = auxValue | 0x0001;
-        }
-        ladder_set_data_value(ladder_ctx, row, column, 1, (void*) &auxValue, &error);
-    }
-
-    return LADDER_INS_ERR_OK;
+    return err;
 }
 
 ladder_ins_err_t fn_ROR(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row) {
-    static uint8_t error = 0;
+    int32_t val = ladder_get_data_value(ladder_ctx, row, column, 0);
+    int32_t amount = ladder_get_data_value(ladder_ctx, row, column, 1);
+    uint32_t uval = (uint32_t) val;
+    amount %= 32;
+    if (amount < 0)
+        amount += 32;
+    uval = (uval >> amount) | (uval << (32 - amount));
+    val = (int32_t) uval;
+
+    uint8_t err = LADDER_INS_ERR_OK;
+    ladder_set_data_value(ladder_ctx, row, column, 0, &val, &err);
 
     CELL_STATE(ladder_ctx, column, row) = CELL_STATE_LEFT(ladder_ctx, column, row);
 
-    if (CELL_STATE_LEFT(ladder_ctx, column, row)) {
-        uint32_t auxCarryBit, auxValue;
-
-        auxValue = ladder_get_data_value(ladder_ctx, row, column, 0);
-        auxCarryBit = auxValue & 0x0001;
-        auxValue = auxValue >> 1;
-        if (auxCarryBit) {
-            auxValue = auxValue | 0x8000;
-        }
-        ladder_set_data_value(ladder_ctx, row, 1, column, (void*) &auxValue, &error);
-    }
-
-    return LADDER_INS_ERR_OK;
+    return err;
 }
 
 ladder_ins_err_t fn_AND(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row) {

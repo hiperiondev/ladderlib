@@ -67,16 +67,16 @@ void ladder_task(void *ladderctx) {
         }
         if (wait_count >= MAX_WAIT_CYCLES) {
             ladder_ctx->ladder.state = LADDER_ST_ERROR;
-            // MODIFIED: Invoke panic here after timeout, integrating it into the error path for consistency.
+            // Invoke panic here after timeout, integrating it into the error path for consistency.
             if (ladder_ctx->on.panic != NULL)
                 ladder_ctx->on.panic(ladder_ctx);
-            // MODIFIED: Issue 1 - After panic (user recovery opportunity), force EXIT if still not RUNNING to prevent infinite loop on persistent ERROR/STOPPED.
+            // After panic (user recovery opportunity), force EXIT if still not RUNNING to prevent infinite loop on persistent ERROR/STOPPED.
             if (ladder_ctx->ladder.state != LADDER_ST_RUNNING) {
                 ladder_ctx->ladder.state = LADDER_ST_EXIT_TSK;
             }
         }
 
-        // MODIFIED: Proceed only if now RUNNING (after wait or direct); no change needed for Issue 2 as order is correct.
+        // Proceed only if now RUNNING (after wait or direct)
         if (ladder_ctx->ladder.state != LADDER_ST_RUNNING) {
             continue;  // Skip to next iteration if still not running after wait/timeout.
         }

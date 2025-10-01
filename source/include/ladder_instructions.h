@@ -155,7 +155,7 @@ static inline int32_t ladder_get_previous_value(ladder_ctx_t *lctx, uint32_t r, 
             return (int32_t) lctx->prev_scan_vals.Tdh[val->value.i32];
         case LADDER_REGISTER_Tr:
             return (int32_t) lctx->prev_scan_vals.Trh[val->value.i32];
-            // Note: For other types like IW/QW/C/T/D/R/S, previous values may not be stored (e.g., no prev for accumulators or data regs).
+            // For other types like IW/QW/C/T/D/R/S, previous values may not be stored (e.g., no prev for accumulators or data regs).
             // Default to current value or 0; adjust based on requirements (e.g., add prev for D if needed).
         case LADDER_REGISTER_IW: {
             uint32_t mod = val->value.mp.module;
