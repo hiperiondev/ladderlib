@@ -37,96 +37,104 @@
 #include "ladder.h"
 #include "ladder_internals.h"
 
+#define MAX_WAIT_CYCLES 1000
+
 void ladder_task(void *ladderctx) {
     if (ladderctx == NULL)
         return;
 
-    ladder_ctx_t *ladder_ctx = NULL;
+    ladder_ctx_t *ladder_ctx = (ladder_ctx_t*) ladderctx;
 
-    ladder_ctx = (ladder_ctx_t*) ladderctx;
-    /* MODIFIED: Conditional checks for read/write arrays only if fn_read_qty/fn_write_qty > 0. */
-    if ((*ladder_ctx).hw.time.millis == NULL || (*ladder_ctx).hw.time.delay == NULL ||
-        ( (*ladder_ctx).hw.io.fn_read_qty > 0 && (*ladder_ctx).hw.io.read == NULL ) ||
-        ( (*ladder_ctx).hw.io.fn_write_qty > 0 && (*ladder_ctx).hw.io.write == NULL ) ) {
-        (*ladder_ctx).ladder.state = LADDER_ST_NULLFN;
-        goto exit;
+    if (ladder_ctx == NULL || ladder_ctx->hw.time.millis == NULL || ladder_ctx->hw.time.delay == NULL
+            || (ladder_ctx->hw.io.fn_read_qty > 0 && ladder_ctx->hw.io.read == NULL)
+            || (ladder_ctx->hw.io.fn_write_qty > 0 && ladder_ctx->hw.io.write == NULL)) {
+        if (ladder_ctx != NULL)
+            ladder_ctx->ladder.state = LADDER_ST_NULLFN;
+        return;
     }
 
     // task main loop
-    while ((*ladder_ctx).ladder.state != LADDER_ST_EXIT_TSK) {
-        if ((*ladder_ctx).ladder.state != LADDER_ST_RUNNING) {
-            if ((*ladder_ctx).on.panic != NULL)
-                (*ladder_ctx).on.panic(ladder_ctx);
+    while (ladder_ctx->ladder.state != LADDER_ST_EXIT_TSK) {
+        if (ladder_ctx->ladder.state != LADDER_ST_RUNNING) {
+            if (ladder_ctx->on.panic != NULL)
+                ladder_ctx->on.panic(ladder_ctx);
 
             break;
         }
 
-        while ((*ladder_ctx).ladder.state != LADDER_ST_RUNNING) {
-            if ((*ladder_ctx).ladder.state == LADDER_ST_EXIT_TSK)
+        /* Inner while with bounded loop using wait_count to prevent infinite wait.
+         * Initializes counter, adds timeout condition, retains EXIT_TSK check, and sets ERROR on timeout.
+         */
+        uint32_t wait_count = 0;
+        while (ladder_ctx->ladder.state != LADDER_ST_RUNNING && wait_count < MAX_WAIT_CYCLES) {
+            if (ladder_ctx->ladder.state == LADDER_ST_EXIT_TSK)
                 return;
-            (*ladder_ctx).hw.time.delay((*ladder_ctx).ladder.quantity.delay_not_run);
+            ladder_ctx->hw.time.delay(ladder_ctx->ladder.quantity.delay_not_run);
+            wait_count++;
+        }
+        if (wait_count >= MAX_WAIT_CYCLES) {
+            ladder_ctx->ladder.state = LADDER_ST_ERROR;
         }
 
         // Set start_time here to capture full cycle time (before pre-hook, reads, scan, writes)
-        (*ladder_ctx).scan_internals.start_time = (*ladder_ctx).hw.time.millis();
+        ladder_ctx->scan_internals.start_time = ladder_ctx->hw.time.millis();
 
         // external function before scan
-        if ((*ladder_ctx).on.task_before != NULL)
-            (*ladder_ctx).on.task_before(ladder_ctx);
+        if (ladder_ctx->on.task_before != NULL)
+            ladder_ctx->on.task_before(ladder_ctx);
 
-        for (uint32_t n = 0; n < (*ladder_ctx).hw.io.fn_read_qty; n++)
-            (*ladder_ctx).hw.io.read[n](ladder_ctx, n);
+        for (uint32_t n = 0; n < ladder_ctx->hw.io.fn_read_qty; n++)
+            ladder_ctx->hw.io.read[n](ladder_ctx, n);
 
         // ladder program scan
         ladder_scan(ladder_ctx);
-        /* MODIFIED: On INV, check write_on_fault before exit; if true, complete post-scan steps. */
-        if ((*ladder_ctx).ladder.state == LADDER_ST_INV) {
-            (*ladder_ctx).ladder.state = LADDER_ST_EXIT_TSK;
-            if ((*ladder_ctx).ladder.write_on_fault) {
+        if (ladder_ctx->ladder.state == LADDER_ST_INV) {
+            ladder_ctx->ladder.state = LADDER_ST_EXIT_TSK;
+            if (ladder_ctx->ladder.write_on_fault) {
                 // Perform writes even on INV for continuity.
-                for (uint32_t n = 0; n < (*ladder_ctx).hw.io.fn_read_qty; n++) {
-                    memcpy((*ladder_ctx).input[n].Ih, (*ladder_ctx).input[n].I, (*ladder_ctx).input[n].i_qty * sizeof(uint8_t));
+                for (uint32_t n = 0; n < ladder_ctx->hw.io.fn_read_qty; n++) {
+                    memcpy(ladder_ctx->input[n].Ih, ladder_ctx->input[n].I, ladder_ctx->input[n].i_qty * sizeof(uint8_t));
                 }
-                for (uint32_t n = 0; n < (*ladder_ctx).hw.io.fn_write_qty; n++) {
-                    memcpy((*ladder_ctx).output[n].Qh, (*ladder_ctx).output[n].Q, (*ladder_ctx).output[n].q_qty * sizeof(uint8_t));
+                for (uint32_t n = 0; n < ladder_ctx->hw.io.fn_write_qty; n++) {
+                    memcpy(ladder_ctx->output[n].Qh, ladder_ctx->output[n].Q, ladder_ctx->output[n].q_qty * sizeof(uint8_t));
                 }
 
                 ladder_save_previous_values(ladder_ctx);
 
-                for (uint32_t n = 0; n < (*ladder_ctx).hw.io.fn_write_qty; n++)
-                    (*ladder_ctx).hw.io.write[n](ladder_ctx, n);
+                for (uint32_t n = 0; n < ladder_ctx->hw.io.fn_write_qty; n++)
+                    ladder_ctx->hw.io.write[n](ladder_ctx, n);
 
                 ladder_scan_time(ladder_ctx);
 
                 // external function after scan
-                if ((*ladder_ctx).on.task_after != NULL)
-                    (*ladder_ctx).on.task_after(ladder_ctx);
+                if (ladder_ctx->on.task_after != NULL)
+                    ladder_ctx->on.task_after(ladder_ctx);
             }
             goto exit;
         }
 
         // Add copies for I/O previous values post-scan (before internals save)
         // This captures updated Q from scan and stable I from read, enabling correct RE/FE on I/Q
-        for (uint32_t n = 0; n < (*ladder_ctx).hw.io.fn_read_qty; n++) {
-            memcpy((*ladder_ctx).input[n].Ih, (*ladder_ctx).input[n].I, (*ladder_ctx).input[n].i_qty * sizeof(uint8_t));
+        for (uint32_t n = 0; n < ladder_ctx->hw.io.fn_read_qty; n++) {
+            memcpy(ladder_ctx->input[n].Ih, ladder_ctx->input[n].I, ladder_ctx->input[n].i_qty * sizeof(uint8_t));
         }
-        for (uint32_t n = 0; n < (*ladder_ctx).hw.io.fn_write_qty; n++) {
-            memcpy((*ladder_ctx).output[n].Qh, (*ladder_ctx).output[n].Q, (*ladder_ctx).output[n].q_qty * sizeof(uint8_t));
+        for (uint32_t n = 0; n < ladder_ctx->hw.io.fn_write_qty; n++) {
+            memcpy(ladder_ctx->output[n].Qh, ladder_ctx->output[n].Q, ladder_ctx->output[n].q_qty * sizeof(uint8_t));
         }
 
         ladder_save_previous_values(ladder_ctx);
 
-        for (uint32_t n = 0; n < (*ladder_ctx).hw.io.fn_write_qty; n++)
-            (*ladder_ctx).hw.io.write[n](ladder_ctx, n);
+        for (uint32_t n = 0; n < ladder_ctx->hw.io.fn_write_qty; n++)
+            ladder_ctx->hw.io.write[n](ladder_ctx, n);
 
         ladder_scan_time(ladder_ctx);
 
         // external function after scan
-        if ((*ladder_ctx).on.task_after != NULL)
-            (*ladder_ctx).on.task_after(ladder_ctx);
+        if (ladder_ctx->on.task_after != NULL)
+            ladder_ctx->on.task_after(ladder_ctx);
     }
 
     exit:
-    if (ladder_ctx != NULL && (*ladder_ctx).on.end_task != NULL)
-        (*ladder_ctx).on.end_task(ladder_ctx);
+    if (ladder_ctx != NULL && ladder_ctx->on.end_task != NULL)
+        ladder_ctx->on.end_task(ladder_ctx);
 }
