@@ -165,15 +165,17 @@ void ladder_scan(ladder_ctx_t *ladder_ctx) {
                 // Use batch override array for efficiency; fixed-size with explicit bounds check
                 bool original_lefts[LADDER_MAX_ROWS];
                 uint32_t num_saved = 0;
+                // Pre-compute group size and check against array limit before loop to prevent any potential overflow attempts.
                 if (column > 0) {
+                    uint32_t group_size = group_end - group_start + 1;
+                    if (group_size > LADDER_MAX_ROWS) {
+                        group_error = true;
+                        (*ladder_ctx).ladder.last.err = LADDER_INS_ERR_OUTOFRANGE;
+                        // Jump to cleanup on bounds error to ensure left states are restored before error propagation
+                        goto cleanup;
+                    }
                     // Save originals for batch override
                     for (uint32_t gr = group_start; gr <= group_end; gr++) {
-                        if (num_saved >= LADDER_MAX_ROWS) { // Bounds check: prevent overflow (safe but explicit)
-                            group_error = true;
-                            (*ladder_ctx).ladder.last.err = LADDER_INS_ERR_OUTOFRANGE;
-                            // Jump to cleanup on bounds error to ensure left states are restored before error propagation
-                            goto cleanup;
-                        }
                         original_lefts[num_saved++] = (*ladder_ctx).exec_network->cells[gr][column - 1].state;
                         (*ladder_ctx).exec_network->cells[gr][column - 1].state = group_input;
                     }
@@ -246,6 +248,14 @@ void ladder_scan(ladder_ctx_t *ladder_ctx) {
 
             if ((*ladder_ctx).on.scan_end != NULL)
                 (*ladder_ctx).on.scan_end(ladder_ctx);
+
+            has_power = false;
+            for (uint32_t r = 0; r < (*ladder_ctx).exec_network->rows; ++r) {
+                if ((*ladder_ctx).exec_network->cells[r][column].state) {
+                    has_power = true;
+                    break;
+                }
+            }
         }
     }
 }

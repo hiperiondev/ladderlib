@@ -55,12 +55,8 @@ void ladder_task(void *ladderctx) {
 
     // task main loop
     while (ladder_ctx->ladder.state != LADDER_ST_EXIT_TSK) {
-        if (ladder_ctx->ladder.state != LADDER_ST_RUNNING) {
-            if (ladder_ctx->on.panic != NULL)
-                ladder_ctx->on.panic(ladder_ctx);
-
-            break;
-        }
+        // MODIFIED: Removed immediate if != RUNNING {panic; break;} to allow bounded wait for non-running states.
+        // This integrates the wait logic directly, enabling recovery retries without redundancy.
 
         /* Inner while with bounded loop using wait_count to prevent infinite wait.
          * Initializes counter, adds timeout condition, retains EXIT_TSK check, and sets ERROR on timeout.
@@ -74,6 +70,14 @@ void ladder_task(void *ladderctx) {
         }
         if (wait_count >= MAX_WAIT_CYCLES) {
             ladder_ctx->ladder.state = LADDER_ST_ERROR;
+            // MODIFIED: Invoke panic here after timeout, integrating it into the error path for consistency.
+            if (ladder_ctx->on.panic != NULL)
+                ladder_ctx->on.panic(ladder_ctx);
+        }
+
+        // MODIFIED: Proceed only if now RUNNING (after wait or direct); no change needed for Issue 2 as order is correct.
+        if (ladder_ctx->ladder.state != LADDER_ST_RUNNING) {
+            continue;  // Skip to next iteration if still not running after wait/timeout.
         }
 
         // Set start_time here to capture full cycle time (before pre-hook, reads, scan, writes)
