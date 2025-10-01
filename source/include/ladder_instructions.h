@@ -51,60 +51,195 @@ static inline int32_t to_integer(int32_t val, ladder_data_type_t type) {
 
 #define exnet(lctx)  (*(*lctx).exec_network)
 
-/**
- * @def ladder_get_data_value
- * @brief Get data values
- *
- */
-#define ladder_get_data_value(lctx, r, c, i)                                                                                                  \
-(                                                                                                                                             \
-(exnet(lctx).cells[r][c].data[i].type == LADDER_REGISTER_NONE) ? (uint8_t)(exnet(lctx).cells[r][c].data[i].value.i32)                       : \
-(exnet(lctx).cells[r][c].data[i].type == LADDER_REGISTER_M)    ? (uint8_t)((*lctx).memory.M[exnet(lctx).cells[r][c].data[i].value.i32])     : \
-(exnet(lctx).cells[r][c].data[i].type == LADDER_REGISTER_Q)    ? (uint8_t)((*lctx).output[exnet(lctx).cells[r][c].data[i].value.mp.module].Q[exnet(lctx).cells[r][c].data[i].value.mp.port]) : \
-(exnet(lctx).cells[r][c].data[i].type == LADDER_REGISTER_I)    ? (uint8_t)((*lctx).input[exnet(lctx).cells[r][c].data[i].value.mp.module].I[exnet(lctx).cells[r][c].data[i].value.mp.port])  : \
-(exnet(lctx).cells[r][c].data[i].type == LADDER_REGISTER_Cd)   ? (bool)((*lctx).memory.Cd[exnet(lctx).cells[r][c].data[i].value.i32])       : \
-(exnet(lctx).cells[r][c].data[i].type == LADDER_REGISTER_Cr)   ? (bool)((*lctx).memory.Cr[exnet(lctx).cells[r][c].data[i].value.i32])       : \
-(exnet(lctx).cells[r][c].data[i].type == LADDER_REGISTER_Td)   ? (bool)((*lctx).memory.Td[exnet(lctx).cells[r][c].data[i].value.i32])       : \
-(exnet(lctx).cells[r][c].data[i].type == LADDER_REGISTER_Tr)   ? (bool)((*lctx).memory.Tr[exnet(lctx).cells[r][c].data[i].value.i32])       : \
-(exnet(lctx).cells[r][c].data[i].type == LADDER_REGISTER_IW)   ? (int32_t)((*lctx).input[exnet(lctx).cells[r][c].data[i].value.mp.module].IW[exnet(lctx).cells[r][c].data[i].value.mp.port])  : \
-(exnet(lctx).cells[r][c].data[i].type == LADDER_REGISTER_QW)   ? (int32_t)((*lctx).output[exnet(lctx).cells[r][c].data[i].value.mp.module].QW[exnet(lctx).cells[r][c].data[i].value.mp.port]) : \
-(exnet(lctx).cells[r][c].data[i].type == LADDER_REGISTER_C)    ? (uint32_t)((*lctx).registers.C[exnet(lctx).cells[r][c].data[i].value.i32]) : \
-(exnet(lctx).cells[r][c].data[i].type == LADDER_REGISTER_T)    ? (uint64_t)((*lctx).timers[exnet(lctx).cells[r][c].data[i].value.i32].acc)  : \
-(exnet(lctx).cells[r][c].data[i].type == LADDER_REGISTER_D)    ? (int32_t)((*lctx).registers.D[exnet(lctx).cells[r][c].data[i].value.i32])  : \
-(exnet(lctx).cells[r][c].data[i].type == LADDER_REGISTER_R)    ? (int32_t)((*lctx).registers.R[exnet(lctx).cells[r][c].data[i].value.i32])  : \
-(exnet(lctx).cells[r][c].data[i].type == LADDER_REGISTER_S)    ? 0                                                                          : \
-(exnet(lctx).cells[r][c].data[i].type == LADDER_REGISTER_INV)  ? 0                                                                          : \
-0                                                                                                                                             \
-)
+static inline int32_t ladder_get_data_value(ladder_ctx_t *lctx, uint32_t r, uint32_t c, uint32_t i) {
+    if (lctx == NULL || lctx->exec_network == NULL) {
+        return 0;  // Safe default on invalid context
+    }
+    ladder_network_t *net = lctx->exec_network;
+    if (r >= net->rows || c >= net->cols || i >= net->cells[r][c].data_qty) {
+        return 0;  // Safe default on OOB
+    }
+    ladder_register_t type = net->cells[r][c].data[i].type;
+    ladder_value_t *val = &net->cells[r][c].data[i];
 
-/**
- * @def ladder_get_previous_value
- * @brief Get previous value
- *
- */
-#define ladder_get_previous_value(lctx, r, c, i)                                                                                                 \
-(                                                                                                                                                \
-(exnet(lctx).cells[r][c].data[i].type == LADDER_REGISTER_M)  ? (uint8_t)((*lctx).prev_scan_vals.Mh[exnet(lctx).cells[r][c].data[i].value.i32]) : \
-(exnet(lctx).cells[r][c].data[i].type == LADDER_REGISTER_Q)  ? (uint8_t)((*lctx).output[exnet(lctx).cells[r][c].data[i].value.mp.module].Qh[exnet(lctx).cells[r][c].data[i].value.mp.port]) : \
-(exnet(lctx).cells[r][c].data[i].type == LADDER_REGISTER_I)  ? (uint8_t)((*lctx).input[exnet(lctx).cells[r][c].data[i].value.mp.module].Ih[exnet(lctx).cells[r][c].data[i].value.mp.port])  : \
-(exnet(lctx).cells[r][c].data[i].type == LADDER_REGISTER_Cd) ? (bool)((*lctx).prev_scan_vals.Cdh[exnet(lctx).cells[r][c].data[i].value.i32])   : \
-(exnet(lctx).cells[r][c].data[i].type == LADDER_REGISTER_Cr) ? (bool)((*lctx).prev_scan_vals.Crh[exnet(lctx).cells[r][c].data[i].value.i32])   : \
-(exnet(lctx).cells[r][c].data[i].type == LADDER_REGISTER_Td) ? (bool)((*lctx).prev_scan_vals.Tdh[exnet(lctx).cells[r][c].data[i].value.i32])   : \
-(exnet(lctx).cells[r][c].data[i].type == LADDER_REGISTER_Tr) ? (bool)((*lctx).prev_scan_vals.Trh[exnet(lctx).cells[r][c].data[i].value.i32])   : \
-0                                                                                                                                                \
-)
+    switch (type) {
+        case LADDER_REGISTER_NONE:
+            return (int32_t) (uint32_t) val->value.i32;
+        case LADDER_REGISTER_M:
+            return (int32_t) lctx->memory.M[val->value.i32];
+        case LADDER_REGISTER_Q: {
+            uint32_t mod = val->value.mp.module;
+            uint8_t port = val->value.mp.port;
+            if (mod >= lctx->hw.io.fn_write_qty)
+                return 0;
+            return (int32_t) lctx->output[mod].Q[port];
+        }
+        case LADDER_REGISTER_I: {
+            uint32_t mod = val->value.mp.module;
+            uint8_t port = val->value.mp.port;
+            if (mod >= lctx->hw.io.fn_read_qty)
+                return 0;
+            return (int32_t) lctx->input[mod].I[port];
+        }
+        case LADDER_REGISTER_Cd:
+            return (int32_t) lctx->memory.Cd[val->value.i32];
+        case LADDER_REGISTER_Cr:
+            return (int32_t) lctx->memory.Cr[val->value.i32];
+        case LADDER_REGISTER_Td:
+            return (int32_t) lctx->memory.Td[val->value.i32];
+        case LADDER_REGISTER_Tr:
+            return (int32_t) lctx->memory.Tr[val->value.i32];
+        case LADDER_REGISTER_IW: {
+            uint32_t mod = val->value.mp.module;
+            uint8_t port = val->value.mp.port;
+            if (mod >= lctx->hw.io.fn_read_qty)
+                return 0;
+            return lctx->input[mod].IW[port];
+        }
+        case LADDER_REGISTER_QW: {
+            uint32_t mod = val->value.mp.module;
+            uint8_t port = val->value.mp.port;
+            if (mod >= lctx->hw.io.fn_write_qty)
+                return 0;
+            return lctx->output[mod].QW[port];
+        }
+        case LADDER_REGISTER_C:
+            return (int32_t) lctx->registers.C[val->value.i32];
+        case LADDER_REGISTER_T:
+            return (int32_t) lctx->timers[val->value.i32].acc;  // Truncate u64 to i32
+        case LADDER_REGISTER_D:
+            return lctx->registers.D[val->value.i32];
+        case LADDER_REGISTER_R:
+            return (int32_t) lctx->registers.R[val->value.i32];
+        case LADDER_REGISTER_S:
+            return 0;  // Strings not numeric; default 0
+        case LADDER_REGISTER_INV:
+        default:
+            return 0;
+    }
+}
 
-/**
- * @def ladder_get_data_int32
- * @brief Get int32
- *
- */
-#define ladder_get_data_int32(lctx, r, c, i)                                                                                              \
-(                                                                                                                                         \
-(exnet(lctx).cells[r][c].data[i].type == LADDER_REGISTER_R) ? (int32_t)((*lctx).registers.R[exnet(lctx).cells[r][c].data[i].value.i32]) : \
-(exnet(lctx).cells[r][c].data[i].type == LADDER_REGISTER_NONE) ? (int32_t)(exnet(lctx).cells[r][c].data[i].value.i32) :                   \
-ladder_get_data_value(lctx, r, c, i)                                                                                                      \
-)
+static inline int32_t ladder_get_previous_value(ladder_ctx_t *lctx, uint32_t r, uint32_t c, uint32_t i) {
+    if (lctx == NULL || lctx->exec_network == NULL) {
+        return 0;  // Safe default on invalid context
+    }
+    ladder_network_t *net = lctx->exec_network;
+    if (r >= net->rows || c >= net->cols || i >= net->cells[r][c].data_qty) {
+        return 0;  // Safe default on OOB
+    }
+    ladder_register_t type = net->cells[r][c].data[i].type;
+    ladder_value_t *val = &net->cells[r][c].data[i];
+
+    switch (type) {
+        case LADDER_REGISTER_M:
+            return (int32_t) lctx->prev_scan_vals.Mh[val->value.i32];
+        case LADDER_REGISTER_Q: {
+            uint32_t mod = val->value.mp.module;
+            uint8_t port = val->value.mp.port;
+            if (mod >= lctx->hw.io.fn_write_qty)
+                return 0;
+            return (int32_t) lctx->output[mod].Qh[port];
+        }
+        case LADDER_REGISTER_I: {
+            uint32_t mod = val->value.mp.module;
+            uint8_t port = val->value.mp.port;
+            if (mod >= lctx->hw.io.fn_read_qty)
+                return 0;
+            return (int32_t) lctx->input[mod].Ih[port];
+        }
+        case LADDER_REGISTER_Cd:
+            return (int32_t) lctx->prev_scan_vals.Cdh[val->value.i32];
+        case LADDER_REGISTER_Cr:
+            return (int32_t) lctx->prev_scan_vals.Crh[val->value.i32];
+        case LADDER_REGISTER_Td:
+            return (int32_t) lctx->prev_scan_vals.Tdh[val->value.i32];
+        case LADDER_REGISTER_Tr:
+            return (int32_t) lctx->prev_scan_vals.Trh[val->value.i32];
+            // Note: For other types like IW/QW/C/T/D/R/S, previous values may not be stored (e.g., no prev for accumulators or data regs).
+            // Default to current value or 0; adjust based on requirements (e.g., add prev for D if needed).
+        case LADDER_REGISTER_IW: {
+            uint32_t mod = val->value.mp.module;
+            uint8_t port = val->value.mp.port;
+            if (mod >= lctx->hw.io.fn_read_qty)
+                return 0;
+            return lctx->input[mod].IW[port];  // No prev for words; use current
+        }
+        case LADDER_REGISTER_QW: {
+            uint32_t mod = val->value.mp.module;
+            uint8_t port = val->value.mp.port;
+            if (mod >= lctx->hw.io.fn_write_qty)
+                return 0;
+            return lctx->output[mod].QW[port];  // No prev for words; use current
+        }
+        case LADDER_REGISTER_C:
+            return (int32_t) lctx->registers.C[val->value.i32];  // No prev; use current
+        case LADDER_REGISTER_T:
+            return (int32_t) lctx->timers[val->value.i32].acc;  // No prev acc; use current
+        case LADDER_REGISTER_D:
+            return lctx->registers.D[val->value.i32];  // No prev; use current
+        case LADDER_REGISTER_R:
+            return (int32_t) lctx->registers.R[val->value.i32];  // No prev; use current
+        case LADDER_REGISTER_S:
+            return 0;  // Strings not applicable for previous
+        case LADDER_REGISTER_NONE:
+        case LADDER_REGISTER_INV:
+        default:
+            return 0;
+    }
+}
+
+static inline int32_t ladder_get_data_int32(ladder_ctx_t *lctx, uint32_t r, uint32_t c, uint32_t i) {
+    if (lctx == NULL || lctx->exec_network == NULL) {
+        return 0;  // Safe default on invalid context
+    }
+    ladder_network_t *net = lctx->exec_network;
+    if (r >= net->rows || c >= net->cols || i >= net->cells[r][c].data_qty) {
+        return 0;  // Safe default on OOB
+    }
+    ladder_register_t type = net->cells[r][c].data[i].type;
+    ladder_value_t *val = &net->cells[r][c].data[i];
+
+    switch (type) {
+        case LADDER_REGISTER_NONE:
+            return val->value.i32;
+        case LADDER_REGISTER_M:
+        case LADDER_REGISTER_Q:
+        case LADDER_REGISTER_I:
+        case LADDER_REGISTER_Cd:
+        case LADDER_REGISTER_Cr:
+        case LADDER_REGISTER_Td:
+        case LADDER_REGISTER_Tr:
+            // Bool types: Treat false=0, true=1
+            return (int32_t) ladder_get_data_value(lctx, r, c, i);
+        case LADDER_REGISTER_IW: {
+            uint32_t mod = val->value.mp.module;
+            uint8_t port = val->value.mp.port;
+            if (mod >= lctx->hw.io.fn_read_qty)
+                return 0;
+            return lctx->input[mod].IW[port];
+        }
+        case LADDER_REGISTER_QW: {
+            uint32_t mod = val->value.mp.module;
+            uint8_t port = val->value.mp.port;
+            if (mod >= lctx->hw.io.fn_write_qty)
+                return 0;
+            return lctx->output[mod].QW[port];
+        }
+        case LADDER_REGISTER_C:
+            return (int32_t) lctx->registers.C[val->value.i32];
+        case LADDER_REGISTER_T:
+            return (int32_t) lctx->timers[val->value.i32].acc;  // Truncate u64 to i32 if needed
+        case LADDER_REGISTER_D:
+            return lctx->registers.D[val->value.i32];
+        case LADDER_REGISTER_R:
+            return (int32_t) lctx->registers.R[val->value.i32];
+        case LADDER_REGISTER_S:
+            return 0;  // Strings not numeric
+        case LADDER_REGISTER_INV:
+        default:
+            return 0;
+    }
+}
 
 /**
  * @def ladder_cell_data_exec
