@@ -625,13 +625,14 @@ bool ladder_fn_cell(ladder_ctx_t *ladder_ctx, uint32_t network, uint32_t row, ui
 
     if (ladder_ctx->network[network].cells[row][column].data != NULL) {
         for (uint32_t d = 0; d < ladder_ctx->network[network].cells[row][column].data_qty; d++) {
-            if (ladder_ctx->network[network].cells[row][column].data[d].type == LADDER_REGISTER_S &&
-                ladder_ctx->network[network].cells[row][column].data[d].value.cstr != NULL) {
+            if (ladder_ctx->network[network].cells[row][column].data[d].type == LADDER_REGISTER_S&&
+            ladder_ctx->network[network].cells[row][column].data[d].value.cstr != NULL) {
                 free((void*) ladder_ctx->network[network].cells[row][column].data[d].value.cstr);
                 ladder_ctx->network[network].cells[row][column].data[d].value.cstr = NULL;
             }
         }
         free(ladder_ctx->network[network].cells[row][column].data);
+        ladder_ctx->network[network].cells[row][column].data = NULL;
     }
 
     ladder_ctx->network[network].cells[row][column].code = function;
@@ -645,6 +646,8 @@ bool ladder_fn_cell(ladder_ctx_t *ladder_ctx, uint32_t network, uint32_t row, ui
     ladder_ctx->network[network].cells[row][column].data = calloc(actual_ioc.data_qty, sizeof(ladder_value_t));
     if (ladder_ctx->network[network].cells[row][column].data == NULL) {
         ladder_ctx->network[network].cells[row][column].data_qty = 0;
+        ladder_ctx->network[network].cells[row][column].code = LADDER_INS_INV;
+        ladder_ctx->network[network].cells[row][column].data = NULL;
         return false;
     }
 
@@ -653,8 +656,8 @@ bool ladder_fn_cell(ladder_ctx_t *ladder_ctx, uint32_t network, uint32_t row, ui
 
         if (ladder_ctx->network[network].cells[row + r][column].data != NULL) {
             for (uint32_t d = 0; d < ladder_ctx->network[network].cells[row + r][column].data_qty; d++) {
-                if (ladder_ctx->network[network].cells[row + r][column].data[d].type == LADDER_REGISTER_S &&
-                    ladder_ctx->network[network].cells[row + r][column].data[d].value.cstr != NULL) {
+                if (ladder_ctx->network[network].cells[row + r][column].data[d].type == LADDER_REGISTER_S&&
+                ladder_ctx->network[network].cells[row + r][column].data[d].value.cstr != NULL) {
                     free((void*) ladder_ctx->network[network].cells[row + r][column].data[d].value.cstr);
                     ladder_ctx->network[network].cells[row + r][column].data[d].value.cstr = NULL;
                 }

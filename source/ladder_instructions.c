@@ -839,6 +839,18 @@ void ladder_set_data_value(ladder_ctx_t *ladder_ctx, uint32_t row, uint32_t colu
         return;
     }
 
+    if (__type == LADDER_REGISTER_Q || __type == LADDER_REGISTER_QW) {
+        if (__module >= ladder_ctx->hw.io.fn_write_qty) {
+            *error = LADDER_INS_ERR_OUTOFRANGE;
+            return;
+        }
+    } else if (__type == LADDER_REGISTER_I || __type == LADDER_REGISTER_IW) {
+        if (__module >= ladder_ctx->hw.io.fn_read_qty) {
+            *error = LADDER_INS_ERR_OUTOFRANGE;
+            return;
+        }
+    }
+
     switch (__type) {
         case LADDER_REGISTER_M:
             __qty = ladder_ctx->ladder.quantity.m;
