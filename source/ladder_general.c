@@ -43,8 +43,16 @@
 
 void ladder_scan_time(ladder_ctx_t *ladder_ctx) {
     uint64_t scanTimeMillis = ladder_ctx->hw.time.millis();
-    // Use explicit unsigned subtraction for overflow-safe comparison.
-    uint64_t diff = scanTimeMillis - ladder_ctx->scan_internals.start_time;
+    uint64_t diff;
+
+    // Explicitly handle potential timer wrap-around using modulo arithmetic
+    // If scanTimeMillis < start_time, assume wrap occurred and compute correct diff
+    if (scanTimeMillis >= ladder_ctx->scan_internals.start_time) {
+        diff = scanTimeMillis - ladder_ctx->scan_internals.start_time;
+    } else {
+        diff = (UINT64_MAX - ladder_ctx->scan_internals.start_time) + scanTimeMillis + 1;
+    }
+
     ladder_ctx->scan_internals.actual_scan_time = diff;
     ladder_ctx->scan_internals.start_time = scanTimeMillis;
 
@@ -623,6 +631,13 @@ bool ladder_fn_cell(ladder_ctx_t *ladder_ctx, uint32_t network, uint32_t row, ui
     if (ladder_ctx->network[network].rows < actual_ioc.cells + row)
         return false;
 
+    // Validation to check if lower cells for multi-cell instructions are free (code == LADDER_INS_INV)
+    for (uint8_t r = 1; r < actual_ioc.cells; r++) {
+        if (ladder_ctx->network[network].cells[row + r][column].code != LADDER_INS_INV) {
+            return false;  // Lower cell occupied, cannot place multi-cell instruction
+        }
+    }
+
     if (ladder_ctx->network[network].cells[row][column].data != NULL) {
         for (uint32_t d = 0; d < ladder_ctx->network[network].cells[row][column].data_qty; d++) {
             if (ladder_ctx->network[network].cells[row][column].data[d].type == LADDER_REGISTER_S&&
@@ -640,6 +655,8 @@ bool ladder_fn_cell(ladder_ctx_t *ladder_ctx, uint32_t network, uint32_t row, ui
 
     if (actual_ioc.data_qty == 0) {
         ladder_ctx->network[network].cells[row][column].data = NULL;
+        // For single-cell, no vertical_bar needed, but ensure it's false if not part of a larger group
+        ladder_ctx->network[network].cells[row][column].vertical_bar = false;
         return true;
     }
 
@@ -651,7 +668,7 @@ bool ladder_fn_cell(ladder_ctx_t *ladder_ctx, uint32_t network, uint32_t row, ui
         return false;
     }
 
-    for (uint8_t r = 1; r < ladder_fn_iocd[function].cells; r++) {
+    for (uint8_t r = 1; r < actual_ioc.cells; r++) {
         ladder_ctx->network[network].cells[row + r][column].code = LADDER_INS_MULTI;
 
         if (ladder_ctx->network[network].cells[row + r][column].data != NULL) {
@@ -667,6 +684,13 @@ bool ladder_fn_cell(ladder_ctx_t *ladder_ctx, uint32_t network, uint32_t row, ui
             ladder_ctx->network[network].cells[row + r][column].data_qty = 0;
         }
     }
+
+    // Set vertical_bar = true for upper cells in multi-cell stack to ensure they form a single group
+    for (uint8_t r = 0; r < actual_ioc.cells - 1; r++) {
+        ladder_ctx->network[network].cells[row + r][column].vertical_bar = true;
+    }
+    // Set vertical_bar = false for the bottom cell to terminate the group
+    ladder_ctx->network[network].cells[row + actual_ioc.cells - 1][column].vertical_bar = false;
 
     return true;
 }

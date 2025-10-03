@@ -32,6 +32,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include <stdlib.h>
 
 #include "ladder.h"
 #include "ladder_instructions.h"
@@ -78,6 +79,48 @@ static ladder_fn_t const ladder_function[] = { //
         fn_NE,      // 34
         fn_FOREIGN, // 35
         fn_TMOVE,   // 36
+        };
+
+// Array to flag instructions with side effects or required execution on false input (e.g., accumulation, resets, or power inversion).
+// This makes the check exhaustive and easier to maintain/expand.
+static const bool has_side_effects_on_false[LADDER_INS_INV] = { //
+        false, // LADDER_INS_NOP
+        false, // LADDER_INS_CONN
+        true,  // LADDER_INS_NEG (inverts false to true, must execute for correct power flow)
+        false, // LADDER_INS_NO
+        false, // LADDER_INS_NC
+        false, // LADDER_INS_RE
+        false, // LADDER_INS_FE
+        true,  // LADDER_INS_COIL (sets value=false on false)
+        false, // LADDER_INS_COILL (retains on false, no side)
+        false, // LADDER_INS_COILU (retains on false, no side)
+        true,  // LADDER_INS_TON (resets acc/flags on false)
+        true,  // LADDER_INS_TOF (accumulates on false)
+        true,  // LADDER_INS_TP (may time on false depending on state)
+        true,  // LADDER_INS_CTU (checks reset, sets flags on false)
+        true,  // LADDER_INS_CTD (checks reset, sets flags on false)
+        false, // LADDER_INS_MOVE (no action on false)
+        false, // LADDER_INS_SUB (no action on false)
+        false, // LADDER_INS_ADD (no action on false)
+        false, // LADDER_INS_MUL (no action on false)
+        false, // LADDER_INS_DIV (no action on false)
+        false, // LADDER_INS_MOD (no action on false)
+        false, // LADDER_INS_SHL (no action on false)
+        false, // LADDER_INS_SHR (no action on false)
+        false, // LADDER_INS_ROL (no action on false)
+        false, // LADDER_INS_ROR (no action on false)
+        false, // LADDER_INS_AND (no action on false)
+        false, // LADDER_INS_OR (no action on false)
+        false, // LADDER_INS_XOR (no action on false)
+        false, // LADDER_INS_NOT (no action on false)
+        false, // LADDER_INS_EQ (no action on false)
+        false, // LADDER_INS_GT (no action on false)
+        false, // LADDER_INS_GE (no action on false)
+        false, // LADDER_INS_LT (no action on false)
+        false, // LADDER_INS_LE (no action on false)
+        false, // LADDER_INS_NE (no action on false)
+        true,  // LADDER_INS_FOREIGN (unknown, assume sides)
+        true   // LADDER_INS_TMOVE (potential sides)
         };
 
 void ladder_scan(ladder_ctx_t *ladder_ctx) {
@@ -127,14 +170,7 @@ void ladder_scan(ladder_ctx_t *ladder_ctx) {
                     skip_safe = false;
                     break;
                 }
-                if (code == LADDER_INS_COIL || // Sets value=false on in=false
-                        code == LADDER_INS_TON || // Resets acc, flags on in=false
-                        code == LADDER_INS_TOF || // Times on false
-                        code == LADDER_INS_TP || // Similar
-                        code == LADDER_INS_CTU || // Sets Cr=false on cu=false
-                        code == LADDER_INS_CTD || // Similar
-                        code == LADDER_INS_FOREIGN || // Unknown sides
-                        code == LADDER_INS_TMOVE) { // Potential sides
+                if (has_side_effects_on_false[code]) {
                     skip_safe = false;
                     break;
                 }
@@ -162,16 +198,20 @@ void ladder_scan(ladder_ctx_t *ladder_ctx) {
                 bool group_output = false;
                 bool group_error = false;
 
-                // Use batch override array for efficiency; fixed-size with explicit bounds check
-                bool original_lefts[LADDER_MAX_ROWS];
+                bool *original_lefts = NULL;
                 uint32_t num_saved = 0;
                 // Pre-compute group size and check against array limit before loop to prevent any potential overflow attempts.
                 if (column > 0) {
                     uint32_t group_size = group_end - group_start + 1;
-                    if (group_size > LADDER_MAX_ROWS) {
+                    // Assertion for group_size <= rows to catch malformed ladder configurations in debug builds (tautological but enforces invariant).
+                    if (group_size > (*ladder_ctx).exec_network->rows) {
+                        (*ladder_ctx).ladder.last.err = LADDER_INS_ERR_FAIL;  // Treat allocation failure as generic error
+                        goto cleanup;
+                    }
+                    original_lefts = (bool*) malloc(group_size * sizeof(bool));
+                    if (original_lefts == NULL) {
                         group_error = true;
-                        (*ladder_ctx).ladder.last.err = LADDER_INS_ERR_OUTOFRANGE;
-                        // Jump to cleanup on bounds error to ensure left states are restored before error propagation
+                        (*ladder_ctx).ladder.last.err = LADDER_INS_ERR_FAIL;  // Treat allocation failure as generic error
                         goto cleanup;
                     }
                     // Save originals for batch override
@@ -229,6 +269,12 @@ void ladder_scan(ladder_ctx_t *ladder_ctx) {
                     for (uint32_t gr = group_start; gr <= group_end && restore_idx < num_saved; gr++) {
                         (*ladder_ctx).exec_network->cells[gr][column - 1].state = original_lefts[restore_idx++];
                     }
+                }
+
+                // Modified: Free the dynamically allocated array after use to prevent memory leaks.
+                if (original_lefts != NULL) {
+                    free(original_lefts);
+                    original_lefts = NULL;
                 }
 
                 // On group error, propagate error
