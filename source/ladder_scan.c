@@ -197,27 +197,22 @@ void ladder_scan(ladder_ctx_t *ladder_ctx) {
                 // Execute instructions in group (using uniform group_input as left where needed)
                 bool group_output = false;
                 bool group_error = false;
-
-                bool *original_lefts = NULL;
+                bool original_lefts[LADDER_MAX_ROWS];  // Stack buffer; safe since group_size <= rows <= LADDER_MAX_ROWS
                 uint32_t num_saved = 0;
+
                 // Pre-compute group size and check against array limit before loop to prevent any potential overflow attempts.
                 if (column > 0) {
                     uint32_t group_size = group_end - group_start + 1;
                     // Assertion for group_size <= rows to catch malformed ladder configurations in debug builds (tautological but enforces invariant).
                     if (group_size > (*ladder_ctx).exec_network->rows) {
-                        (*ladder_ctx).ladder.last.err = LADDER_INS_ERR_FAIL;  // Treat allocation failure as generic error
-                        goto cleanup;
-                    }
-                    original_lefts = (bool*) malloc(group_size * sizeof(bool));
-                    if (original_lefts == NULL) {
+                        (*ladder_ctx).ladder.last.err = LADDER_INS_ERR_FAIL;  // Treat as generic error
                         group_error = true;
-                        (*ladder_ctx).ladder.last.err = LADDER_INS_ERR_FAIL;  // Treat allocation failure as generic error
-                        goto cleanup;
-                    }
-                    // Save originals for batch override
-                    for (uint32_t gr = group_start; gr <= group_end; gr++) {
-                        original_lefts[num_saved++] = (*ladder_ctx).exec_network->cells[gr][column - 1].state;
-                        (*ladder_ctx).exec_network->cells[gr][column - 1].state = group_input;
+                    } else {
+                        // Save originals for batch override
+                        for (uint32_t gr = group_start; gr <= group_end; gr++) {
+                            original_lefts[num_saved++] = (*ladder_ctx).exec_network->cells[gr][column - 1].state;
+                            (*ladder_ctx).exec_network->cells[gr][column - 1].state = group_input;
+                        }
                     }
                 }
 
@@ -239,8 +234,7 @@ void ladder_scan(ladder_ctx_t *ladder_ctx) {
                         (*ladder_ctx).ladder.state = LADDER_ST_INV;
                         (*ladder_ctx).ladder.last.err = LADDER_INS_ERR_FAIL;
                         group_error = true;
-                        // Jump to cleanup on invalid code to restore left states immediately
-                        goto cleanup;
+                        break;  // Break loop on error to proceed to restore.
                     }
 
                     // execute instruction
@@ -249,8 +243,7 @@ void ladder_scan(ladder_ctx_t *ladder_ctx) {
 
                         if ((*ladder_ctx).ladder.last.err != LADDER_INS_ERR_OK) {
                             group_error = true;
-                            // Jump to cleanup on execution error to ensure restoration before halting
-                            goto cleanup;
+                            break;
                         }
 
                         if ((*ladder_ctx).on.instruction != NULL)
@@ -261,7 +254,6 @@ void ladder_scan(ladder_ctx_t *ladder_ctx) {
                     }
                 }
 
-                cleanup:
                 // Always restore left states after execution, regardless of error, to prevent corruption for next groups/columns
                 // This ensures overrides are isolated to the current group, fixing cascading errors in parallel rungs
                 if (column > 0) {
@@ -269,12 +261,6 @@ void ladder_scan(ladder_ctx_t *ladder_ctx) {
                     for (uint32_t gr = group_start; gr <= group_end && restore_idx < num_saved; gr++) {
                         (*ladder_ctx).exec_network->cells[gr][column - 1].state = original_lefts[restore_idx++];
                     }
-                }
-
-                // Modified: Free the dynamically allocated array after use to prevent memory leaks.
-                if (original_lefts != NULL) {
-                    free(original_lefts);
-                    original_lefts = NULL;
                 }
 
                 // On group error, propagate error

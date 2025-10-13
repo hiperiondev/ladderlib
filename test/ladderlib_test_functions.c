@@ -30,7 +30,15 @@
  *
  */
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdint.h>
 #include <stdbool.h>
+#include <string.h>
+
+#include "ladder_instructions.h"
+#include "ladder.h"
+#include "ladder_internals.h"
 
 bool test_ladder_instructions(void) {
     return true;

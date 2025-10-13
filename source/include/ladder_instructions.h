@@ -70,15 +70,25 @@ static inline int32_t ladder_get_data_value(ladder_ctx_t *lctx, uint32_t r, uint
         case LADDER_REGISTER_Q: {
             uint32_t mod = val->value.mp.module;
             uint8_t port = val->value.mp.port;
-            if (mod >= lctx->hw.io.fn_write_qty)
+            if (mod >= lctx->hw.io.fn_write_qty) {
                 return 0;
+            }
+            // Bounds check for port to prevent OOB access
+            if (port >= lctx->output[mod].q_qty) {
+                return 0;  // Safe default on invalid port
+            }
             return (int32_t) lctx->output[mod].Q[port];
         }
         case LADDER_REGISTER_I: {
             uint32_t mod = val->value.mp.module;
             uint8_t port = val->value.mp.port;
-            if (mod >= lctx->hw.io.fn_read_qty)
+            if (mod >= lctx->hw.io.fn_read_qty) {
                 return 0;
+            }
+            // Bounds check for port to prevent OOB access
+            if (port >= lctx->input[mod].i_qty) {
+                return 0;  // Safe default on invalid port
+            }
             return (int32_t) lctx->input[mod].I[port];
         }
         case LADDER_REGISTER_Cd:
@@ -92,21 +102,38 @@ static inline int32_t ladder_get_data_value(ladder_ctx_t *lctx, uint32_t r, uint
         case LADDER_REGISTER_IW: {
             uint32_t mod = val->value.mp.module;
             uint8_t port = val->value.mp.port;
-            if (mod >= lctx->hw.io.fn_read_qty)
+            if (mod >= lctx->hw.io.fn_read_qty) {
                 return 0;
+            }
+            // Bounds check for port to prevent OOB access
+            if (port >= lctx->input[mod].iw_qty) {
+                return 0;  // Safe default on invalid port
+            }
             return lctx->input[mod].IW[port];
         }
         case LADDER_REGISTER_QW: {
             uint32_t mod = val->value.mp.module;
             uint8_t port = val->value.mp.port;
-            if (mod >= lctx->hw.io.fn_write_qty)
+            if (mod >= lctx->hw.io.fn_write_qty) {
                 return 0;
+            }
+            // Bounds check for port to prevent OOB access
+            if (port >= lctx->output[mod].qw_qty) {
+                return 0;  // Safe default on invalid port
+            }
             return lctx->output[mod].QW[port];
         }
         case LADDER_REGISTER_C:
             return (int32_t) lctx->registers.C[val->value.i32];
         case LADDER_REGISTER_T:
-            return (int32_t) lctx->timers[val->value.i32].acc;  // Truncate u64 to i32
+            uint64_t acc = lctx->timers[val->value.i32].acc;
+            // Overflow check to prevent truncation issues for large accumulators
+            if (acc > (uint64_t) INT32_MAX) {
+                // Set error in context
+                lctx->ladder.last.err = LADDER_INS_ERR_OVERFLOW;
+                return 0;  // Safe default on overflow
+            }
+            return (int32_t) acc;  // Safe cast after check
         case LADDER_REGISTER_D:
             return lctx->registers.D[val->value.i32];
         case LADDER_REGISTER_R:
@@ -136,15 +163,33 @@ static inline int32_t ladder_get_previous_value(ladder_ctx_t *lctx, uint32_t r, 
         case LADDER_REGISTER_Q: {
             uint32_t mod = val->value.mp.module;
             uint8_t port = val->value.mp.port;
-            if (mod >= lctx->hw.io.fn_write_qty)
+            if (mod >= lctx->hw.io.fn_write_qty) {
                 return 0;
+            }
+            // Null check for Qh to prevent dereference of unallocated array
+            if (lctx->output[mod].Qh == NULL) {
+                return 0;  // Safe default if history not allocated
+            }
+            // Bounds check for port to prevent OOB access
+            if (port >= lctx->output[mod].q_qty) {
+                return 0;  // Safe default on invalid port
+            }
             return (int32_t) lctx->output[mod].Qh[port];
         }
         case LADDER_REGISTER_I: {
             uint32_t mod = val->value.mp.module;
             uint8_t port = val->value.mp.port;
-            if (mod >= lctx->hw.io.fn_read_qty)
+            if (mod >= lctx->hw.io.fn_read_qty) {
                 return 0;
+            }
+            // Null check for Ih to prevent dereference of unallocated array
+            if (lctx->input[mod].Ih == NULL) {
+                return 0;  // Safe default if history not allocated
+            }
+            // Bounds check for port to prevent OOB access
+            if (port >= lctx->input[mod].i_qty) {
+                return 0;  // Safe default on invalid port
+            }
             return (int32_t) lctx->input[mod].Ih[port];
         }
         case LADDER_REGISTER_Cd:

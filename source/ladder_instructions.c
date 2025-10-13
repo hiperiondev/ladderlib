@@ -194,7 +194,7 @@ ladder_ins_err_t fn_COIL(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row
 }
 
 ladder_ins_err_t fn_COILL(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row) {
-    static uint8_t error = 0;
+    uint8_t error = 0;
 
     bool state = CELL_STATE_LEFT(ladder_ctx, column, row);
     bool prev = ladder_get_previous_value(ladder_ctx, row, column, 0); // From history (Mh/Qh)
@@ -208,7 +208,7 @@ ladder_ins_err_t fn_COILL(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t ro
 }
 
 ladder_ins_err_t fn_COILU(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row) {
-    static uint8_t error = 0;
+    uint8_t error = 0;
 
     bool state = CELL_STATE_LEFT(ladder_ctx, column, row);
     bool prev = ladder_get_previous_value(ladder_ctx, row, column, 0); // From history (Mh/Qh)
@@ -314,7 +314,7 @@ ladder_ins_err_t fn_TOF(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row)
 
 ladder_ins_err_t fn_TP(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row) {
     // detect rising edge to start pulse
-    if (CELL_STATE_LEFT(ladder_ctx, column, row) && !ladder_get_previous_value(ladder_ctx, row, column, -1)
+    if (CELL_STATE_LEFT(ladder_ctx, column, row) && !ladder_get_previous_value(ladder_ctx, row, column, 0)
             && !(*ladder_ctx).memory.Tr[ladder_cell_data_exec(ladder_ctx, row, column, 0).value.i32]) {
         (*ladder_ctx).memory.Tr[ladder_cell_data_exec(ladder_ctx, row, column, 0).value.i32] = true;
 
@@ -513,7 +513,7 @@ ladder_ins_err_t fn_MOVE(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row
 }
 
 ladder_ins_err_t fn_SUB(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row) {
-    static uint8_t error = 0;
+    uint8_t error = 0;
 
     CELL_STATE(ladder_ctx, column, row) = CELL_STATE_LEFT(ladder_ctx, column, row);
     int32_t auxValue1 = ladder_get_data_value(ladder_ctx, row, column, 0);
@@ -529,14 +529,14 @@ ladder_ins_err_t fn_SUB(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row)
         }
 
         uint32_t res = auxValue1 - auxValue2;
-        ladder_set_data_value(ladder_ctx, row, 2, column, (void*) &res, &error);
+        ladder_set_data_value(ladder_ctx, row, column, 2, &res, &error);
     }
 
     return LADDER_INS_ERR_OK;
 }
 
 ladder_ins_err_t fn_ADD(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row) {
-    static uint8_t error = 0;
+    uint8_t error = 0;
 
     CELL_STATE(ladder_ctx, column, row) = CELL_STATE_LEFT(ladder_ctx, column, row);
 
@@ -549,7 +549,7 @@ ladder_ins_err_t fn_ADD(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row)
 }
 
 ladder_ins_err_t fn_MUL(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row) {
-    static uint8_t error = 0;
+    uint8_t error = 0;
 
     CELL_STATE(ladder_ctx, column, row) = CELL_STATE_LEFT(ladder_ctx, column, row);
 
@@ -562,23 +562,24 @@ ladder_ins_err_t fn_MUL(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row)
 }
 
 ladder_ins_err_t fn_DIV(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row) {
-    static uint8_t error = 0;
-
+    uint8_t error = LADDER_INS_ERR_OK;
     CELL_STATE(ladder_ctx, column, row) = CELL_STATE_LEFT(ladder_ctx, column, row);
+
     if (CELL_STATE_LEFT(ladder_ctx, column, row)) {
-        if (ladder_get_data_value(ladder_ctx, row +1, column, 0) == 0) {
-            ladder_set_data_value(ladder_ctx, row, 2, column, 0, &error);
+        int32_t divisor = ladder_get_data_value(ladder_ctx, row, column, 1);
+        if (divisor == 0) {
+            int32_t zero = 0;
+            ladder_set_data_value(ladder_ctx, row, column, 2, &zero, &error);
         } else {
-            int32_t val = ladder_get_data_value(ladder_ctx, row, column, 0) / ladder_get_data_value(ladder_ctx, row, column, 1);
-            ladder_set_data_value(ladder_ctx, row, column, 2, (void*) &val, &error);
+            int32_t val = ladder_get_data_value(ladder_ctx, row, column, 0) / divisor;
+            ladder_set_data_value(ladder_ctx, row, column, 2, &val, &error);
         }
     }
-
     return LADDER_INS_ERR_OK;
 }
 
 ladder_ins_err_t fn_MOD(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row) {
-    static uint8_t error = 0;
+    uint8_t error = 0;
 
     CELL_STATE(ladder_ctx, column, row) = CELL_STATE_LEFT(ladder_ctx, column, row);
 
@@ -663,7 +664,7 @@ ladder_ins_err_t fn_ROR(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row)
 }
 
 ladder_ins_err_t fn_AND(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row) {
-    static uint8_t error = 0;
+    uint8_t error = 0;
 
     CELL_STATE(ladder_ctx, column, row) = CELL_STATE_LEFT(ladder_ctx, column, row);
 
@@ -676,7 +677,7 @@ ladder_ins_err_t fn_AND(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row)
 }
 
 ladder_ins_err_t fn_OR(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row) {
-    static uint8_t error = 0;
+    uint8_t error = 0;
 
     CELL_STATE(ladder_ctx, column, row) = CELL_STATE_LEFT(ladder_ctx, column, row);
 
@@ -689,7 +690,7 @@ ladder_ins_err_t fn_OR(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row) 
 }
 
 ladder_ins_err_t fn_XOR(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row) {
-    static uint8_t error = 0;
+    uint8_t error = 0;
 
     CELL_STATE(ladder_ctx, column, row) = CELL_STATE_LEFT(ladder_ctx, column, row);
 
@@ -702,7 +703,7 @@ ladder_ins_err_t fn_XOR(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row)
 }
 
 ladder_ins_err_t fn_NOT(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row) {
-    static uint8_t error = 0;
+    uint8_t error = 0;
 
     CELL_STATE(ladder_ctx, column, row) = CELL_STATE_LEFT(ladder_ctx, column, row);
 
@@ -839,79 +840,118 @@ void ladder_set_data_value(ladder_ctx_t *ladder_ctx, uint32_t row, uint32_t colu
         return;
     }
 
-    if (__type == LADDER_REGISTER_Q || __type == LADDER_REGISTER_QW) {
-        if (__module >= ladder_ctx->hw.io.fn_write_qty) {
-            *error = LADDER_INS_ERR_OUTOFRANGE;
-            return;
-        }
-    } else if (__type == LADDER_REGISTER_I || __type == LADDER_REGISTER_IW) {
-        if (__module >= ladder_ctx->hw.io.fn_read_qty) {
-            *error = LADDER_INS_ERR_OUTOFRANGE;
-            return;
-        }
-    }
-
     switch (__type) {
         case LADDER_REGISTER_M:
             __qty = ladder_ctx->ladder.quantity.m;
-            __data_size = sizeof(uint8_t);
             __index = __idx;
+            if (__index >= __qty) {
+                *error = LADDER_INS_ERR_OUTOFRANGE;
+                return;
+            }
+            __data_size = sizeof(uint8_t);
             break;
         case LADDER_REGISTER_Q:
+            if (__module >= ladder_ctx->hw.io.fn_write_qty) {
+                *error = LADDER_INS_ERR_OUTOFRANGE;
+                return;
+            }
             __qty = ladder_ctx->output[__module].q_qty;
-            __data_size = sizeof(uint8_t);
             __index = __port;
+            if (__index >= __qty) {
+                *error = LADDER_INS_ERR_OUTOFRANGE;
+                return;
+            }
+            __data_size = sizeof(uint8_t);
             break;
         case LADDER_REGISTER_I:
+            if (__module >= ladder_ctx->hw.io.fn_read_qty) {
+                *error = LADDER_INS_ERR_OUTOFRANGE;
+                return;
+            }
             __qty = ladder_ctx->input[__module].i_qty;
-            __data_size = sizeof(uint8_t);
             __index = __port;
+            if (__index >= __qty) {
+                *error = LADDER_INS_ERR_OUTOFRANGE;
+                return;
+            }
+            __data_size = sizeof(uint8_t);
             break;
         case LADDER_REGISTER_Cd:
         case LADDER_REGISTER_Cr:
             __qty = ladder_ctx->ladder.quantity.c;
-            __data_size = sizeof(bool);
             __index = __idx;
+            if (__index >= __qty) {
+                *error = LADDER_INS_ERR_OUTOFRANGE;
+                return;
+            }
+            __data_size = sizeof(bool);
             break;
         case LADDER_REGISTER_Td:
         case LADDER_REGISTER_Tr:
             __qty = ladder_ctx->ladder.quantity.t;
-            __data_size = sizeof(bool);
             __index = __idx;
+            if (__index >= __qty) {
+                *error = LADDER_INS_ERR_OUTOFRANGE;
+                return;
+            }
+            __data_size = sizeof(bool);
             break;
         case LADDER_REGISTER_IW:
+            if (__module >= ladder_ctx->hw.io.fn_read_qty) {
+                *error = LADDER_INS_ERR_OUTOFRANGE;
+                return;
+            }
             __qty = ladder_ctx->input[__module].iw_qty;
-            __data_size = sizeof(int32_t);
             __index = __port;
+            if (__index >= __qty) {
+                *error = LADDER_INS_ERR_OUTOFRANGE;
+                return;
+            }
+            __data_size = sizeof(int32_t);
             break;
         case LADDER_REGISTER_QW:
+            if (__module >= ladder_ctx->hw.io.fn_write_qty) {
+                *error = LADDER_INS_ERR_OUTOFRANGE;
+                return;
+            }
             __qty = ladder_ctx->output[__module].qw_qty;
-            __data_size = sizeof(int32_t);
             __index = __port;
+            if (__index >= __qty) {
+                *error = LADDER_INS_ERR_OUTOFRANGE;
+                return;
+            }
+            __data_size = sizeof(int32_t);
             break;
         case LADDER_REGISTER_C:
             __qty = ladder_ctx->ladder.quantity.c;
-            __data_size = sizeof(uint32_t);
             __index = __idx;
+            if (__index >= __qty) {
+                *error = LADDER_INS_ERR_OUTOFRANGE;
+                return;
+            }
+            __data_size = sizeof(uint32_t);
             break;
         case LADDER_REGISTER_D:
             __qty = ladder_ctx->ladder.quantity.d;
-            __data_size = sizeof(int32_t);
             __index = __idx;
+            if (__index >= __qty) {
+                *error = LADDER_INS_ERR_OUTOFRANGE;
+                return;
+            }
+            __data_size = sizeof(int32_t);
             break;
         case LADDER_REGISTER_R:
             __qty = ladder_ctx->ladder.quantity.r;
-            __data_size = sizeof(float);
             __index = __idx;
+            if (__index >= __qty) {
+                *error = LADDER_INS_ERR_OUTOFRANGE;
+                return;
+            }
+            __data_size = sizeof(float);
             break;
         default:
             *error = LADDER_INS_ERR_SETDATAVAL;
             return;
-    }
-
-    if (__index >= __qty) {
-        *error = LADDER_INS_ERR_OUTOFRANGE;
-        return;
     }
 
     switch (__type) {
