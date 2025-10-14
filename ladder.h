@@ -212,14 +212,12 @@ typedef enum LADDER_REGISTERS {
  * @brief Instruction description: inputs, outputs, occupied cells
  *
  */
-#pragma pack(push, 1)
 typedef struct ladder_instructions_ioc_s {
     uint8_t inputs;   /**< Inputs quantity */
     uint8_t outputs;  /**< Outputs quantity */
     uint8_t cells;    /**< Cells quantity */
     uint8_t data_qty; /**< Quantity */
 } ladder_instructions_iocd_t;
-#pragma pack(pop)
 
 extern const ladder_instructions_iocd_t ladder_fn_iocd[];
 
@@ -228,19 +226,16 @@ extern const ladder_instructions_iocd_t ladder_fn_iocd[];
  * @brief Module/Port value
  *
  */
-#pragma pack(push, 1)
 typedef struct moduleportvalue_s {
     uint8_t module; /**< Module */
     uint8_t port;   /**< Port */
 } moduleport_t;
-#pragma pack(pop)
 
 /**
  * @struct ladder_value_s
  * @brief Value container
  *
  */
-#pragma pack(push, 1)
 typedef struct ladder_value_s {
     ladder_register_t type; /**< Data type */
     union {
@@ -256,7 +251,6 @@ typedef struct ladder_value_s {
         moduleport_t mp;    /**< Module.port value */
     } value; /**< Data */
 } ladder_value_t;
-#pragma pack(pop)
 
 /**
  * @struct ladder_cell_s
@@ -563,7 +557,6 @@ typedef bool (*_foreign_fn_deinit)(ladder_foreign_function_t *function);
  * @brief Main foreign function definition
  *
  */
-#pragma pack(push, 1)
 typedef struct ladder_foreign_function_s {
                       uint32_t id;          /**< Foreign function id */
                           char name[7];     /**< Foreign function name */
@@ -572,7 +565,6 @@ typedef struct ladder_foreign_function_s {
             _foreign_fn_deinit deinit;      /**< Foreign functions deinitializer pointers */
                           void *data;       /**< Internal data for foreign functions */
 } ladder_foreign_function_t;
-#pragma pack(pop)
 
 /**
  * @struct ladder_foreign_s

@@ -123,6 +123,7 @@ static const bool has_side_effects_on_false[LADDER_INS_INV] = { //
         true   // LADDER_INS_TMOVE (potential sides)
         };
 
+// ladder_scan.c (only modified function: ladder_scan)
 void ladder_scan(ladder_ctx_t *ladder_ctx) {
     uint32_t network = 0;
 
@@ -184,8 +185,6 @@ void ladder_scan(ladder_ctx_t *ladder_ctx) {
             uint32_t row = 0;
             while (row < (*ladder_ctx).exec_network->rows) {
                 uint32_t group_start = row;
-                // Compute group input from top row's left (power rail or prev col top state)
-                bool group_input = (column == 0) ? true : (*ladder_ctx).exec_network->cells[group_start][column - 1].state;
 
                 // Tightened loop condition to prevent OOB access to cells[rows][column].
                 // Checks group_end + 1 < rows before deref, ensuring group_end never >= rows.
@@ -197,24 +196,6 @@ void ladder_scan(ladder_ctx_t *ladder_ctx) {
                 // Execute instructions in group (using uniform group_input as left where needed)
                 bool group_output = false;
                 bool group_error = false;
-                bool original_lefts[LADDER_MAX_ROWS];  // Stack buffer; safe since group_size <= rows <= LADDER_MAX_ROWS
-                uint32_t num_saved = 0;
-
-                // Pre-compute group size and check against array limit before loop to prevent any potential overflow attempts.
-                if (column > 0) {
-                    uint32_t group_size = group_end - group_start + 1;
-                    // Assertion for group_size <= rows to catch malformed ladder configurations in debug builds (tautological but enforces invariant).
-                    if (group_size > (*ladder_ctx).exec_network->rows) {
-                        (*ladder_ctx).ladder.last.err = LADDER_INS_ERR_FAIL;  // Treat as generic error
-                        group_error = true;
-                    } else {
-                        // Save originals for batch override
-                        for (uint32_t gr = group_start; gr <= group_end; gr++) {
-                            original_lefts[num_saved++] = (*ladder_ctx).exec_network->cells[gr][column - 1].state;
-                            (*ladder_ctx).exec_network->cells[gr][column - 1].state = group_input;
-                        }
-                    }
-                }
 
                 for (uint32_t gr = group_start; gr <= group_end; gr++) {
                     // Set current row for last instr tracking
@@ -248,18 +229,6 @@ void ladder_scan(ladder_ctx_t *ladder_ctx) {
 
                         if ((*ladder_ctx).on.instruction != NULL)
                             (*ladder_ctx).on.instruction(ladder_ctx);
-
-                        // Collect individual output for OR
-                        group_output |= (*(*ladder_ctx).exec_network).cells[current_row_for_exec][column].state;
-                    }
-                }
-
-                // Always restore left states after execution, regardless of error, to prevent corruption for next groups/columns
-                // This ensures overrides are isolated to the current group, fixing cascading errors in parallel rungs
-                if (column > 0) {
-                    uint32_t restore_idx = 0;
-                    for (uint32_t gr = group_start; gr <= group_end && restore_idx < num_saved; gr++) {
-                        (*ladder_ctx).exec_network->cells[gr][column - 1].state = original_lefts[restore_idx++];
                     }
                 }
 
@@ -267,6 +236,12 @@ void ladder_scan(ladder_ctx_t *ladder_ctx) {
                 if (group_error) {
                     (*ladder_ctx).ladder.state = LADDER_ST_INV;
                     return;
+                }
+
+                // Captures multi-output settings (e.g., CTU sets state[row]=done, state[row+1]=overflow); used for power continuation.
+                group_output = false;
+                for (uint32_t gr = group_start; gr <= group_end; gr++) {
+                    group_output |= (*ladder_ctx).exec_network->cells[gr][column].state;
                 }
 
                 // Set uniform group output to all rows in group (ORed flow to right)
