@@ -123,7 +123,6 @@ static const bool has_side_effects_on_false[LADDER_INS_INV] = { //
         true   // LADDER_INS_TMOVE (potential sides)
         };
 
-// ladder_scan.c (only modified function: ladder_scan)
 void ladder_scan(ladder_ctx_t *ladder_ctx) {
     uint32_t network = 0;
 
@@ -156,48 +155,72 @@ void ladder_scan(ladder_ctx_t *ladder_ctx) {
             }
         }
 
-        // Power rail tracking to enable short-circuiting of columns with no incoming power.
-        // Initialize to true, simulating the energized left power rail.
-        bool has_power = true;
-
-        // Detect vertical groups per column, uniform input from top, OR outputs uniformly
-        for (uint32_t column = 0; column < (*ladder_ctx).exec_network->cols; column++) {
-            // Check if safe to skip before breaking. Scan column for instructions without side effects on false input.
-            bool skip_safe = true;
-            for (uint32_t r = 0; r < (*ladder_ctx).exec_network->rows; r++) {
-                ladder_instruction_t code = (*ladder_ctx).exec_network->cells[r][column].code;
-                if (code == LADDER_INS_MULTI) {
-                    // Treat MULTI as potentially unsafe (part of multi-cell like timers/counters).
-                    skip_safe = false;
-                    break;
-                }
-                if (has_side_effects_on_false[code]) {
-                    skip_safe = false;
-                    break;
-                }
-            }
-
-            // Short-circuit only if no power and column is safe to skip (no side effects on false).
-            if (!has_power && skip_safe) {
+        // Row-major order (outer loop on rows, inner on columns) for independent rung evaluation.
+        // Each vertical group is treated as a separate rung with its own power flow, starting from true (left rail).
+        // Advance row past the group after processing the entire rung across columns.
+        uint32_t row = 0;
+        while (row < (*ladder_ctx).exec_network->rows) {
+            // Skip if this row is part of a multi-cell group from above (LADDER_INS_MULTI)
+            if ((*ladder_ctx).exec_network->cells[row][0].code == LADDER_INS_MULTI) {
+                row++;
                 continue;
             }
 
-            uint32_t row = 0;
-            while (row < (*ladder_ctx).exec_network->rows) {
-                uint32_t group_start = row;
+            // Detect the vertical group starting at this row (for stacked multi-cell)
+            uint32_t group_start = row;
+            uint32_t group_end = row;
+            while (group_end + 1 < (*ladder_ctx).exec_network->rows && (*ladder_ctx).exec_network->cells[group_end + 1][0].vertical_bar) {
+                group_end++;
+            }
 
-                // Tightened loop condition to prevent OOB access to cells[rows][column].
-                // Checks group_end + 1 < rows before deref, ensuring group_end never >= rows.
-                uint32_t group_end = group_start;
-                while (group_end + 1 < (*ladder_ctx).exec_network->rows && (*ladder_ctx).exec_network->cells[group_end + 1][column].vertical_bar) {
-                    group_end++;
+            // Detect if this is a lower branch (vertical_bar true in any column, but not if next row is MULTI for multi-cell distinction).
+            bool is_lower = false;
+            for (uint32_t c = 0; c < (*ladder_ctx).exec_network->cols; c++) {
+                if ((*ladder_ctx).exec_network->cells[row][c].vertical_bar) {
+                    bool is_multi = (row + 1 < (*ladder_ctx).exec_network->rows) && ((*ladder_ctx).exec_network->cells[row + 1][c].code == LADDER_INS_MULTI);
+                    if (!is_multi) {
+                        is_lower = true;
+                        break;
+                    }
+                }
+            }
+
+            // Initialize power for this rung/group (left rail energized for main rungs, false for lower branches)
+            bool rung_power = !is_lower;
+
+            // Inner loop: Scan left-to-right across columns for this rung
+            for (uint32_t column = 0; column < (*ladder_ctx).exec_network->cols; column++) {
+                // Re-detect group for consistency (assume vertical structure consistent across columns)
+                uint32_t col_group_end = group_start;
+                while (col_group_end + 1 < (*ladder_ctx).exec_network->rows && (*ladder_ctx).exec_network->cells[col_group_end + 1][column].vertical_bar) {
+                    col_group_end++;
+                }
+                // Note: In production, add check if col_group_end != group_end, set error if inconsistent
+
+                // Check if safe to skip this column for the rung
+                bool skip_safe = true;
+                for (uint32_t gr = group_start; gr <= col_group_end; gr++) {
+                    ladder_instruction_t code = (*ladder_ctx).exec_network->cells[gr][column].code;
+                    if (code == LADDER_INS_MULTI) {
+                        // Treat MULTI as potentially unsafe (part of multi-cell like timers/counters).
+                        skip_safe = false;
+                        break;
+                    }
+                    if (has_side_effects_on_false[code]) {
+                        skip_safe = false;
+                        break;
+                    }
                 }
 
-                // Execute instructions in group (using uniform group_input as left where needed)
+                // Short-circuit only if no power and column is safe to skip (no side effects)
+                if (!rung_power && skip_safe) {
+                    continue;
+                }
+
                 bool group_output = false;
                 bool group_error = false;
 
-                for (uint32_t gr = group_start; gr <= group_end; gr++) {
+                for (uint32_t gr = group_start; gr <= col_group_end; gr++) {
                     // Set current row for last instr tracking
                     uint32_t current_row_for_exec = gr;
 
@@ -240,29 +263,21 @@ void ladder_scan(ladder_ctx_t *ladder_ctx) {
 
                 // Captures multi-output settings (e.g., CTU sets state[row]=done, state[row+1]=overflow); used for power continuation.
                 group_output = false;
-                for (uint32_t gr = group_start; gr <= group_end; gr++) {
+                for (uint32_t gr = group_start; gr <= col_group_end; gr++) {
                     group_output |= (*ladder_ctx).exec_network->cells[gr][column].state;
                 }
 
                 // Set uniform group output to all rows in group (ORed flow to right)
-                for (uint32_t gr = group_start; gr <= group_end; gr++) {
+                for (uint32_t gr = group_start; gr <= col_group_end; gr++) {
                     (*(*ladder_ctx).exec_network).cells[gr][column].state = group_output;
                 }
-
-                // Advance to next group
-                row = group_end + 1;
             }
 
             if ((*ladder_ctx).on.scan_end != NULL)
                 (*ladder_ctx).on.scan_end(ladder_ctx);
 
-            has_power = false;
-            for (uint32_t r = 0; r < (*ladder_ctx).exec_network->rows; ++r) {
-                if ((*ladder_ctx).exec_network->cells[r][column].state) {
-                    has_power = true;
-                    break;
-                }
-            }
+            // Advance to next rung after processing the group
+            row = group_end + 1;
         }
     }
 }
