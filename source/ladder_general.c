@@ -197,7 +197,7 @@ void ladder_clear_program(ladder_ctx_t *ladder_ctx) {
 }
 
 bool ladder_ctx_init(ladder_ctx_t *ladder_ctx, uint8_t net_columns_qty, uint8_t net_rows_qty, uint32_t networks_qty, uint32_t qty_m, uint32_t qty_c,
-        uint32_t qty_t, uint32_t qty_d, uint32_t qty_r, uint32_t delay_not_run, uint32_t watchdog_ms, bool init_network, bool write_on_fault) {
+        uint32_t qty_t, uint32_t qty_d, uint32_t qty_r, uint32_t delay_not_run, uint32_t watchdog_ms, bool init_network, bool write_on_fault, uint64_t max_scan_cycles) {
     if (ladder_ctx == NULL)
         return false;
     if (net_rows_qty > LADDER_MAX_ROWS)
@@ -214,6 +214,7 @@ bool ladder_ctx_init(ladder_ctx_t *ladder_ctx, uint8_t net_columns_qty, uint8_t 
 
     ladder_ctx->scan_internals.actual_scan_time = 0;
     ladder_ctx->scan_internals.start_time = 0;
+    ladder_ctx->scan_internals.max_scan_cycles = max_scan_cycles;
 
     ladder_ctx->hw.io.read = NULL;
     ladder_ctx->hw.io.write = NULL;
@@ -370,6 +371,7 @@ bool ladder_ctx_init(ladder_ctx_t *ladder_ctx, uint8_t net_columns_qty, uint8_t 
     return true;
 
     cleanup:
+    ladder_ctx->ladder.state = LADDER_ST_ERROR;
     ladder_ctx_deinit(ladder_ctx);
     return false;
 }
@@ -706,8 +708,12 @@ bool ladder_add_foreign(ladder_ctx_t *ladder_ctx, _foreign_fn_init fn_init, void
     memset(&fn_new, 0, sizeof(ladder_foreign_function_t));
     fn_new.id = ladder_ctx->foreign.qty;
 
-    if (!fn_init(&fn_new, init_data, qty))
+    if (!fn_init(&fn_new, init_data, qty)) {
+        if (fn_new.deinit != NULL) {
+            fn_new.deinit(&fn_new);
+        }
         return false;
+    }
 
     void *tmp_fn = NULL;
     if (ladder_ctx->foreign.qty == 0)

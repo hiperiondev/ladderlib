@@ -347,9 +347,19 @@ static inline int32_t ladder_get_data_int32(ladder_ctx_t *lctx, uint32_t r, uint
             return lctx->output[mod].QW[port];
         }
         case LADDER_REGISTER_C:
-            return (int32_t) lctx->registers.C[val->value.i32];
+            uint32_t cv = lctx->registers.C[val->value.i32];
+            if (cv > (uint32_t) INT32_MAX) { // Overflow check for unsigned to signed cast
+                lctx->ladder.last.err = LADDER_INS_ERR_OVERFLOW;
+                return 0;
+            }
+            return (int32_t) cv;
         case LADDER_REGISTER_T:
-            return (int32_t) lctx->timers[val->value.i32].acc;  // Truncate u64 to i32 if needed
+            uint64_t acc = lctx->timers[val->value.i32].acc;  // Truncate u64 to i32 if needed
+            if (acc > (uint64_t) INT32_MAX) { // Overflow check consistent with ladder_get_data_value
+                lctx->ladder.last.err = LADDER_INS_ERR_OVERFLOW;
+                return 0;
+            }
+            return (int32_t) acc;
         case LADDER_REGISTER_D:
             return lctx->registers.D[val->value.i32];
         case LADDER_REGISTER_R:
@@ -456,5 +466,84 @@ static inline void ladder_set_data_value(ladder_ctx_t *ladder_ctx, uint32_t row,
         default:
             *error = LADDER_INS_ERR_SETDATAVAL;
             break;
+    }
+}
+
+static inline ladder_data_type_t get_effective_type(ladder_register_t reg_type) {
+    switch (reg_type) {
+        case LADDER_REGISTER_NONE:
+        case LADDER_REGISTER_D:
+        case LADDER_REGISTER_IW:
+        case LADDER_REGISTER_QW:
+            return LADDER_DATATYPE_I32;
+        case LADDER_REGISTER_R:
+            return LADDER_DATATYPE_REAL;
+        case LADDER_REGISTER_M:
+        case LADDER_REGISTER_Q:
+        case LADDER_REGISTER_I:
+        case LADDER_REGISTER_Cd:
+        case LADDER_REGISTER_Cr:
+        case LADDER_REGISTER_Td:
+        case LADDER_REGISTER_Tr:
+            return LADDER_DATATYPE_BOOL;
+        case LADDER_REGISTER_C:
+        case LADDER_REGISTER_T:
+            return LADDER_DATATYPE_U32;
+        case LADDER_REGISTER_S:
+            return LADDER_DATATYPE_CSTR;
+        default:
+            return LADDER_DATATYPE_BOOL; // Default to bool for unknown
+    }
+}
+
+static inline float ladder_get_data_float(ladder_ctx_t *lctx, uint32_t r, uint32_t c, uint32_t i) {
+    if (lctx == NULL || lctx->exec_network == NULL) {
+        return 0.0f;  // Safe default on invalid context
+    }
+    ladder_network_t *net = lctx->exec_network;
+    if (r >= net->rows || c >= net->cols || i >= net->cells[r][c].data_qty) {
+        return 0.0f;  // Safe default on OOB
+    }
+    ladder_register_t type = net->cells[r][c].data[i].type;
+    ladder_value_t *val = &net->cells[r][c].data[i];
+
+    switch (type) {
+        case LADDER_REGISTER_NONE:
+            return (float) val->value.i32;
+        case LADDER_REGISTER_M:
+        case LADDER_REGISTER_Q:
+        case LADDER_REGISTER_I:
+        case LADDER_REGISTER_Cd:
+        case LADDER_REGISTER_Cr:
+        case LADDER_REGISTER_Td:
+        case LADDER_REGISTER_Tr:
+            return (float) ladder_get_data_value(lctx, r, c, i);
+        case LADDER_REGISTER_IW: {
+            uint32_t mod = val->value.mp.module;
+            uint8_t port = val->value.mp.port;
+            if (mod >= lctx->hw.io.fn_read_qty)
+                return 0.0f;
+            return (float) lctx->input[mod].IW[port];
+        }
+        case LADDER_REGISTER_QW: {
+            uint32_t mod = val->value.mp.module;
+            uint8_t port = val->value.mp.port;
+            if (mod >= lctx->hw.io.fn_write_qty)
+                return 0.0f;
+            return (float) lctx->output[mod].QW[port];
+        }
+        case LADDER_REGISTER_C:
+            return (float) lctx->registers.C[val->value.i32];
+        case LADDER_REGISTER_T:
+            return (float) lctx->timers[val->value.i32].acc;
+        case LADDER_REGISTER_D:
+            return (float) lctx->registers.D[val->value.i32];
+        case LADDER_REGISTER_R:
+            return lctx->registers.R[val->value.i32];
+        case LADDER_REGISTER_S:
+            return 0.0f;  // Strings not numeric
+        case LADDER_REGISTER_INV:
+        default:
+            return 0.0f;
     }
 }

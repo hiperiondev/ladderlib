@@ -82,15 +82,14 @@ void ladder_task(void *ladderctx) {
             }
             wait_count++;
         }
+
         if (wait_count >= MAX_WAIT_CYCLES) {
             ladder_ctx->ladder.state = LADDER_ST_ERROR;
             // Invoke panic here after timeout, integrating it into the error path for consistency.
             if (ladder_ctx->on.panic != NULL)
                 ladder_ctx->on.panic(ladder_ctx);
-            // After panic (user recovery opportunity), force EXIT if still not RUNNING to prevent infinite loop on persistent ERROR/STOPPED.
-            if (ladder_ctx->ladder.state != LADDER_ST_RUNNING) {
-                ladder_ctx->ladder.state = LADDER_ST_EXIT_TSK;
-            }
+            // Unconditionally set to EXIT_TSK after panic to prevent potential infinite loop if panic doesn't recover state.
+            ladder_ctx->ladder.state = LADDER_ST_EXIT_TSK;
         }
 
         // Proceed only if now RUNNING (after wait or direct)
@@ -113,9 +112,26 @@ void ladder_task(void *ladderctx) {
         if (ladder_ctx->on.task_before != NULL)
             ladder_ctx->on.task_before(ladder_ctx);
 
+        // Input history copy moved BEFORE read loop to capture previous hardware values in Ih/IWh for edge detection.
+        // This ensures Ih = last cycle's I (previous), then read updates I to current.
+        // Copy for analog IW to IWh for consistency (though no edges on analogs).
+        if (ladder_ctx->hw.io.fn_read_qty > 0 && ladder_ctx->input != NULL) {
+            for (uint32_t n = 0; n < ladder_ctx->hw.io.fn_read_qty; n++) {
+                // Discrete inputs: Ih = previous I
+                if (ladder_ctx->input[n].i_qty > 0 && ladder_ctx->input[n].I != NULL && ladder_ctx->input[n].Ih != NULL) {
+                    memcpy(ladder_ctx->input[n].Ih, ladder_ctx->input[n].I, ladder_ctx->input[n].i_qty * sizeof(uint8_t));
+                }
+                // Analog inputs: IWh = previous IW (new addition for full snapshot symmetry)
+                if (ladder_ctx->input[n].iw_qty > 0 && ladder_ctx->input[n].IW != NULL && ladder_ctx->input[n].IWh != NULL) {
+                    memcpy(ladder_ctx->input[n].IWh, ladder_ctx->input[n].IW, ladder_ctx->input[n].iw_qty * sizeof(int32_t));
+                }
+            }
+        }
+
         // Per-entry NULL checks before loop.
         if (ladder_ctx->hw.io.fn_read_qty > 0 && ladder_ctx->hw.io.read != NULL) {
             for (uint32_t n = 0; n < ladder_ctx->hw.io.fn_read_qty; n++) {
+                // Runtime null check to prevent dereference if callback altered state
                 if (ladder_ctx->hw.io.read[n] == NULL) {
                     ladder_ctx->ladder.state = LADDER_ST_ERROR;
                     if (ladder_ctx->on.panic != NULL) {
@@ -127,14 +143,17 @@ void ladder_task(void *ladderctx) {
             }
         }
 
-        // Copy output history before scan to ensure RE/FE on outputs use pre-scan values (last cycle's final outputs).
-        // Input history is now updated at the end of the cycle for the next scan's edge detection.
+        // Copy for analog QW to QWh for consistency
         if (ladder_ctx->hw.io.fn_write_qty > 0 && ladder_ctx->hw.io.write != NULL && ladder_ctx->output != NULL) {
             for (uint32_t n = 0; n < ladder_ctx->hw.io.fn_write_qty; n++) {
                 if (ladder_ctx->output[n].Q == NULL || ladder_ctx->output[n].Qh == NULL) {
                     continue;  // Skip invalid module
                 }
                 memcpy(ladder_ctx->output[n].Qh, ladder_ctx->output[n].Q, ladder_ctx->output[n].q_qty * sizeof(uint8_t));
+                // Analog outputs: QWh = previous QW (new addition for full snapshot symmetry)
+                if (ladder_ctx->output[n].qw_qty > 0 && ladder_ctx->output[n].QW != NULL && ladder_ctx->output[n].QWh != NULL) {
+                    memcpy(ladder_ctx->output[n].QWh, ladder_ctx->output[n].QW, ladder_ctx->output[n].qw_qty * sizeof(int32_t));
+                }
             }
         }
 
@@ -142,22 +161,20 @@ void ladder_task(void *ladderctx) {
         ladder_scan(ladder_ctx);
         if (ladder_ctx->ladder.state == LADDER_ST_INV) {
             ladder_ctx->ladder.state = LADDER_ST_EXIT_TSK;
-            if (ladder_ctx->hw.io.fn_read_qty > 0 && ladder_ctx->hw.io.read != NULL) {
-                for (uint32_t n = 0; n < ladder_ctx->hw.io.fn_read_qty; n++) {
-                    if (ladder_ctx->hw.io.read[n] == NULL || ladder_ctx->input[n].I == NULL || ladder_ctx->input[n].Ih == NULL) {
-                        continue;
-                    }
-                    memcpy(ladder_ctx->input[n].Ih, ladder_ctx->input[n].I, ladder_ctx->input[n].i_qty * sizeof(uint8_t)); // Always copy current inputs to history
-                }
-            }
+
             if (ladder_ctx->hw.io.fn_write_qty > 0 && ladder_ctx->hw.io.write != NULL && ladder_ctx->output != NULL) {
                 for (uint32_t n = 0; n < ladder_ctx->hw.io.fn_write_qty; n++) {
                     if (ladder_ctx->output[n].Q == NULL || ladder_ctx->output[n].Qh == NULL) {
                         continue;
                     }
                     memcpy(ladder_ctx->output[n].Q, ladder_ctx->output[n].Qh, ladder_ctx->output[n].q_qty * sizeof(uint8_t));  // Revert Q to last good
+                    // Added: Revert QW to QWh for consistency (new)
+                    if (ladder_ctx->output[n].qw_qty > 0 && ladder_ctx->output[n].QW != NULL && ladder_ctx->output[n].QWh != NULL) {
+                        memcpy(ladder_ctx->output[n].QW, ladder_ctx->output[n].QWh, ladder_ctx->output[n].qw_qty * sizeof(int32_t));
+                    }
                 }
             }
+
             memcpy(ladder_ctx->memory.M, ladder_ctx->prev_scan_vals.Mh, ladder_ctx->ladder.quantity.m * sizeof(uint8_t));  // Revert M to last good
             memcpy(ladder_ctx->memory.Cd, ladder_ctx->prev_scan_vals.Cdh, ladder_ctx->ladder.quantity.c * sizeof(bool));  // Revert Cd
             memcpy(ladder_ctx->memory.Cr, ladder_ctx->prev_scan_vals.Crh, ladder_ctx->ladder.quantity.c * sizeof(bool));  // Revert Cr
@@ -194,6 +211,9 @@ void ladder_task(void *ladderctx) {
                         if (ladder_ctx->output[n].Qh != NULL && ladder_ctx->output[n].Q != NULL) {
                             memcpy(ladder_ctx->output[n].Qh, ladder_ctx->output[n].Q, ladder_ctx->output[n].q_qty * sizeof(uint8_t)); // Update history to cleared state
                         }
+                        if (ladder_ctx->output[n].QWh != NULL && ladder_ctx->output[n].QW != NULL) {
+                            memcpy(ladder_ctx->output[n].QWh, ladder_ctx->output[n].QW, ladder_ctx->output[n].qw_qty * sizeof(int32_t));
+                        }
                     }
                 }
             }
@@ -201,6 +221,7 @@ void ladder_task(void *ladderctx) {
             // Per-entry NULL checks before loop.
             if (ladder_ctx->hw.io.fn_write_qty > 0 && ladder_ctx->hw.io.write != NULL) {
                 for (uint32_t n = 0; n < ladder_ctx->hw.io.fn_write_qty; n++) {
+                    // Runtime null check to prevent dereference if callback altered state
                     if (ladder_ctx->hw.io.write[n] == NULL) {
                         ladder_ctx->ladder.state = LADDER_ST_ERROR;
                         if (ladder_ctx->on.panic != NULL) {
@@ -234,16 +255,6 @@ void ladder_task(void *ladderctx) {
                     break;  // Skip remaining writes
                 }
                 ladder_ctx->hw.io.write[n](ladder_ctx, n);
-            }
-        }
-
-        // ensuring the next cycle's edge detection compares new fresh inputs to this cycle's.
-        if (ladder_ctx->hw.io.fn_read_qty > 0 && ladder_ctx->input != NULL) {
-            for (uint32_t n = 0; n < ladder_ctx->hw.io.fn_read_qty; n++) {
-                if (ladder_ctx->input[n].I == NULL || ladder_ctx->input[n].Ih == NULL) {
-                    continue;
-                }
-                memcpy(ladder_ctx->input[n].Ih, ladder_ctx->input[n].I, ladder_ctx->input[n].i_qty * sizeof(uint8_t));
             }
         }
 

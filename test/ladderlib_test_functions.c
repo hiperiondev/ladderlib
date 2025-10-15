@@ -40,197 +40,267 @@
 #include "ladder.h"
 #include "ladder_internals.h"
 
-uint8_t test_fn_ADD(void) {
+#define TEST_QTY_M  18
+#define TEST_QTY_C  8
+#define TEST_QTY_T  8
+#define TEST_QTY_D  8
+#define TEST_QTY_R  8
+
+uint8_t assert_count = 0;
+ladder_ctx_t ladder_ctx;
+
+/////////////////////////////////////////////////////////////////
+
+void test_delay(long msec) {
+}
+
+uint64_t test_millis(void) {
     return 0;
 }
 
-uint8_t test_fn_AND(void) {
-    return 0;
+void test_read(ladder_ctx_t *ladder_ctx, uint32_t id) {
 }
 
-uint8_t test_fn_COIL(void) {
-    return 0;
+void test_write(ladder_ctx_t *ladder_ctx, uint32_t id) {
 }
 
-uint8_t test_fn_COILL(void) {
-    return 0;
+bool test_on_scan_end(ladder_ctx_t *ladder_ctx) {
+    return false;
 }
 
-uint8_t test_fn_COILU(void) {
-    return 0;
+bool test_on_instruction(ladder_ctx_t *ladder_ctx) {
+    return false;
 }
 
-uint8_t test_fn_CONN(void) {
-    return 0;
+bool test_on_task_before(ladder_ctx_t *ladder_ctx) {
+    return false;
 }
 
-uint8_t test_fn_CTD(void) {
-    return 0;
+bool test_on_task_after(ladder_ctx_t *ladder_ctx) {
+    return false;
 }
 
-uint8_t test_fn_CTU(void) {
-    return 0;
+void test_on_panic(ladder_ctx_t *ladder_ctx) {
 }
 
-uint8_t test_fn_DIV(void) {
-    return 0;
+void test_on_end_task(ladder_ctx_t *ladder_ctx) {
 }
 
-uint8_t test_fn_EQ(void) {
-    return 0;
+bool test_init_read(ladder_ctx_t *ladder_ctx, uint32_t id, bool init) {
+    return true;
 }
 
-uint8_t test_fn_FE(void) {
-    return 0;
+bool test_init(void) {
+
+    // initialize context
+    if (!ladder_ctx_init(&ladder_ctx, 6, 7, 3, TEST_QTY_M, TEST_QTY_C, TEST_QTY_T, TEST_QTY_D, TEST_QTY_R, 10, 0, true, true, 1000000UL)) {
+        printf("ERROR Initializing\n");
+        return 1;
+    }
+
+    return false;
 }
 
-uint8_t test_fn_FOREIGN(void) {
-    return 0;
+bool test_deinit(void) {
+    return false;
 }
 
-uint8_t test_fn_GE(void) {
-    return 0;
+/////////////////////////////////////////////////////////////////
+
+void test_fn_ADD(void) {
+
 }
 
-uint8_t test_fn_GT(void) {
-    return 0;
+void test_fn_AND(void) {
+
 }
 
-uint8_t test_fn_LE(void) {
-    return 0;
+void test_fn_COIL(void) {
+
 }
 
-uint8_t test_fn_LT(void) {
-    return 0;
+void test_fn_COILL(void) {
+
 }
 
-uint8_t test_fn_MOD(void) {
-    return 0;
+void test_fn_COILU(void) {
+
 }
 
-uint8_t test_fn_MOVE(void) {
-    return 0;
+void test_fn_CONN(void) {
+
 }
 
-uint8_t test_fn_MUL(void) {
-    return 0;
+void test_fn_CTD(void) {
+
 }
 
-uint8_t test_fn_NC(void) {
-    return 0;
+void test_fn_CTU(void) {
+
 }
 
-uint8_t test_fn_NE(void) {
-    return 0;
+void test_fn_DIV(void) {
+
 }
 
-uint8_t test_fn_NEG(void) {
-    return 0;
+void test_fn_EQ(void) {
+
 }
 
-uint8_t test_fn_NO(void) {
-    return 0;
+void test_fn_FE(void) {
+
 }
 
-uint8_t test_fn_NOP(void) {
-    return 0;
+void test_fn_FOREIGN(void) {
+
 }
 
-uint8_t test_fn_NOT(void) {
-    return 0;
+void test_fn_GE(void) {
+
 }
 
-uint8_t test_fn_OR(void) {
-    return 0;
+void test_fn_GT(void) {
+
 }
 
-uint8_t test_fn_RE(void) {
-    return 0;
+void test_fn_LE(void) {
+
 }
 
-uint8_t test_fn_ROL(void) {
-    return 0;
+void test_fn_LT(void) {
+
 }
 
-uint8_t test_fn_ROR(void) {
-    return 0;
+void test_fn_MOD(void) {
+
 }
 
-uint8_t test_fn_SHL(void) {
-    return 0;
+void test_fn_MOVE(void) {
+
 }
 
-uint8_t test_fn_SHR(void) {
-    return 0;
+void test_fn_MUL(void) {
+
 }
 
-uint8_t test_fn_SUB(void) {
-    return 0;
+void test_fn_NC(void) {
+
 }
 
-uint8_t test_fn_TMOVE(void) {
-    return 0;
+void test_fn_NE(void) {
+
 }
 
-uint8_t test_fn_TOF(void) {
-    return 0;
+void test_fn_NEG(void) {
+
 }
 
-uint8_t test_fn_TON(void) {
-    return 0;
+void test_fn_NO(void) {
+
 }
 
-uint8_t test_fn_TP(void) {
-    return 0;
+void test_fn_NOP(void) {
+
 }
 
-uint8_t test_fn_XOR(void) {
-    return 0;
+void test_fn_NOT(void) {
+
 }
+
+void test_fn_OR(void) {
+
+}
+
+void test_fn_RE(void) {
+
+}
+
+void test_fn_ROL(void) {
+
+}
+
+void test_fn_ROR(void) {
+
+}
+
+void test_fn_SHL(void) {
+
+}
+
+void test_fn_SHR(void) {
+
+}
+
+void test_fn_SUB(void) {
+
+}
+
+void test_fn_TMOVE(void) {
+
+}
+
+void test_fn_TOF(void) {
+
+}
+
+void test_fn_TON(void) {
+
+}
+
+void test_fn_TP(void) {
+
+}
+
+void test_fn_XOR(void) {
+
+}
+
+/////////////////////////////////////////////////////////////////
 
 bool test_ladder_instructions(void) {
-    uint8_t err = 0;
+    // clear screen
+    printf("\e[1;1H\e[2J");
 
-    err += test_fn_ADD();
-    err += test_fn_AND();
-    err += test_fn_COIL();
-    err += test_fn_COILL();
-    err += test_fn_COILU();
-    err += test_fn_CONN();
-    err += test_fn_CTD();
-    err += test_fn_CTU();
-    err += test_fn_DIV();
-    err += test_fn_EQ();
-    err += test_fn_FE();
-    err += test_fn_FOREIGN();
-    err += test_fn_GE();
-    err += test_fn_GT();
-    err += test_fn_LE();
-    err += test_fn_LT();
-    err += test_fn_MOD();
-    err += test_fn_MOVE();
-    err += test_fn_MUL();
-    err += test_fn_NC();
-    err += test_fn_NE();
-    err += test_fn_NEG();
-    err += test_fn_NO();
-    err += test_fn_NOP();
-    err += test_fn_NOT();
-    err += test_fn_OR();
-    err += test_fn_RE();
-    err += test_fn_ROL();
-    err += test_fn_ROR();
-    err += test_fn_SHL();
-    err += test_fn_SHR();
-    err += test_fn_SUB();
-    err += test_fn_TMOVE();
-    err += test_fn_TOF();
-    err += test_fn_TON();
-    err += test_fn_TP();
-    err += test_fn_XOR();
+    test_fn_ADD();
+    test_fn_AND();
+    test_fn_COIL();
+    test_fn_COILL();
+    test_fn_COILU();
+    test_fn_CONN();
+    test_fn_CTD();
+    test_fn_CTU();
+    test_fn_DIV();
+    test_fn_EQ();
+    test_fn_FE();
+    test_fn_FOREIGN();
+    test_fn_GE();
+    test_fn_GT();
+    test_fn_LE();
+    test_fn_LT();
+    test_fn_MOD();
+    test_fn_MOVE();
+    test_fn_MUL();
+    test_fn_NC();
+    test_fn_NE();
+    test_fn_NEG();
+    test_fn_NO();
+    test_fn_NOP();
+    test_fn_NOT();
+    test_fn_OR();
+    test_fn_RE();
+    test_fn_ROL();
+    test_fn_ROR();
+    test_fn_SHL();
+    test_fn_SHR();
+    test_fn_SUB();
+    test_fn_TMOVE();
+    test_fn_TOF();
+    test_fn_TON();
+    test_fn_TP();
+    test_fn_XOR();
 
-    if (err != 0) {
-        printf("ERROR: %d tests fails\n\n", err);
+    if (assert_count != 0) {
+        printf("ERROR: %d tests fails\n\n", assert_count);
         return false;
     }
 

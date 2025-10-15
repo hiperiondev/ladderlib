@@ -35,6 +35,17 @@
 
 #include <stdbool.h>
 
+#define TEST_ASSERT(condition, message, assert_count)     \
+    {                                                     \
+        ++(assert_count);                                 \
+        printf("\033[0;31m[%04d] ");                      \
+        if (!(condition))                                 \
+            printf("FAIL: ");                             \
+        else                                              \
+            printf("PASS: ");                             \
+        printf("%s\033[0m\n", (assert_count), (message)); \
+    }
+
 bool test_ladder_instructions(void);
 
 #endif /* LADDERLIB_TEST_FUNCTIONS_H_ */

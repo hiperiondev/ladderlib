@@ -33,7 +33,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "fn_commons.h"
+#include "ladder_fn_commons.h"
 #include "ladder.h"
 #include "ladder_internals.h"
 #include "ladder_instructions.h"

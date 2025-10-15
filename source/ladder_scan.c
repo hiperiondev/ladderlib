@@ -141,11 +141,32 @@ void ladder_scan(ladder_ctx_t *ladder_ctx) {
     }
 #endif
 
+    // Early null check for network array to prevent dereference
+    if (ladder_ctx->network == NULL) {
+        ladder_ctx->ladder.state = LADDER_ST_ERROR;
+        if (ladder_ctx->on.panic != NULL) {
+            ladder_ctx->on.panic(ladder_ctx);
+        }
+        return;
+    }
+
+    // Cycle counter for preventive watchdog to detect excessive iterations (e.g., infinite loops)
+    uint64_t cycle_count = 0;
+
     for (network = 0; network < (*ladder_ctx).ladder.quantity.networks; network++) {
         if (!(*ladder_ctx).network[network].enable)
             continue;
 
         (*ladder_ctx).exec_network = &((*ladder_ctx).network[network]);
+
+        // Null check for exec_network cells before clearing states
+        if ((*ladder_ctx).exec_network->cells == NULL) {
+            (*ladder_ctx).ladder.state = LADDER_ST_ERROR;
+            if ((*ladder_ctx).on.panic != NULL) {
+                (*ladder_ctx).on.panic(ladder_ctx);
+            }
+            return;
+        }
 
         // Clear all cell states to ensure fresh evaluation each scan cycle
         // This prevents retention of states from previous scans, which could lead to incorrect power flow
@@ -160,6 +181,17 @@ void ladder_scan(ladder_ctx_t *ladder_ctx) {
         // Advance row past the group after processing the entire rung across columns.
         uint32_t row = 0;
         while (row < (*ladder_ctx).exec_network->rows) {
+            //  Increment cycle counter for outer row loop and check against max to prevent infinite loops
+            ++cycle_count;
+            if (cycle_count > ladder_ctx->scan_internals.max_scan_cycles) {
+                ladder_ctx->ladder.state = LADDER_ST_ERROR;
+                ladder_ctx->ladder.last.err = LADDER_INS_ERR_OVERFLOW;  // Reuse overflow error for cycle limit
+                if (ladder_ctx->on.panic != NULL) {
+                    ladder_ctx->on.panic(ladder_ctx);
+                }
+                return;  // Abort scan early
+            }
+
             // Skip if this row is part of a multi-cell group from above (LADDER_INS_MULTI)
             if ((*ladder_ctx).exec_network->cells[row][0].code == LADDER_INS_MULTI) {
                 row++;
@@ -200,6 +232,17 @@ void ladder_scan(ladder_ctx_t *ladder_ctx) {
                 // Check if safe to skip this column for the rung
                 bool skip_safe = true;
                 for (uint32_t gr = group_start; gr <= col_group_end; gr++) {
+                    // Increment cycle counter for group processing loop and check against max to prevent infinite loops
+                    ++cycle_count;
+                    if (cycle_count > ladder_ctx->scan_internals.max_scan_cycles) {
+                        ladder_ctx->ladder.state = LADDER_ST_ERROR;
+                        ladder_ctx->ladder.last.err = LADDER_INS_ERR_OVERFLOW;  // Reuse overflow error for cycle limit
+                        if (ladder_ctx->on.panic != NULL) {
+                            ladder_ctx->on.panic(ladder_ctx);
+                        }
+                        return;  // Abort scan early
+                    }
+
                     ladder_instruction_t code = (*ladder_ctx).exec_network->cells[gr][column].code;
                     if (code == LADDER_INS_MULTI) {
                         // Treat MULTI as potentially unsafe (part of multi-cell like timers/counters).
