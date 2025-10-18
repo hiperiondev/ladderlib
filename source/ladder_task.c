@@ -112,19 +112,32 @@ void ladder_task(void *ladderctx) {
         if (ladder_ctx->on.task_before != NULL)
             ladder_ctx->on.task_before(ladder_ctx);
 
+        // Pre-loop guard for input array null when qty > 0
+        if (ladder_ctx->hw.io.fn_read_qty > 0 && ladder_ctx->input == NULL) {
+            ladder_ctx->ladder.state = LADDER_ST_ERROR;
+            if (ladder_ctx->on.panic != NULL) {
+                ladder_ctx->on.panic(ladder_ctx);
+            }
+            continue;  // Skip reads to avoid crash
+        }
+
         // Input history copy moved BEFORE read loop to capture previous hardware values in Ih/IWh for edge detection.
         // This ensures Ih = last cycle's I (previous), then read updates I to current.
         // Copy for analog IW to IWh for consistency (though no edges on analogs).
         if (ladder_ctx->hw.io.fn_read_qty > 0 && ladder_ctx->input != NULL) {
             for (uint32_t n = 0; n < ladder_ctx->hw.io.fn_read_qty; n++) {
+                // Per-module null/zero-qty checks before memcpy to skip invalid
+                if (ladder_ctx->input[n].i_qty == 0 || ladder_ctx->input[n].I == NULL || ladder_ctx->input[n].Ih == NULL) {
+                    continue;
+                }
                 // Discrete inputs: Ih = previous I
-                if (ladder_ctx->input[n].i_qty > 0 && ladder_ctx->input[n].I != NULL && ladder_ctx->input[n].Ih != NULL) {
-                    memcpy(ladder_ctx->input[n].Ih, ladder_ctx->input[n].I, ladder_ctx->input[n].i_qty * sizeof(uint8_t));
+                memcpy(ladder_ctx->input[n].Ih, ladder_ctx->input[n].I, ladder_ctx->input[n].i_qty * sizeof(uint8_t));
+                // Similar check for analog
+                if (ladder_ctx->input[n].iw_qty == 0 || ladder_ctx->input[n].IW == NULL || ladder_ctx->input[n].IWh == NULL) {
+                    continue;
                 }
                 // Analog inputs: IWh = previous IW (new addition for full snapshot symmetry)
-                if (ladder_ctx->input[n].iw_qty > 0 && ladder_ctx->input[n].IW != NULL && ladder_ctx->input[n].IWh != NULL) {
-                    memcpy(ladder_ctx->input[n].IWh, ladder_ctx->input[n].IW, ladder_ctx->input[n].iw_qty * sizeof(int32_t));
-                }
+                memcpy(ladder_ctx->input[n].IWh, ladder_ctx->input[n].IW, ladder_ctx->input[n].iw_qty * sizeof(int32_t));
             }
         }
 
@@ -143,17 +156,28 @@ void ladder_task(void *ladderctx) {
             }
         }
 
-        // Copy for analog QW to QWh for consistency
-        if (ladder_ctx->hw.io.fn_write_qty > 0 && ladder_ctx->hw.io.write != NULL && ladder_ctx->output != NULL) {
+        // Pre-loop guard for output array null when qty > 0
+        if (ladder_ctx->hw.io.fn_write_qty > 0 && ladder_ctx->output == NULL) {
+            ladder_ctx->ladder.state = LADDER_ST_ERROR;
+            if (ladder_ctx->on.panic != NULL) {
+                ladder_ctx->on.panic(ladder_ctx);
+            }
+            continue;  // Skip writes to avoid crash
+        }
+
+        // Output history copy (symmetric to inputs)
+        if (ladder_ctx->hw.io.fn_write_qty > 0 && ladder_ctx->output != NULL) {
             for (uint32_t n = 0; n < ladder_ctx->hw.io.fn_write_qty; n++) {
-                if (ladder_ctx->output[n].Q == NULL || ladder_ctx->output[n].Qh == NULL) {
-                    continue;  // Skip invalid module
+                // Per-module null/zero-qty checks before memcpy
+                if (ladder_ctx->output[n].q_qty == 0 || ladder_ctx->output[n].Q == NULL || ladder_ctx->output[n].Qh == NULL) {
+                    continue;
                 }
                 memcpy(ladder_ctx->output[n].Qh, ladder_ctx->output[n].Q, ladder_ctx->output[n].q_qty * sizeof(uint8_t));
-                // Analog outputs: QWh = previous QW (new addition for full snapshot symmetry)
-                if (ladder_ctx->output[n].qw_qty > 0 && ladder_ctx->output[n].QW != NULL && ladder_ctx->output[n].QWh != NULL) {
-                    memcpy(ladder_ctx->output[n].QWh, ladder_ctx->output[n].QW, ladder_ctx->output[n].qw_qty * sizeof(int32_t));
+                // Similar for analog
+                if (ladder_ctx->output[n].qw_qty == 0 || ladder_ctx->output[n].QW == NULL || ladder_ctx->output[n].QWh == NULL) {
+                    continue;
                 }
+                memcpy(ladder_ctx->output[n].QWh, ladder_ctx->output[n].QW, ladder_ctx->output[n].qw_qty * sizeof(int32_t));
             }
         }
 
@@ -162,16 +186,18 @@ void ladder_task(void *ladderctx) {
         if (ladder_ctx->ladder.state == LADDER_ST_INV) {
             ladder_ctx->ladder.state = LADDER_ST_EXIT_TSK;
 
-            if (ladder_ctx->hw.io.fn_write_qty > 0 && ladder_ctx->hw.io.write != NULL && ladder_ctx->output != NULL) {
+            // Checks before revert loops to skip if invalid
+            if (ladder_ctx->hw.io.fn_write_qty > 0 && ladder_ctx->output != NULL) {
                 for (uint32_t n = 0; n < ladder_ctx->hw.io.fn_write_qty; n++) {
-                    if (ladder_ctx->output[n].Q == NULL || ladder_ctx->output[n].Qh == NULL) {
+                    if (ladder_ctx->output[n].q_qty == 0 || ladder_ctx->output[n].Q == NULL || ladder_ctx->output[n].Qh == NULL) {
                         continue;
                     }
                     memcpy(ladder_ctx->output[n].Q, ladder_ctx->output[n].Qh, ladder_ctx->output[n].q_qty * sizeof(uint8_t));  // Revert Q to last good
                     // Added: Revert QW to QWh for consistency (new)
-                    if (ladder_ctx->output[n].qw_qty > 0 && ladder_ctx->output[n].QW != NULL && ladder_ctx->output[n].QWh != NULL) {
-                        memcpy(ladder_ctx->output[n].QW, ladder_ctx->output[n].QWh, ladder_ctx->output[n].qw_qty * sizeof(int32_t));
+                    if (ladder_ctx->output[n].qw_qty == 0 || ladder_ctx->output[n].QW == NULL || ladder_ctx->output[n].QWh == NULL) {
+                        continue;
                     }
+                    memcpy(ladder_ctx->output[n].QW, ladder_ctx->output[n].QWh, ladder_ctx->output[n].qw_qty * sizeof(int32_t));
                 }
             }
 
@@ -202,12 +228,15 @@ void ladder_task(void *ladderctx) {
             if (!ladder_ctx->ladder.write_on_fault) {
                 if (ladder_ctx->hw.io.fn_write_qty > 0 && ladder_ctx->output != NULL) {
                     for (uint32_t n = 0; n < ladder_ctx->hw.io.fn_write_qty; n++) {
-                        if (ladder_ctx->output[n].Q != NULL) {
-                            memset(ladder_ctx->output[n].Q, 0, ladder_ctx->output[n].q_qty * sizeof(uint8_t));
+                        // Per-module checks before memset/memcpy
+                        if (ladder_ctx->output[n].q_qty == 0 || ladder_ctx->output[n].Q == NULL) {
+                            continue;
                         }
-                        if (ladder_ctx->output[n].QW != NULL) {
-                            memset(ladder_ctx->output[n].QW, 0, ladder_ctx->output[n].qw_qty * sizeof(int32_t));
+                        memset(ladder_ctx->output[n].Q, 0, ladder_ctx->output[n].q_qty * sizeof(uint8_t));
+                        if (ladder_ctx->output[n].qw_qty == 0 || ladder_ctx->output[n].QW == NULL) {
+                            continue;
                         }
+                        memset(ladder_ctx->output[n].QW, 0, ladder_ctx->output[n].qw_qty * sizeof(int32_t));
                         if (ladder_ctx->output[n].Qh != NULL && ladder_ctx->output[n].Q != NULL) {
                             memcpy(ladder_ctx->output[n].Qh, ladder_ctx->output[n].Q, ladder_ctx->output[n].q_qty * sizeof(uint8_t)); // Update history to cleared state
                         }
@@ -259,6 +288,13 @@ void ladder_task(void *ladderctx) {
         }
 
         ladder_scan_time(ladder_ctx);
+
+        // Pad to target scan cycle if enabled and actual < target
+        if (ladder_ctx->scan_internals.target_scan_ms
+                > 0&& ladder_ctx->scan_internals.actual_scan_time < ladder_ctx->scan_internals.target_scan_ms && ladder_ctx->hw.time.delay != NULL) {
+            uint64_t pad_ms = ladder_ctx->scan_internals.target_scan_ms - ladder_ctx->scan_internals.actual_scan_time;
+            ladder_ctx->hw.time.delay(pad_ms);
+        }
 
         // external function after scan
         if (ladder_ctx->on.task_after != NULL)

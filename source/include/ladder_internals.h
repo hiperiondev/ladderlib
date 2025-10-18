@@ -35,8 +35,25 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+#include <string.h>
 
 #include "ladder.h"
+
+/**
+ * @fn static inline bool safe_memcpy(void *dst, size_t dst_len, const void *src, size_t n
+ * @brief Safe memcpy
+ */
+static inline bool safe_memcpy(void *dst, size_t dst_len, const void *src, size_t n) {
+    if (dst == NULL || src == NULL)
+        return false;
+
+    if (n > dst_len)
+        return false;
+
+    memcpy(dst, src, n);
+
+    return true;
+}
 
 /**
  * @fn void ladder_clear_memory(ladder_ctx_t *ladder_ctx)
@@ -82,6 +99,6 @@ void ladder_save_previous_values(ladder_ctx_t *ladder_ctx);
  * @param error Error status
  * @return Status
  */
-void ladder_set_data_value(ladder_ctx_t *ladder_ctx, uint32_t row, uint32_t column, uint32_t pos, void *value, uint8_t *error);
+void ladder_set_data_value(ladder_ctx_t *ladder_ctx, uint32_t row, uint32_t column, uint32_t pos, void *value, ladder_ins_err_t *error);
 
 #endif /* LADDER_INTERNALS_H */

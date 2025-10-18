@@ -125,23 +125,23 @@ static const bool has_side_effects_on_false[LADDER_INS_INV] = { //
 
 void ladder_scan(ladder_ctx_t *ladder_ctx) {
     uint32_t network = 0;
-
+    ladder_ctx->exec_network = NULL;
 #ifdef OPTIONAL_CRON
-    // Auto_reset clearing before evaluation to prevent race conditions where set flags are immediately cleared, ensuring triggers are not missed in fast scans.
-    // clean auto reset cron registers
-    if ((ladderlib_cron_t*) (*ladder_ctx).cron != NULL)
-        for (uint32_t n = 0; n < ((ladderlib_cron_t*) (*ladder_ctx).cron)->used; n++)
-            if (((ladderlib_cron_t*) (*ladder_ctx).cron)->ctx[n].enabled && ((ladderlib_cron_t*) (*ladder_ctx).cron)->ctx[n].auto_reset)
-                (*ladder_ctx).memory.M[((ladderlib_cron_t*) (*ladder_ctx).cron)->ctx[n].flag_reg] = false;
-
-    // evaluate cron for actual time
-    if (ladderlib_cron_eval(ladder_ctx) != LADDER_INS_ERR_OK) {
-        (*ladder_ctx).ladder.state = LADDER_ST_INV;
-        return;
+// Auto_reset clearing before evaluation to prevent race conditions where set flags are immediately cleared, ensuring triggers are not missed in fast scans.
+// clean auto reset cron registers
+    if ((ladderlib_cron_t*) (ladder_ctx->cron) != NULL) {
+        for (uint32_t n = 0; n < ((ladderlib_cron_t*) (ladder_ctx->cron))->used; n++)
+            if (((ladderlib_cron_t*) (ladder_ctx->cron))->ctx[n].enabled && ((ladderlib_cron_t*) (ladder_ctx->cron))->ctx[n].auto_reset)
+                ladder_ctx->memory.M[((ladderlib_cron_t*) (ladder_ctx->cron))->ctx[n].flag_reg] = false;
+// evaluate cron for actual time
+        if (ladderlib_cron_eval(ladder_ctx) != LADDER_INS_ERR_OK) {
+            ladder_ctx->ladder.state = LADDER_ST_INV;
+            return;
+        }
     }
 #endif
 
-    // Early null check for network array to prevent dereference
+// Early null check for network array to prevent dereference
     if (ladder_ctx->network == NULL) {
         ladder_ctx->ladder.state = LADDER_ST_ERROR;
         if (ladder_ctx->on.panic != NULL) {
@@ -149,40 +149,41 @@ void ladder_scan(ladder_ctx_t *ladder_ctx) {
         }
         return;
     }
-
-    // Cycle counter for preventive watchdog to detect excessive iterations (e.g., infinite loops)
     uint64_t cycle_count = 0;
-
-    for (network = 0; network < (*ladder_ctx).ladder.quantity.networks; network++) {
-        if (!(*ladder_ctx).network[network].enable)
-            continue;
-
-        (*ladder_ctx).exec_network = &((*ladder_ctx).network[network]);
-
-        // Null check for exec_network cells before clearing states
-        if ((*ladder_ctx).exec_network->cells == NULL) {
-            (*ladder_ctx).ladder.state = LADDER_ST_ERROR;
-            if ((*ladder_ctx).on.panic != NULL) {
-                (*ladder_ctx).on.panic(ladder_ctx);
+    for (network = 0; network < ladder_ctx->ladder.quantity.networks; network++) {
+// Reset cycle_count to 0 at the start of each network to monitor per-network iterations independently,
+// preventing false overflows in multi-network programs and aligning with granular watchdog practices in PLCs.
+        cycle_count = 0;
+// Unconditional null check for cells before accessing enable, to catch corruption even in disabled networks
+        if (ladder_ctx->network[network].cells == NULL) {
+            ladder_ctx->ladder.state = LADDER_ST_ERROR;
+            if (ladder_ctx->on.panic != NULL) {
+                ladder_ctx->on.panic(ladder_ctx);
             }
             return;
         }
+        if (!ladder_ctx->network[network].enable)
+            continue;
+        ladder_ctx->exec_network = &(ladder_ctx->network[network]);
 
-        // Clear all cell states to ensure fresh evaluation each scan cycle
-        // This prevents retention of states from previous scans, which could lead to incorrect power flow
-        for (uint32_t column = 0; column < (*ladder_ctx).exec_network->cols; column++) {
-            for (uint32_t row = 0; row < (*ladder_ctx).exec_network->rows; row++) {
-                (*ladder_ctx).exec_network->cells[row][column].state = false;
+// Clear all cell states to ensure fresh evaluation each scan cycle
+// This prevents retention of states from previous scans, which could lead to incorrect power flow
+        for (uint32_t column = 0; column < ladder_ctx->exec_network->cols; column++) {
+            for (uint32_t row = 0; row < ladder_ctx->exec_network->rows; row++) {
+                ladder_ctx->exec_network->cells[row][column].state = false;
             }
         }
-
-        // Row-major order (outer loop on rows, inner on columns) for independent rung evaluation.
-        // Each vertical group is treated as a separate rung with its own power flow, starting from true (left rail).
-        // Advance row past the group after processing the entire rung across columns.
         uint32_t row = 0;
-        while (row < (*ladder_ctx).exec_network->rows) {
-            //  Increment cycle counter for outer row loop and check against max to prevent infinite loops
+        while (row < ladder_ctx->exec_network->rows) {
+// Increment cycle counter for row processing loop and check against max to prevent infinite loops
             ++cycle_count;
+// Check for near-threshold (80% of max) to log potential high-usage via panic callback,
+// allowing diagnostics without immediate fault, as recommended in embedded watchdog best practices.
+            if (cycle_count > (ladder_ctx->scan_internals.max_scan_cycles * 0.8)) {
+                if (ladder_ctx->on.panic != NULL) {
+                    ladder_ctx->on.panic(ladder_ctx);  // Used as warning; future: add dedicated on.warning.
+                }
+            }
             if (cycle_count > ladder_ctx->scan_internals.max_scan_cycles) {
                 ladder_ctx->ladder.state = LADDER_ST_ERROR;
                 ladder_ctx->ladder.last.err = LADDER_INS_ERR_OVERFLOW;  // Reuse overflow error for cycle limit
@@ -191,61 +192,60 @@ void ladder_scan(ladder_ctx_t *ladder_ctx) {
                 }
                 return;  // Abort scan early
             }
-
-            // Skip if this row is part of a multi-cell group from above (LADDER_INS_MULTI)
-            if ((*ladder_ctx).exec_network->cells[row][0].code == LADDER_INS_MULTI) {
+// Skip if this row is part of a multi-cell group from above (LADDER_INS_MULTI)
+            if (ladder_ctx->exec_network->cells[row][0].code == LADDER_INS_MULTI) {
                 row++;
                 continue;
             }
-
-            // Detect the vertical group starting at this row (for stacked multi-cell)
+// Detect the vertical group starting at this row (for stacked multi-cell)
             uint32_t group_start = row;
             uint32_t group_end = row;
-            while (group_end + 1 < (*ladder_ctx).exec_network->rows && (*ladder_ctx).exec_network->cells[group_end + 1][0].vertical_bar) {
+            while (group_end + 1 < ladder_ctx->exec_network->rows && ladder_ctx->exec_network->cells[group_end + 1][0].vertical_bar) {
                 group_end++;
             }
-
-            // Detect if this is a lower branch (vertical_bar true in any column, but not if next row is MULTI for multi-cell distinction).
+// Detect if this is a lower branch (vertical_bar true in any column, but not if next row is MULTI for multi-cell distinction).
             bool is_lower = false;
-            for (uint32_t c = 0; c < (*ladder_ctx).exec_network->cols; c++) {
-                if ((*ladder_ctx).exec_network->cells[row][c].vertical_bar) {
-                    bool is_multi = (row + 1 < (*ladder_ctx).exec_network->rows) && ((*ladder_ctx).exec_network->cells[row + 1][c].code == LADDER_INS_MULTI);
+            for (uint32_t c = 0; c < ladder_ctx->exec_network->cols; c++) {
+                if (ladder_ctx->exec_network->cells[row][c].vertical_bar) {
+                    bool is_multi = (row + 1 < ladder_ctx->exec_network->rows) && (ladder_ctx->exec_network->cells[row + 1][c].code == LADDER_INS_MULTI);
                     if (!is_multi) {
                         is_lower = true;
                         break;
                     }
                 }
             }
-
-            // Initialize power for this rung/group (left rail energized for main rungs, false for lower branches)
+// Initialize power for this rung/group (left rail energized for main rungs, false for lower branches)
             bool rung_power = !is_lower;
-
-            // Inner loop: Scan left-to-right across columns for this rung
-            for (uint32_t column = 0; column < (*ladder_ctx).exec_network->cols; column++) {
-                // Re-detect group for consistency (assume vertical structure consistent across columns)
+// Inner loop: Scan left-to-right across columns for this rung
+            for (uint32_t column = 0; column < ladder_ctx->exec_network->cols; column++) {
+// Re-detect group for consistency (assume vertical structure consistent across columns)
                 uint32_t col_group_end = group_start;
-                while (col_group_end + 1 < (*ladder_ctx).exec_network->rows && (*ladder_ctx).exec_network->cells[col_group_end + 1][column].vertical_bar) {
+                while (col_group_end + 1 < ladder_ctx->exec_network->rows && ladder_ctx->exec_network->cells[col_group_end + 1][column].vertical_bar) {
                     col_group_end++;
                 }
-                // Note: In production, add check if col_group_end != group_end, set error if inconsistent
-
-                // Check if safe to skip this column for the rung
+// Check if safe to skip this column for the rung
                 bool skip_safe = true;
                 for (uint32_t gr = group_start; gr <= col_group_end; gr++) {
-                    // Increment cycle counter for group processing loop and check against max to prevent infinite loops
+// Increment cycle counter for group processing loop and check against max to prevent infinite loops
                     ++cycle_count;
+// Check for near-threshold (80% of max) to log potential high-usage via panic callback,
+// allowing diagnostics without immediate fault, as recommended in embedded watchdog best practices.
+                    if (cycle_count > (ladder_ctx->scan_internals.max_scan_cycles * 0.8)) {
+                        if (ladder_ctx->on.panic != NULL) {
+                            ladder_ctx->on.panic(ladder_ctx);  // Used as warning; future: add dedicated on.warning.
+                        }
+                    }
                     if (cycle_count > ladder_ctx->scan_internals.max_scan_cycles) {
                         ladder_ctx->ladder.state = LADDER_ST_ERROR;
-                        ladder_ctx->ladder.last.err = LADDER_INS_ERR_OVERFLOW;  // Reuse overflow error for cycle limit
+                        ladder_ctx->ladder.last.err = LADDER_INS_ERR_OVERFLOW; // Reuse overflow error for cycle limit
                         if (ladder_ctx->on.panic != NULL) {
                             ladder_ctx->on.panic(ladder_ctx);
                         }
-                        return;  // Abort scan early
+                        return; // Abort scan early
                     }
-
-                    ladder_instruction_t code = (*ladder_ctx).exec_network->cells[gr][column].code;
+                    ladder_instruction_t code = ladder_ctx->exec_network->cells[gr][column].code;
                     if (code == LADDER_INS_MULTI) {
-                        // Treat MULTI as potentially unsafe (part of multi-cell like timers/counters).
+// Treat MULTI as potentially unsafe (part of multi-cell like timers/counters).
                         skip_safe = false;
                         break;
                     }
@@ -254,72 +254,58 @@ void ladder_scan(ladder_ctx_t *ladder_ctx) {
                         break;
                     }
                 }
-
-                // Short-circuit only if no power and column is safe to skip (no side effects)
+// Short-circuit only if no power and column is safe to skip (no side effects)
                 if (!rung_power && skip_safe) {
                     continue;
                 }
-
                 bool group_output = false;
                 bool group_error = false;
-
                 for (uint32_t gr = group_start; gr <= col_group_end; gr++) {
-                    // Set current row for last instr tracking
+// Set current row for last instr tracking
                     uint32_t current_row_for_exec = gr;
-
-                    // save this execution
-                    (*ladder_ctx).ladder.last.instr = (*(*ladder_ctx).exec_network).cells[current_row_for_exec][column].code;
-                    (*ladder_ctx).ladder.last.err = LADDER_INS_ERR_OK;
-                    (*ladder_ctx).ladder.last.network = network;
-                    (*ladder_ctx).ladder.last.cell_row = current_row_for_exec;
-                    (*ladder_ctx).ladder.last.cell_column = column;
-
-                    ladder_instruction_t code = (*(*ladder_ctx).exec_network).cells[current_row_for_exec][column].code;
-
-                    // evaluation for an invalid code if the cell is not part of an instruction that uses more than one cell
+// save this execution
+                    ladder_ctx->ladder.last.instr = ladder_ctx->exec_network->cells[current_row_for_exec][column].code;
+                    ladder_ctx->ladder.last.err = LADDER_INS_ERR_OK;
+                    ladder_ctx->ladder.last.network = network;
+                    ladder_ctx->ladder.last.cell_row = current_row_for_exec;
+                    ladder_ctx->ladder.last.cell_column = column;
+                    ladder_instruction_t code = ladder_ctx->exec_network->cells[current_row_for_exec][column].code;
+// evaluation for an invalid code if the cell is not part of an instruction that uses more than one cell
                     if (code >= LADDER_INS_INV && code != LADDER_INS_MULTI) {
-                        (*ladder_ctx).ladder.state = LADDER_ST_INV;
-                        (*ladder_ctx).ladder.last.err = LADDER_INS_ERR_FAIL;
+                        ladder_ctx->ladder.state = LADDER_ST_INV;
+                        ladder_ctx->ladder.last.err = LADDER_INS_ERR_FAIL;
                         group_error = true;
                         break;  // Break loop on error to proceed to restore.
                     }
-
-                    // execute instruction
+// execute instruction
                     if (code != LADDER_INS_MULTI) {
-                        (*ladder_ctx).ladder.last.err = ladder_function[code](ladder_ctx, column, current_row_for_exec);
-
-                        if ((*ladder_ctx).ladder.last.err != LADDER_INS_ERR_OK) {
+                        ladder_ctx->ladder.last.err = ladder_function[code](ladder_ctx, column, current_row_for_exec);
+                        if (ladder_ctx->ladder.last.err != LADDER_INS_ERR_OK) {
                             group_error = true;
                             break;
                         }
-
-                        if ((*ladder_ctx).on.instruction != NULL)
-                            (*ladder_ctx).on.instruction(ladder_ctx);
+                        if (ladder_ctx->on.instruction != NULL)
+                            ladder_ctx->on.instruction(ladder_ctx);
                     }
                 }
-
-                // On group error, propagate error
+// On group error, propagate error
                 if (group_error) {
-                    (*ladder_ctx).ladder.state = LADDER_ST_INV;
+                    ladder_ctx->ladder.state = LADDER_ST_INV;
                     return;
                 }
-
-                // Captures multi-output settings (e.g., CTU sets state[row]=done, state[row+1]=overflow); used for power continuation.
+// Captures multi-output settings (e.g., CTU sets state[row]=done, state[row+1]=overflow); used for power continuation.
                 group_output = false;
                 for (uint32_t gr = group_start; gr <= col_group_end; gr++) {
-                    group_output |= (*ladder_ctx).exec_network->cells[gr][column].state;
+                    group_output |= ladder_ctx->exec_network->cells[gr][column].state;
                 }
-
-                // Set uniform group output to all rows in group (ORed flow to right)
+// Set uniform group output to all rows in group (ORed flow to right)
                 for (uint32_t gr = group_start; gr <= col_group_end; gr++) {
-                    (*(*ladder_ctx).exec_network).cells[gr][column].state = group_output;
+                    ladder_ctx->exec_network->cells[gr][column].state = group_output;
                 }
             }
-
-            if ((*ladder_ctx).on.scan_end != NULL)
-                (*ladder_ctx).on.scan_end(ladder_ctx);
-
-            // Advance to next rung after processing the group
+            if (ladder_ctx->on.scan_end != NULL)
+                ladder_ctx->on.scan_end(ladder_ctx);
+// Advance to next rung after processing the group
             row = group_end + 1;
         }
     }

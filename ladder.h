@@ -167,6 +167,7 @@ typedef enum LADDER_DATA_TYPE {
     LADDER_DATATYPE_REAL,     /**< Float 32 bits */
     LADDER_DATATYPE_CSTR,     /**< Constant string */
     LADDER_DATATYPE_MOD_PORT, /**< Module.port format */
+    LADDER_DATATYPE_INV,      /**< INVALID */
 } ladder_data_type_t;
 
 /**
@@ -520,7 +521,16 @@ typedef struct ladder_scan_internals_s {
     uint64_t actual_scan_time; /**< Actual scan time */
     uint64_t start_time;       /**< Start time for calculate scan time */
     uint64_t max_scan_cycles;  /**< Watchdog */
+     int32_t target_scan_ms;   /**< Target scan cycle time in ms (0 to disable padding) */
+    uint64_t min_scan_time;    /**< Minimum scan time observed */
+    uint64_t max_scan_time;    /**< Maximum scan time observed */
+    uint64_t total_scan_time;  /**< Cumulative total for average */
+    uint64_t avg_scan_time;    /**< Average scan time */
+    uint32_t scan_count;       /**< Number of scans for average */
+        bool overrun;          /**< Flag if last scan exceeded target_scan_ms */
 } ladder_scan_internals_t;
+
+
 
 /**
  * @fn  ladder_ins_err_t (*ladder_fn_t)(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row, bool *state)
@@ -620,7 +630,8 @@ static inline bool LADDER_VERTICAL_BAR(const ladder_ctx_t *lctx, uint32_t n, uin
 
 /**
  * @fn bool ladder_ctx_init(ladder_ctx_t *ladder_ctx, uint8_t net_columns_qty, uint8_t net_rows_qty, uint32_t networks_qty, uint32_t qty_m, uint32_t qty_c,
- *  uint32_t qty_t, uint32_t qty_d, uint32_t qty_r, uint32_t delay_not_run, uint32_t watchdog_ms, bool init_network, bool write_on_fault, uint64_t max_scan_cycles);
+ *  uint32_t qty_t, uint32_t qty_d, uint32_t qty_r, uint32_t delay_not_run, uint32_t watchdog_ms, bool init_network, bool write_on_fault,
+ *   uint64_t max_scan_cycles, uint32_t target_scan_ms);
  * @brief Initialize context.
  *
  *
@@ -638,10 +649,12 @@ static inline bool LADDER_VERTICAL_BAR(const ladder_ctx_t *lctx, uint32_t n, uin
  * @param init_network If false not initialize Networks
  * @param write_on_fault If true, write outputs on fault/INV states.
  * @param max_scan_cycles Watchdog
+ * @param target_scan_ms fixed-cycle timer
  * @return Error
  */
 bool ladder_ctx_init(ladder_ctx_t *ladder_ctx, uint8_t net_columns_qty, uint8_t net_rows_qty, uint32_t networks_qty, uint32_t qty_m, uint32_t qty_c,
-        uint32_t qty_t, uint32_t qty_d, uint32_t qty_r, uint32_t delay_not_run, uint32_t watchdog_ms, bool init_network, bool write_on_fault, uint64_t max_scan_cycles);
+        uint32_t qty_t, uint32_t qty_d, uint32_t qty_r, uint32_t delay_not_run, uint32_t watchdog_ms, bool init_network, bool write_on_fault,
+        uint64_t max_scan_cycles, uint32_t target_scan_ms);
 
 /**
  * @fn bool ladder_ctx_deinit(ladder_ctx_t *ladder_ctx)

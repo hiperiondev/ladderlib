@@ -39,6 +39,8 @@
 #include "ladder_instructions.h"
 
 ladder_ins_err_t fn_SHL(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row) {
+    ladder_ins_err_t error = LADDER_INS_ERR_OK;
+
     int32_t val = ladder_get_data_value(ladder_ctx, row, column, 0);
     int32_t amount = ladder_get_data_value(ladder_ctx, row, column, 1);
     uint32_t uval = (uint32_t) val;
@@ -48,10 +50,9 @@ ladder_ins_err_t fn_SHL(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row)
     uval <<= amount;
     val = (int32_t) uval;
 
-    uint8_t err = LADDER_INS_ERR_OK;
-    ladder_set_data_value(ladder_ctx, row, column, 0, &val, &err);
+    ladder_set_data_value(ladder_ctx, row, column, 0, &val, &error);
 
     CELL_STATE(ladder_ctx, column, row) = CELL_STATE_LEFT(ladder_ctx, column, row);
 
-    return err;
+    return error;
 }

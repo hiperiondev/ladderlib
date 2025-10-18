@@ -40,7 +40,7 @@
 #include "ladder.h"
 
 
-#define exnet(lctx)  (*(*lctx).exec_network)
+#define exnet(lctx)  ((lctx)->exec_network ? *(*lctx).exec_network : (ladder_network_t){0})
 
 /**
  * @def ladder_cell_data_exec

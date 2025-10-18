@@ -66,6 +66,22 @@ void ladder_scan_time(ladder_ctx_t *ladder_ctx) {
     ladder_ctx->scan_internals.actual_scan_time = diff;
     ladder_ctx->scan_internals.start_time = scanTimeMillis;
 
+    // Update scan metrics
+    if (ladder_ctx->scan_internals.scan_count == 0) {
+        ladder_ctx->scan_internals.min_scan_time = diff;
+    } else if (diff < ladder_ctx->scan_internals.min_scan_time) {
+        ladder_ctx->scan_internals.min_scan_time = diff;
+    }
+    if (diff > ladder_ctx->scan_internals.max_scan_time) {
+        ladder_ctx->scan_internals.max_scan_time = diff;
+    }
+    ladder_ctx->scan_internals.total_scan_time += diff;
+    ladder_ctx->scan_internals.scan_count++;
+    ladder_ctx->scan_internals.avg_scan_time = ladder_ctx->scan_internals.total_scan_time / ladder_ctx->scan_internals.scan_count;
+
+    // Check for overrun against target (if set)
+    ladder_ctx->scan_internals.overrun = (ladder_ctx->scan_internals.target_scan_ms > 0 && diff > ladder_ctx->scan_internals.target_scan_ms);
+
     if (ladder_ctx->ladder.quantity.watchdog_ms > 0 && diff > ladder_ctx->ladder.quantity.watchdog_ms) {
         // Set error and invoke panic immediately for synchronous fault handling.
         ladder_ctx->ladder.state = LADDER_ST_ERROR;
@@ -102,21 +118,61 @@ bool ladder_fault_clear(ladder_ctx_t *ladder_ctx) {
             ladder_ctx->memory.Td[i] = false;
             ladder_ctx->memory.Tr[i] = false;
         }
+    } else if (ladder_ctx->ladder.quantity.t > 0) {  // Added: if qty >0 but null, error
+        ladder_ctx->ladder.state = LADDER_ST_ERROR;
+        if (ladder_ctx->on.panic != NULL) {
+            ladder_ctx->on.panic(ladder_ctx);
+        }
+        return false;
     }
 
     if (ladder_ctx->ladder.quantity.c > 0) {
         if (ladder_ctx->registers.C != NULL) {
             memset(ladder_ctx->registers.C, 0, ladder_ctx->ladder.quantity.c * sizeof(uint32_t));
+        } else {
+            ladder_ctx->ladder.state = LADDER_ST_ERROR;
+            if (ladder_ctx->on.panic != NULL) {
+                ladder_ctx->on.panic(ladder_ctx);
+            }
+            return false;
         }
-        memset(ladder_ctx->memory.Cd, 0, ladder_ctx->ladder.quantity.c * sizeof(bool));
-        memset(ladder_ctx->memory.Cr, 0, ladder_ctx->ladder.quantity.c * sizeof(bool));
+        if (ladder_ctx->memory.Cd != NULL) {  // Added null check
+            memset(ladder_ctx->memory.Cd, 0, ladder_ctx->ladder.quantity.c * sizeof(uint8_t));  // Modified: sizeof(uint8_t)
+        } else {
+            ladder_ctx->ladder.state = LADDER_ST_ERROR;
+            if (ladder_ctx->on.panic != NULL) {
+                ladder_ctx->on.panic(ladder_ctx);
+            }
+            return false;
+        }
+        if (ladder_ctx->memory.Cr != NULL) {  // Added null check
+            memset(ladder_ctx->memory.Cr, 0, ladder_ctx->ladder.quantity.c * sizeof(uint8_t));  // Modified: sizeof(uint8_t)
+        } else {
+            ladder_ctx->ladder.state = LADDER_ST_ERROR;
+            if (ladder_ctx->on.panic != NULL) {
+                ladder_ctx->on.panic(ladder_ctx);
+            }
+            return false;
+        }
     }
 
     if (ladder_ctx->ladder.quantity.d > 0 && ladder_ctx->registers.D != NULL) {
         memset(ladder_ctx->registers.D, 0, ladder_ctx->ladder.quantity.d * sizeof(int32_t));
+    } else if (ladder_ctx->ladder.quantity.d > 0) {
+        ladder_ctx->ladder.state = LADDER_ST_ERROR;
+        if (ladder_ctx->on.panic != NULL) {
+            ladder_ctx->on.panic(ladder_ctx);
+        }
+        return false;
     }
     if (ladder_ctx->ladder.quantity.r > 0 && ladder_ctx->registers.R != NULL) {
         memset(ladder_ctx->registers.R, 0, ladder_ctx->ladder.quantity.r * sizeof(float));
+    } else if (ladder_ctx->ladder.quantity.r > 0) {
+        ladder_ctx->ladder.state = LADDER_ST_ERROR;
+        if (ladder_ctx->on.panic != NULL) {
+            ladder_ctx->on.panic(ladder_ctx);
+        }
+        return false;
     }
 
     // Reset outputs: Set to safe state (e.g., all false/0) for each module.
@@ -129,26 +185,49 @@ bool ladder_fault_clear(ladder_ctx_t *ladder_ctx) {
                 memset(ladder_ctx->output[n].QW, 0, ladder_ctx->output[n].qw_qty * sizeof(int32_t));
             }
             // Also update history to match.
-            if (ladder_ctx->output[n].Qh != NULL) {
+            if (ladder_ctx->output[n].Qh != NULL && ladder_ctx->output[n].Q != NULL) {
                 memcpy(ladder_ctx->output[n].Qh, ladder_ctx->output[n].Q, ladder_ctx->output[n].q_qty * sizeof(uint8_t));
             }
+            if (ladder_ctx->output[n].QWh != NULL && ladder_ctx->output[n].QW != NULL) {
+                memcpy(ladder_ctx->output[n].QWh, ladder_ctx->output[n].QW, ladder_ctx->output[n].qw_qty * sizeof(int32_t));
+            }
         }
-    }
-
-    // Optional: Invoke a clear hook if registered (for logging recovery).
-    if (ladder_ctx->on.end_task != NULL) {  // Reuse end_task as clear notifier, or add dedicated if needed.
-        ladder_ctx->on.end_task(ladder_ctx);
     }
 
     return true;
 }
 
 void ladder_save_previous_values(ladder_ctx_t *ladder_ctx) {
-    memcpy(ladder_ctx->prev_scan_vals.Mh, ladder_ctx->memory.M, ladder_ctx->ladder.quantity.m * sizeof(uint8_t));
-    memcpy(ladder_ctx->prev_scan_vals.Crh, ladder_ctx->memory.Cr, ladder_ctx->ladder.quantity.c * sizeof(bool));
-    memcpy(ladder_ctx->prev_scan_vals.Cdh, ladder_ctx->memory.Cd, ladder_ctx->ladder.quantity.c * sizeof(bool));
-    memcpy(ladder_ctx->prev_scan_vals.Tdh, ladder_ctx->memory.Td, ladder_ctx->ladder.quantity.t * sizeof(bool));
-    memcpy(ladder_ctx->prev_scan_vals.Trh, ladder_ctx->memory.Tr, ladder_ctx->ladder.quantity.t * sizeof(bool));
+    if (ladder_ctx == NULL) return;
+
+    // Save memory areas
+    if (ladder_ctx->ladder.quantity.m > 0 && ladder_ctx->memory.M != NULL && ladder_ctx->prev_scan_vals.Mh != NULL) {
+        memcpy(ladder_ctx->prev_scan_vals.Mh, ladder_ctx->memory.M, ladder_ctx->ladder.quantity.m * sizeof(uint8_t));
+    }
+    if (ladder_ctx->ladder.quantity.c > 0 && ladder_ctx->memory.Cd != NULL && ladder_ctx->prev_scan_vals.Cdh != NULL) {
+        memcpy(ladder_ctx->prev_scan_vals.Cdh, ladder_ctx->memory.Cd, ladder_ctx->ladder.quantity.c * sizeof(uint8_t));  // Modified: sizeof(uint8_t)
+    }
+    if (ladder_ctx->ladder.quantity.c > 0 && ladder_ctx->memory.Cr != NULL && ladder_ctx->prev_scan_vals.Crh != NULL) {
+        memcpy(ladder_ctx->prev_scan_vals.Crh, ladder_ctx->memory.Cr, ladder_ctx->ladder.quantity.c * sizeof(uint8_t));  // Modified: sizeof(uint8_t)
+    }
+    if (ladder_ctx->ladder.quantity.t > 0 && ladder_ctx->memory.Td != NULL && ladder_ctx->prev_scan_vals.Tdh != NULL) {
+        memcpy(ladder_ctx->prev_scan_vals.Tdh, ladder_ctx->memory.Td, ladder_ctx->ladder.quantity.t * sizeof(uint8_t));  // Modified: sizeof(uint8_t)
+    }
+    if (ladder_ctx->ladder.quantity.t > 0 && ladder_ctx->memory.Tr != NULL && ladder_ctx->prev_scan_vals.Trh != NULL) {
+        memcpy(ladder_ctx->prev_scan_vals.Trh, ladder_ctx->memory.Tr, ladder_ctx->ladder.quantity.t * sizeof(uint8_t));  // Modified: sizeof(uint8_t)
+    }
+
+    // Save outputs (added for consistency in history)
+    if (ladder_ctx->hw.io.fn_write_qty > 0 && ladder_ctx->output != NULL) {
+        for (uint32_t n = 0; n < ladder_ctx->hw.io.fn_write_qty; n++) {
+            if (ladder_ctx->output[n].q_qty > 0 && ladder_ctx->output[n].Q != NULL && ladder_ctx->output[n].Qh != NULL) {
+                memcpy(ladder_ctx->output[n].Qh, ladder_ctx->output[n].Q, ladder_ctx->output[n].q_qty * sizeof(uint8_t));
+            }
+            if (ladder_ctx->output[n].qw_qty > 0 && ladder_ctx->output[n].QW != NULL && ladder_ctx->output[n].QWh != NULL) {
+                memcpy(ladder_ctx->output[n].QWh, ladder_ctx->output[n].QW, ladder_ctx->output[n].qw_qty * sizeof(int32_t));
+            }
+        }
+    }
 }
 
 void ladder_clear_memory(ladder_ctx_t *ladder_ctx) {
@@ -197,7 +276,8 @@ void ladder_clear_program(ladder_ctx_t *ladder_ctx) {
 }
 
 bool ladder_ctx_init(ladder_ctx_t *ladder_ctx, uint8_t net_columns_qty, uint8_t net_rows_qty, uint32_t networks_qty, uint32_t qty_m, uint32_t qty_c,
-        uint32_t qty_t, uint32_t qty_d, uint32_t qty_r, uint32_t delay_not_run, uint32_t watchdog_ms, bool init_network, bool write_on_fault, uint64_t max_scan_cycles) {
+        uint32_t qty_t, uint32_t qty_d, uint32_t qty_r, uint32_t delay_not_run, uint32_t watchdog_ms, bool init_network, bool write_on_fault,
+        uint64_t max_scan_cycles, uint32_t target_scan_ms) {
     if (ladder_ctx == NULL)
         return false;
     if (net_rows_qty > LADDER_MAX_ROWS)
@@ -215,6 +295,13 @@ bool ladder_ctx_init(ladder_ctx_t *ladder_ctx, uint8_t net_columns_qty, uint8_t 
     ladder_ctx->scan_internals.actual_scan_time = 0;
     ladder_ctx->scan_internals.start_time = 0;
     ladder_ctx->scan_internals.max_scan_cycles = max_scan_cycles;
+    ladder_ctx->scan_internals.target_scan_ms = target_scan_ms;
+    ladder_ctx->scan_internals.min_scan_time = UINT64_MAX;
+    ladder_ctx->scan_internals.max_scan_time = 0;
+    ladder_ctx->scan_internals.total_scan_time = 0;
+    ladder_ctx->scan_internals.avg_scan_time = 0;
+    ladder_ctx->scan_internals.scan_count = 0;
+    ladder_ctx->scan_internals.overrun = false;
 
     ladder_ctx->hw.io.read = NULL;
     ladder_ctx->hw.io.write = NULL;
@@ -477,118 +564,82 @@ bool ladder_ctx_deinit(ladder_ctx_t *ladder_ctx) {
     ladder_ctx->cron = NULL;
 #endif
 
+    ladder_ctx->scan_internals.min_scan_time = 0;
+    ladder_ctx->scan_internals.max_scan_time = 0;
+    ladder_ctx->scan_internals.total_scan_time = 0;
+    ladder_ctx->scan_internals.avg_scan_time = 0;
+    ladder_ctx->scan_internals.scan_count = 0;
+    ladder_ctx->scan_internals.overrun = false;
+
     return true;
 }
 
 bool ladder_add_read_fn(ladder_ctx_t *ladder_ctx, _io_read read, _io_init read_init) {
-    if (ladder_ctx == NULL || read == NULL || read_init == NULL) {
+    if (ladder_ctx == NULL || read == NULL) {
         return false;
     }
 
-    if (ladder_ctx->hw.io.fn_read_qty >= 255) {  // Arbitrary safe max; define const if needed
+    if (ladder_ctx->hw.io.fn_read_qty >= 255) {
         ladder_ctx->ladder.last.err = LADDER_INS_ERR_OUTOFRANGE;
         return false;
     }
 
-    uint32_t new_qty = ladder_ctx->hw.io.fn_read_qty + 1;
     size_t fn_size = sizeof(_io_read);
     size_t init_size = sizeof(_io_init);
     size_t input_size = sizeof(ladder_hw_input_vals_t);
+
     uint32_t old_qty = ladder_ctx->hw.io.fn_read_qty;
+    uint32_t new_qty = old_qty + 1;
+    uint32_t idx = old_qty;  // New slot index
 
-    if (old_qty == 0) {
-        // Initial allocation: calloc all three, check each, free partial on any failure.
-        _io_read *tmp_read = calloc(1, fn_size);
-        if (!tmp_read)
-            return false;
-
-        _io_init *tmp_init_read = calloc(1, init_size);
-        if (!tmp_init_read) {
-            free(tmp_read);
-            return false;
-        }
-
-        ladder_hw_input_vals_t *tmp_input = calloc(1, input_size);
-        if (!tmp_input) {
-            free(tmp_read);
-            free(tmp_init_read);
-            return false;
-        }
-
-        // All succeeded: assign.
-        ladder_ctx->hw.io.read = tmp_read;
-        ladder_ctx->hw.io.init_read = tmp_init_read;
-        ladder_ctx->input = tmp_input;
-
-        // Initialize the new slot.
-        ladder_ctx->hw.io.read[0] = read;
-        ladder_ctx->hw.io.init_read[0] = read_init;
-        ladder_ctx->input[0].fn_id = 0;
-        ladder_ctx->input[0].i_qty = 0;
-        ladder_ctx->input[0].iw_qty = 0;
-
-        if (!read_init(ladder_ctx, 0, true)) {
-            read_init(ladder_ctx, 0, false);
-            free(ladder_ctx->hw.io.read);
-            free(ladder_ctx->hw.io.init_read);
-            free(ladder_ctx->input);
-            ladder_ctx->hw.io.read = NULL;
-            ladder_ctx->hw.io.init_read = NULL;
-            ladder_ctx->input = NULL;
-            ladder_ctx->hw.io.fn_read_qty = 0;
-            return false;
-        }
-
-        ladder_ctx->hw.io.fn_read_qty = 1;
-        return true;
-    } else {
-        // Expansion: realloc one at a time, assign immediately on success, return false on any failure.
-        _io_read *tmp_read = realloc(ladder_ctx->hw.io.read, new_qty * fn_size);
-        if (!tmp_read)
-            return false;  // Original unchanged.
-        ladder_ctx->hw.io.read = tmp_read;
-
-        _io_init *tmp_init_read = realloc(ladder_ctx->hw.io.init_read, new_qty * init_size);
-        if (!tmp_init_read) {
-            // Undo previous success: realloc back to old size.
-            ladder_ctx->hw.io.read = realloc(ladder_ctx->hw.io.read, old_qty * fn_size);
-            return false;
-        }
-        ladder_ctx->hw.io.init_read = tmp_init_read;
-
-        ladder_hw_input_vals_t *tmp_input = realloc(ladder_ctx->input, new_qty * input_size);
-        if (!tmp_input) {
-            // Undo previous successes.
-            ladder_ctx->hw.io.read = realloc(ladder_ctx->hw.io.read, old_qty * fn_size);
-            ladder_ctx->hw.io.init_read = realloc(ladder_ctx->hw.io.init_read, old_qty * init_size);
-            return false;
-        }
-        ladder_ctx->input = tmp_input;
-
-        // All succeeded: initialize new slot.
-        uint32_t idx = old_qty;
-        ladder_ctx->hw.io.read[idx] = read;
-        ladder_ctx->hw.io.init_read[idx] = read_init;
-        ladder_ctx->input[idx].fn_id = idx;
-        ladder_ctx->input[idx].i_qty = 0;
-        ladder_ctx->input[idx].iw_qty = 0;
-
-        if (!read_init(ladder_ctx, idx, true)) {
-            read_init(ladder_ctx, idx, false);
-            // Rollback allocations to previous size.
-            ladder_ctx->hw.io.read = realloc(ladder_ctx->hw.io.read, old_qty * fn_size);
-            ladder_ctx->hw.io.init_read = realloc(ladder_ctx->hw.io.init_read, old_qty * init_size);
-            ladder_ctx->input = realloc(ladder_ctx->input, old_qty * input_size);
-            return false;
-        }
-
-        ladder_ctx->hw.io.fn_read_qty = new_qty;
-        return true;
+    void *tmp_read = realloc(ladder_ctx->hw.io.read, new_qty * fn_size);
+    if (!tmp_read) {
+        ladder_ctx->ladder.last.err = LADDER_INS_ERR_FAIL;
+        return false;
     }
+    ladder_ctx->hw.io.read = tmp_read;
+
+    void *tmp_init = realloc(ladder_ctx->hw.io.init_read, new_qty * init_size);
+    if (!tmp_init) {
+        // Rollback: Shrink read back
+        ladder_ctx->hw.io.read = realloc(ladder_ctx->hw.io.read, old_qty * fn_size);
+        ladder_ctx->ladder.last.err = LADDER_INS_ERR_FAIL;
+        return false;
+    }
+    ladder_ctx->hw.io.init_read = tmp_init;
+
+    void *tmp_input = realloc(ladder_ctx->input, new_qty * input_size);
+    if (!tmp_input) {
+        // Rollback: Shrink read and init_read
+        ladder_ctx->hw.io.read = realloc(ladder_ctx->hw.io.read, old_qty * fn_size);
+        ladder_ctx->hw.io.init_read = realloc(ladder_ctx->hw.io.init_read, old_qty * init_size);
+        ladder_ctx->ladder.last.err = LADDER_INS_ERR_FAIL;
+        return false;
+    }
+    ladder_ctx->input = tmp_input;
+
+    // Set new slot
+    ladder_ctx->hw.io.read[idx] = read;
+    ladder_ctx->hw.io.init_read[idx] = read_init;
+    memset(&ladder_ctx->input[idx], 0, input_size);
+
+    if (read_init && !read_init(ladder_ctx, idx, true)) {
+        // Deinit the new slot
+        if (read_init) read_init(ladder_ctx, idx, false);
+        // Rollback: Shrink all arrays
+        ladder_ctx->hw.io.read = realloc(ladder_ctx->hw.io.read, old_qty * fn_size);
+        ladder_ctx->hw.io.init_read = realloc(ladder_ctx->hw.io.init_read, old_qty * init_size);
+        ladder_ctx->input = realloc(ladder_ctx->input, old_qty * input_size);
+        ladder_ctx->ladder.last.err = LADDER_INS_ERR_FAIL;
+        return false;
+    }
+
+    ladder_ctx->hw.io.fn_read_qty = new_qty;
+    return true;
 }
 
 bool ladder_add_write_fn(ladder_ctx_t *ladder_ctx, _io_write write, _io_init write_init) {
-    if (ladder_ctx == NULL || write == NULL || write_init == NULL) {
+    if (ladder_ctx == NULL || write == NULL) {
         return false;
     }
 
@@ -597,101 +648,58 @@ bool ladder_add_write_fn(ladder_ctx_t *ladder_ctx, _io_write write, _io_init wri
         return false;
     }
 
-    uint32_t new_qty = ladder_ctx->hw.io.fn_write_qty + 1;
     size_t fn_size = sizeof(_io_write);
     size_t init_size = sizeof(_io_init);
     size_t output_size = sizeof(ladder_hw_output_vals_t);
+
     uint32_t old_qty = ladder_ctx->hw.io.fn_write_qty;
+    uint32_t new_qty = old_qty + 1;
+    uint32_t idx = old_qty;  // New slot index
 
-    if (old_qty == 0) {
-        // Initial allocation: calloc all three, check each, free partial on any failure.
-        _io_write *tmp_write = calloc(1, fn_size);
-        if (!tmp_write)
-            return false;
-
-        _io_init *tmp_init_write = calloc(1, init_size);
-        if (!tmp_init_write) {
-            free(tmp_write);
-            return false;
-        }
-
-        ladder_hw_output_vals_t *tmp_output = calloc(1, output_size);
-        if (!tmp_output) {
-            free(tmp_write);
-            free(tmp_init_write);
-            return false;
-        }
-
-        // All succeeded: assign.
-        ladder_ctx->hw.io.write = tmp_write;
-        ladder_ctx->hw.io.init_write = tmp_init_write;
-        ladder_ctx->output = tmp_output;
-
-        // Initialize the new slot.
-        ladder_ctx->hw.io.write[0] = write;
-        ladder_ctx->hw.io.init_write[0] = write_init;
-        ladder_ctx->output[0].fn_id = 0;
-        ladder_ctx->output[0].q_qty = 0;
-        ladder_ctx->output[0].qw_qty = 0;
-
-        if (!write_init(ladder_ctx, 0, true)) {
-            write_init(ladder_ctx, 0, false);
-            free(ladder_ctx->hw.io.write);
-            free(ladder_ctx->hw.io.init_write);
-            free(ladder_ctx->output);
-            ladder_ctx->hw.io.write = NULL;
-            ladder_ctx->hw.io.init_write = NULL;
-            ladder_ctx->output = NULL;
-            ladder_ctx->hw.io.fn_write_qty = 0;
-            return false;
-        }
-
-        ladder_ctx->hw.io.fn_write_qty = 1;
-        return true;
-    } else {
-        // Expansion: realloc one at a time, assign immediately on success, return false on any failure.
-        _io_write *tmp_write = realloc(ladder_ctx->hw.io.write, new_qty * fn_size);
-        if (!tmp_write)
-            return false;  // Original unchanged.
-        ladder_ctx->hw.io.write = tmp_write;
-
-        _io_init *tmp_init_write = realloc(ladder_ctx->hw.io.init_write, new_qty * init_size);
-        if (!tmp_init_write) {
-            // Undo previous success.
-            ladder_ctx->hw.io.write = realloc(ladder_ctx->hw.io.write, old_qty * fn_size);
-            return false;
-        }
-        ladder_ctx->hw.io.init_write = tmp_init_write;
-
-        ladder_hw_output_vals_t *tmp_output = realloc(ladder_ctx->output, new_qty * output_size);
-        if (!tmp_output) {
-            // Undo previous successes.
-            ladder_ctx->hw.io.write = realloc(ladder_ctx->hw.io.write, old_qty * fn_size);
-            ladder_ctx->hw.io.init_write = realloc(ladder_ctx->hw.io.init_write, old_qty * init_size);
-            return false;
-        }
-        ladder_ctx->output = tmp_output;
-
-        // All succeeded: initialize new slot.
-        uint32_t idx = old_qty;
-        ladder_ctx->hw.io.write[idx] = write;
-        ladder_ctx->hw.io.init_write[idx] = write_init;
-        ladder_ctx->output[idx].fn_id = idx;
-        ladder_ctx->output[idx].q_qty = 0;
-        ladder_ctx->output[idx].qw_qty = 0;
-
-        if (!write_init(ladder_ctx, idx, true)) {
-            write_init(ladder_ctx, idx, false);
-            // Rollback allocations to previous size.
-            ladder_ctx->hw.io.write = realloc(ladder_ctx->hw.io.write, old_qty * fn_size);
-            ladder_ctx->hw.io.init_write = realloc(ladder_ctx->hw.io.init_write, old_qty * init_size);
-            ladder_ctx->output = realloc(ladder_ctx->output, old_qty * output_size);
-            return false;
-        }
-
-        ladder_ctx->hw.io.fn_write_qty = new_qty;
-        return true;
+    void *tmp_write = realloc(ladder_ctx->hw.io.write, new_qty * fn_size);
+    if (!tmp_write) {
+        ladder_ctx->ladder.last.err = LADDER_INS_ERR_FAIL;
+        return false;
     }
+    ladder_ctx->hw.io.write = tmp_write;
+
+    void *tmp_init = realloc(ladder_ctx->hw.io.init_write, new_qty * init_size);
+    if (!tmp_init) {
+        // Rollback: Shrink write back
+        ladder_ctx->hw.io.write = realloc(ladder_ctx->hw.io.write, old_qty * fn_size);
+        ladder_ctx->ladder.last.err = LADDER_INS_ERR_FAIL;
+        return false;
+    }
+    ladder_ctx->hw.io.init_write = tmp_init;
+
+    void *tmp_output = realloc(ladder_ctx->output, new_qty * output_size);
+    if (!tmp_output) {
+        // Rollback: Shrink write and init_write
+        ladder_ctx->hw.io.write = realloc(ladder_ctx->hw.io.write, old_qty * fn_size);
+        ladder_ctx->hw.io.init_write = realloc(ladder_ctx->hw.io.init_write, old_qty * init_size);
+        ladder_ctx->ladder.last.err = LADDER_INS_ERR_FAIL;
+        return false;
+    }
+    ladder_ctx->output = tmp_output;
+
+    // Set new slot
+    ladder_ctx->hw.io.write[idx] = write;
+    ladder_ctx->hw.io.init_write[idx] = write_init;
+    memset(&ladder_ctx->output[idx], 0, output_size);
+
+    if (write_init && !write_init(ladder_ctx, idx, true)) {
+        // Deinit the new slot
+        if (write_init) write_init(ladder_ctx, idx, false);
+        // Rollback: Shrink all arrays
+        ladder_ctx->hw.io.write = realloc(ladder_ctx->hw.io.write, old_qty * fn_size);
+        ladder_ctx->hw.io.init_write = realloc(ladder_ctx->hw.io.init_write, old_qty * init_size);
+        ladder_ctx->output = realloc(ladder_ctx->output, old_qty * output_size);
+        ladder_ctx->ladder.last.err = LADDER_INS_ERR_FAIL;
+        return false;
+    }
+
+    ladder_ctx->hw.io.fn_write_qty = new_qty;
+    return true;
 }
 
 bool ladder_add_foreign(ladder_ctx_t *ladder_ctx, _foreign_fn_init fn_init, void *init_data, uint32_t qty) {
@@ -807,9 +815,13 @@ bool ladder_fn_cell(ladder_ctx_t *ladder_ctx, uint32_t network, uint32_t row, ui
 
     ladder_ctx->network[network].cells[row][column].data = calloc(actual_ioc.data_qty, sizeof(ladder_value_t));
     if (ladder_ctx->network[network].cells[row][column].data == NULL) {
-        ladder_ctx->network[network].cells[row][column].data_qty = 0;
-        ladder_ctx->network[network].cells[row][column].code = LADDER_INS_INV;
-        ladder_ctx->network[network].cells[row][column].data = NULL;
+        // Explicit cleanup for the span to revert any partial state changes (e.g., code set above)
+        for (uint8_t r = 0; r < actual_ioc.cells; r++) {
+            ladder_ctx->network[network].cells[row + r][column].code = LADDER_INS_INV;
+            ladder_ctx->network[network].cells[row + r][column].data = NULL;
+            ladder_ctx->network[network].cells[row + r][column].data_qty = 0;
+            ladder_ctx->network[network].cells[row + r][column].vertical_bar = false;  // Reset bars to terminate any group
+        }
         ladder_ctx->ladder.last.err = LADDER_INS_ERR_FAIL;  // Alloc fail
         return false;
     }

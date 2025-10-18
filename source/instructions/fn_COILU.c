@@ -39,7 +39,7 @@
 #include "ladder_instructions.h"
 
 ladder_ins_err_t fn_COILU(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row) {
-    uint8_t error = 0;
+    ladder_ins_err_t error = LADDER_INS_ERR_OK;
 
     bool state = CELL_STATE_LEFT(ladder_ctx, column, row);
     bool prev = ladder_get_previous_value(ladder_ctx, row, column, 0); // From history (Mh/Qh)

@@ -99,8 +99,8 @@ ladder_ins_err_t fn_MOVE(ladder_ctx_t *ladder_ctx, uint32_t column, uint32_t row
     move_val_t dest_val = src_val;
 
     // Set destination (use set_data for consistency, pass correct pointer/size)
-    uint8_t set_err;
-    void *val_ptr = is_float_dest ? (void *)&dest_val.f : (void *)&dest_val.i;  // MODIFIED: Casts to void* for ternary compatibility.
+    ladder_ins_err_t set_err = LADDER_INS_ERR_OK;
+    void *val_ptr = is_float_dest ? (void *)&dest_val.f : (void *)&dest_val.i;  // Casts to void* for ternary compatibility.
     ladder_set_data_value(lctx, row, column, 1, val_ptr, &set_err);
     if (set_err != LADDER_INS_ERR_OK) {
         err = LADDER_INS_ERR_SETDATAVAL;
