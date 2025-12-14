@@ -46,7 +46,63 @@
 #define TEST_QTY_D  8
 #define TEST_QTY_R  8
 
-uint8_t assert_count = 0;
+#define CHECK(condition, desc, print_pass) \
+    do { \
+        tests_qty++; \
+        if (condition) { \
+            if (print_pass) { \
+                printf("\033[92m[PASS] %s\033[0m\n", desc); \
+            } \
+        } else { \
+            printf("\033[91m[FAIL] %s\033[0m\n", desc); \
+            tests_failed++; \
+        } \
+    } while (0)
+
+#define CHECK_EQ(val, exp, desc, print_pass) \
+    do { \
+        tests_qty++; \
+        if ((val) == (exp)) { \
+            if (print_pass) { \
+                printf("\033[92m[PASS] %s\033[0m\n", desc); \
+            } \
+        } else { \
+            printf("\033[91m[FAIL] %s: got=%" PRIi32 " expected=%" PRIi32 "\033[0m\n", desc, (int32_t)(val), (int32_t)(exp)); \
+            tests_failed++; \
+        } \
+    } while (0)
+
+#define CHECK_CLOSE(val, exp, tol, desc, print_pass) \
+    do { \
+        tests_qty++; \
+        int32_t diff = abs((val) - (exp)); \
+        if (diff <= (tol)) { \
+            if (print_pass) { \
+                printf("\033[92m[PASS] %s\033[0m\n", desc); \
+            } \
+        } else { \
+            printf("\033[91m[FAIL] %s: got=%" PRIi32 " expected=%" PRIi32 " tol=%" PRIi32 " diff=%" PRIi32 "\033[0m\n", desc, (int32_t)(val), (int32_t)(exp), \
+                   (int32_t)(tol), (int32_t)diff); \
+            tests_failed++; \
+        } \
+    } while (0)
+
+#define CHECK_CLOSE_U32(val, exp, tol, desc, print_pass) \
+    do { \
+        tests_qty++; \
+        uint32_t v = (val); \
+        uint32_t e = (exp); \
+        uint32_t diff = (v > e) ? (v - e) : (e - v); \
+        if (diff <= (tol)) { \
+            if (print_pass) \
+                printf("\033[92m[PASS] %s\033[0m\n", desc); \
+        } else { \
+            printf("\033[91m[FAIL] %s: got=%" PRIu32 " expected=%" PRIu32 " diff=%" PRIu32 "\033[0m\n", desc, v, e, diff); \
+            tests_failed++; \
+        } \
+    } while (0)
+
+static int32_t tests_qty = 0, tests_failed = 0;
 ladder_ctx_t ladder_ctx;
 
 /////////////////////////////////////////////////////////////////
@@ -91,175 +147,580 @@ bool test_init_read(ladder_ctx_t *ladder_ctx, uint32_t id, bool init) {
 }
 
 bool test_init(void) {
-
-    // initialize context
-    if (!ladder_ctx_init(&ladder_ctx, 6, 7, 3, TEST_QTY_M, TEST_QTY_C, TEST_QTY_T, TEST_QTY_D, TEST_QTY_R, 10, 0, true, true, 1000000UL, 100)) {
-        printf("ERROR Initializing\n");
-        return 1;
+    if (!ladder_ctx_init(&ladder_ctx, 15, 15, 1, TEST_QTY_M, TEST_QTY_C, TEST_QTY_T, TEST_QTY_D, TEST_QTY_R, 10, 0, true, true, 1000000UL, 100)) {
+        printf("   ERROR Initializing\n");
+        return true;
     }
 
     return false;
 }
 
 bool test_deinit(void) {
+    ladder_ctx_deinit(&ladder_ctx);
     return false;
 }
 
 /////////////////////////////////////////////////////////////////
 
 void test_fn_ADD(void) {
+    printf("-- TEST: ADD\n");
+    tests_qty++;
+    if (test_init()) {
+        tests_failed++;
+        return;
+    }
 
+// start test
+
+// end test
+
+    test_deinit();
 }
 
 void test_fn_AND(void) {
+    printf("-- TEST: AND\n");
+    tests_qty++;
+    if (test_init()) {
+        tests_failed++;
+        return;
+    }
 
+// start test
+
+// end test
+
+    test_deinit();
 }
 
 void test_fn_COIL(void) {
+    printf("-- TEST: COIL\n");
+    tests_qty++;
+    if (test_init()) {
+        tests_failed++;
+        return;
+    }
 
+// start test
+
+// end test
+
+    test_deinit();
 }
 
 void test_fn_COILL(void) {
+    printf("-- TEST: COILL\n");
+    tests_qty++;
+    if (test_init()) {
+        tests_failed++;
+        return;
+    }
 
+// start test
+
+// end test
+
+    test_deinit();
 }
 
 void test_fn_COILU(void) {
+    printf("-- TEST: COILU\n");
+    tests_qty++;
+    if (test_init()) {
+        tests_failed++;
+        return;
+    }
 
+// start test
+
+// end test
+
+    test_deinit();
 }
 
 void test_fn_CONN(void) {
+    printf("-- TEST: CONN\n");
+    tests_qty++;
+    if (test_init()) {
+        tests_failed++;
+        return;
+    }
 
+// start test
+
+// end test
+
+    test_deinit();
 }
 
 void test_fn_CTD(void) {
+    printf("-- TEST: CTD\n");
+    tests_qty++;
+    if (test_init()) {
+        tests_failed++;
+        return;
+    }
 
+// start test
+
+// end test
+
+    test_deinit();
 }
 
 void test_fn_CTU(void) {
+    printf("-- TEST: CTU\n");
+    tests_qty++;
+    if (test_init()) {
+        tests_failed++;
+        return;
+    }
 
+// start test
+
+// end test
+
+    test_deinit();
 }
 
 void test_fn_DIV(void) {
+    printf("-- TEST: DIV\n");
+    tests_qty++;
+    if (test_init()) {
+        tests_failed++;
+        return;
+    }
 
+// start test
+
+// end test
+
+    test_deinit();
 }
 
 void test_fn_EQ(void) {
+    printf("-- TEST: EQ\n");
+    tests_qty++;
+    if (test_init()) {
+        tests_failed++;
+        return;
+    }
 
+// start test
+
+// end test
+
+    test_deinit();
 }
 
 void test_fn_FE(void) {
+    printf("-- TEST: FE\n");
+    tests_qty++;
+    if (test_init()) {
+        tests_failed++;
+        return;
+    }
 
+// start test
+
+// end test
+
+    test_deinit();
 }
 
 void test_fn_FOREIGN(void) {
+    printf("-- TEST: FOREIGN\n");
+    tests_qty++;
+    if (test_init()) {
+        tests_failed++;
+        return;
+    }
 
+// start test
+
+// end test
+
+    test_deinit();
 }
 
 void test_fn_GE(void) {
+    printf("-- TEST: GE\n");
+    tests_qty++;
+    if (test_init()) {
+        tests_failed++;
+        return;
+    }
 
+// start test
+
+// end test
+
+    test_deinit();
 }
 
 void test_fn_GT(void) {
+    printf("-- TEST: GT\n");
+    tests_qty++;
+    if (test_init()) {
+        tests_failed++;
+        return;
+    }
 
+// start test
+
+// end test
+
+    test_deinit();
 }
 
 void test_fn_LE(void) {
+    printf("-- TEST: LE\n");
+    tests_qty++;
+    if (test_init()) {
+        tests_failed++;
+        return;
+    }
 
+// start test
+
+// end test
+
+    test_deinit();
 }
 
 void test_fn_LT(void) {
+    printf("-- TEST: LT\n");
+    tests_qty++;
+    if (test_init()) {
+        tests_failed++;
+        return;
+    }
 
+// start test
+
+// end test
+
+    test_deinit();
 }
 
 void test_fn_MOD(void) {
+    printf("-- TEST: MOD\n");
+    tests_qty++;
+    if (test_init()) {
+        tests_failed++;
+        return;
+    }
 
+// start test
+
+// end test
+
+    test_deinit();
 }
 
 void test_fn_MOVE(void) {
+    printf("-- TEST: MOVE\n");
+    tests_qty++;
+    if (test_init()) {
+        tests_failed++;
+        return;
+    }
 
+// start test
+
+// end test
+
+    test_deinit();
 }
 
 void test_fn_MUL(void) {
+    printf("-- TEST: MUL\n");
+    tests_qty++;
+    if (test_init()) {
+        tests_failed++;
+        return;
+    }
 
+// start test
+
+// end test
+
+    test_deinit();
 }
 
 void test_fn_NC(void) {
+    printf("-- TEST: NC\n");
+    tests_qty++;
+    if (test_init()) {
+        tests_failed++;
+        return;
+    }
 
+// start test
+
+// end test
+
+    test_deinit();
 }
 
 void test_fn_NE(void) {
+    printf("-- TEST: NE\n");
+    tests_qty++;
+    if (test_init()) {
+        tests_failed++;
+        return;
+    }
 
+// start test
+
+// end test
+
+    test_deinit();
 }
 
 void test_fn_NEG(void) {
+    printf("-- TEST: NEG\n");
+    tests_qty++;
+    if (test_init()) {
+        tests_failed++;
+        return;
+    }
 
+// start test
+
+// end test
+
+    test_deinit();
 }
 
 void test_fn_NO(void) {
+    printf("-- TEST: NO\n");
+    tests_qty++;
+    if (test_init()) {
+        tests_failed++;
+        return;
+    }
 
+// start test
+
+// end test
+
+    test_deinit();
 }
 
 void test_fn_NOP(void) {
+    printf("-- TEST: NOP\n");
+    tests_qty++;
+    if (test_init()) {
+        tests_failed++;
+        return;
+    }
 
+// start test
+
+// end test
+
+    test_deinit();
 }
 
 void test_fn_NOT(void) {
+    printf("-- TEST: NOT\n");
+    tests_qty++;
+    if (test_init()) {
+        tests_failed++;
+        return;
+    }
 
+// start test
+
+// end test
+
+    test_deinit();
 }
 
 void test_fn_OR(void) {
+    printf("-- TEST: OR\n");
+    tests_qty++;
+    if (test_init()) {
+        tests_failed++;
+        return;
+    }
 
+// start test
+
+// end test
+
+    test_deinit();
 }
 
 void test_fn_RE(void) {
+    printf("-- TEST: RE\n");
+    tests_qty++;
+    if (test_init()) {
+        tests_failed++;
+        return;
+    }
 
+// start test
+
+// end test
+
+    test_deinit();
 }
 
 void test_fn_ROL(void) {
+    printf("-- TEST: ROL\n");
+    tests_qty++;
+    if (test_init()) {
+        tests_failed++;
+        return;
+    }
 
+// start test
+
+// end test
+
+    test_deinit();
 }
 
 void test_fn_ROR(void) {
+    printf("-- TEST: ROR\n");
+    tests_qty++;
+    if (test_init()) {
+        tests_failed++;
+        return;
+    }
 
+// start test
+
+// end test
+
+    test_deinit();
 }
 
 void test_fn_SHL(void) {
+    printf("-- TEST: SHL\n");
+    tests_qty++;
+    if (test_init()) {
+        tests_failed++;
+        return;
+    }
 
+// start test
+
+// end test
+
+    test_deinit();
 }
 
 void test_fn_SHR(void) {
+    printf("-- TEST: SHR\n");
+    tests_qty++;
+    if (test_init()) {
+        tests_failed++;
+        return;
+    }
 
+// start test
+
+// end test
+
+    test_deinit();
 }
 
 void test_fn_SUB(void) {
+    printf("-- TEST: SUB\n");
+    tests_qty++;
+    if (test_init()) {
+        tests_failed++;
+        return;
+    }
 
+// start test
+
+// end test
+
+    test_deinit();
 }
 
 void test_fn_TMOVE(void) {
+    printf("-- TEST: TMOVE\n");
+    tests_qty++;
+    if (test_init()) {
+        tests_failed++;
+        return;
+    }
 
+// start test
+
+// end test
+
+    test_deinit();
 }
 
 void test_fn_TOF(void) {
+    printf("-- TEST: TOF\n");
+    tests_qty++;
+    if (test_init()) {
+        tests_failed++;
+        return;
+    }
 
+// start test
+
+// end test
+
+    test_deinit();
 }
 
 void test_fn_TON(void) {
+    printf("-- TEST: TON\n");
+    tests_qty++;
+    if (test_init()) {
+        tests_failed++;
+        return;
+    }
 
+// start test
+
+// end test
+
+    test_deinit();
 }
 
 void test_fn_TP(void) {
+    printf("-- TEST: TP\n");
+    tests_qty++;
+    if (test_init()) {
+        tests_failed++;
+        return;
+    }
 
+// start test
+
+// end test
+
+    test_deinit();
 }
 
 void test_fn_XOR(void) {
+    printf("-- TEST: XOR\n");
+    tests_qty++;
+    if (test_init()) {
+        tests_failed++;
+        return;
+    }
 
+// start test
+
+// end test
+
+    test_deinit();
 }
 
 /////////////////////////////////////////////////////////////////
 
 bool test_ladder_instructions(void) {
-    // clear screen
-    printf("\e[1;1H\e[2J");
+    printf("\e[1;1H\e[2J- [START TESTS] -\n\n");
 
     test_fn_ADD();
     test_fn_AND();
@@ -299,10 +760,13 @@ bool test_ladder_instructions(void) {
     test_fn_TP();
     test_fn_XOR();
 
-    if (assert_count != 0) {
-        printf("ERROR: %d tests fails\n\n", assert_count);
+    printf("\n- [END TESTS] -\n\n");
+
+    if (tests_failed != 0) {
+        printf("\033[91m[ERROR] %d tests failed out of %d\033[0m\n\n", tests_failed, tests_qty);
         return false;
     }
 
+    printf("\033[92m[SUCCESS] All %d tests passed\033[0m\n\n", tests_qty);
     return true;
 }
