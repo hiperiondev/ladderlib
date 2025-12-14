@@ -35,6 +35,9 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <string.h>
+#include <errno.h>
+#include <time.h>
+#include <sys/time.h>
 
 #include "ladder_instructions.h"
 #include "ladder.h"
@@ -107,17 +110,18 @@ ladder_ctx_t ladder_ctx;
 
 /////////////////////////////////////////////////////////////////
 
-void test_delay(long msec) {
-}
-
-uint64_t test_millis(void) {
-    return 0;
-}
-
 void test_read(ladder_ctx_t *ladder_ctx, uint32_t id) {
 }
 
+bool test_init_read(ladder_ctx_t *ladder_ctx, uint32_t id, bool init) {
+    return true;
+}
+
 void test_write(ladder_ctx_t *ladder_ctx, uint32_t id) {
+}
+
+bool test_init_write(ladder_ctx_t *ladder_ctx, uint32_t id, bool init) {
+    return true;
 }
 
 bool test_on_scan_end(ladder_ctx_t *ladder_ctx) {
@@ -133,6 +137,8 @@ bool test_on_task_before(ladder_ctx_t *ladder_ctx) {
 }
 
 bool test_on_task_after(ladder_ctx_t *ladder_ctx) {
+    ladder_ctx->ladder.state = LADDER_ST_STOPPED;
+
     return false;
 }
 
@@ -142,15 +148,57 @@ void test_on_panic(ladder_ctx_t *ladder_ctx) {
 void test_on_end_task(ladder_ctx_t *ladder_ctx) {
 }
 
-bool test_init_read(ladder_ctx_t *ladder_ctx, uint32_t id, bool init) {
-    return true;
+void test_delay(long msec) {
+    struct timespec ts;
+    int res;
+
+    if (msec < 0) {
+        errno = EINVAL;
+        return;
+    }
+
+    ts.tv_sec = msec / 1000;
+    ts.tv_nsec = (msec % 1000) * 1000000;
+
+    do {
+        res = nanosleep(&ts, &ts);
+    } while (res && errno == EINTR);
+
+    return;
+}
+
+uint64_t test_millis(void) {
+    struct timeval time;
+    gettimeofday(&time, NULL);
+    return (uint64_t) ((time.tv_sec * 1000000L + time.tv_usec) / 1000);
 }
 
 bool test_init(void) {
-    if (!ladder_ctx_init(&ladder_ctx, 15, 15, 1, TEST_QTY_M, TEST_QTY_C, TEST_QTY_T, TEST_QTY_D, TEST_QTY_R, 10, 0, true, true, 1000000UL, 100)) {
-        printf("   ERROR Initializing\n");
+    if (!ladder_ctx_init(&ladder_ctx, 5, 5, 1, TEST_QTY_M, TEST_QTY_C, TEST_QTY_T, TEST_QTY_D, TEST_QTY_R, 10, 0, true, true, 1000000UL, 100)) {
+        printf("ERROR Initializing\n");
         return true;
     }
+
+    if (!ladder_add_read_fn(&ladder_ctx, test_read, test_init_read)) {
+        printf("ERROR Adding io read function\n");
+        return true;
+    }
+
+    if (!ladder_add_write_fn(&ladder_ctx, test_write, test_init_write)) {
+        printf("ERROR Adding io write function\n");
+        return true;
+    }
+
+    ladder_ctx.on.scan_end = test_on_scan_end;
+    ladder_ctx.on.instruction = test_on_instruction;
+    ladder_ctx.on.task_before = test_on_task_before;
+    ladder_ctx.on.task_after = test_on_task_after;
+    ladder_ctx.on.panic = test_on_panic;
+    ladder_ctx.on.end_task = test_on_end_task;
+    ladder_ctx.hw.time.millis = test_millis;
+    ladder_ctx.hw.time.delay = test_delay;
+
+    ladder_ctx.ladder.state = LADDER_ST_RUNNING;
 
     return false;
 }
@@ -170,10 +218,14 @@ void test_fn_ADD(void) {
         return;
     }
 
-// start test
+    // create cell test
 
-// end test
+    // end create cell test
+    ladder_task((void*) &ladder_ctx);
 
+    // check values
+
+    // end
     test_deinit();
 }
 
@@ -185,10 +237,14 @@ void test_fn_AND(void) {
         return;
     }
 
-// start test
+    // create cell test
 
-// end test
+    // end create cell test
+    ladder_task((void*) &ladder_ctx);
 
+    // check values
+
+    // end
     test_deinit();
 }
 
@@ -200,10 +256,14 @@ void test_fn_COIL(void) {
         return;
     }
 
-// start test
+    // create cell test
 
-// end test
+    // end create cell test
+    ladder_task((void*) &ladder_ctx);
 
+    // check values
+
+    // end
     test_deinit();
 }
 
@@ -215,10 +275,14 @@ void test_fn_COILL(void) {
         return;
     }
 
-// start test
+    // create cell test
 
-// end test
+    // end create cell test
+    ladder_task((void*) &ladder_ctx);
 
+    // check values
+
+    // end
     test_deinit();
 }
 
@@ -230,10 +294,14 @@ void test_fn_COILU(void) {
         return;
     }
 
-// start test
+    // create cell test
 
-// end test
+    // end create cell test
+    ladder_task((void*) &ladder_ctx);
 
+    // check values
+
+    // end
     test_deinit();
 }
 
@@ -245,10 +313,14 @@ void test_fn_CONN(void) {
         return;
     }
 
-// start test
+    // create cell test
 
-// end test
+    // end create cell test
+    ladder_task((void*) &ladder_ctx);
 
+    // check values
+
+    // end
     test_deinit();
 }
 
@@ -260,10 +332,14 @@ void test_fn_CTD(void) {
         return;
     }
 
-// start test
+    // create cell test
 
-// end test
+    // end create cell test
+    ladder_task((void*) &ladder_ctx);
 
+    // check values
+
+    // end
     test_deinit();
 }
 
@@ -275,10 +351,14 @@ void test_fn_CTU(void) {
         return;
     }
 
-// start test
+    // create cell test
 
-// end test
+    // end create cell test
+    ladder_task((void*) &ladder_ctx);
 
+    // check values
+
+    // end
     test_deinit();
 }
 
@@ -290,10 +370,14 @@ void test_fn_DIV(void) {
         return;
     }
 
-// start test
+    // create cell test
 
-// end test
+    // end create cell test
+    ladder_task((void*) &ladder_ctx);
 
+    // check values
+
+    // end
     test_deinit();
 }
 
@@ -305,10 +389,14 @@ void test_fn_EQ(void) {
         return;
     }
 
-// start test
+    // create cell test
 
-// end test
+    // end create cell test
+    ladder_task((void*) &ladder_ctx);
 
+    // check values
+
+    // end
     test_deinit();
 }
 
@@ -320,10 +408,14 @@ void test_fn_FE(void) {
         return;
     }
 
-// start test
+    // create cell test
 
-// end test
+    // end create cell test
+    ladder_task((void*) &ladder_ctx);
 
+    // check values
+
+    // end
     test_deinit();
 }
 
@@ -335,10 +427,14 @@ void test_fn_FOREIGN(void) {
         return;
     }
 
-// start test
+    // create cell test
 
-// end test
+    // end create cell test
+    ladder_task((void*) &ladder_ctx);
 
+    // check values
+
+    // end
     test_deinit();
 }
 
@@ -350,10 +446,14 @@ void test_fn_GE(void) {
         return;
     }
 
-// start test
+    // create cell test
 
-// end test
+    // end create cell test
+    ladder_task((void*) &ladder_ctx);
 
+    // check values
+
+    // end
     test_deinit();
 }
 
@@ -365,10 +465,14 @@ void test_fn_GT(void) {
         return;
     }
 
-// start test
+    // create cell test
 
-// end test
+    // end create cell test
+    ladder_task((void*) &ladder_ctx);
 
+    // check values
+
+    // end
     test_deinit();
 }
 
@@ -380,10 +484,14 @@ void test_fn_LE(void) {
         return;
     }
 
-// start test
+    // create cell test
 
-// end test
+    // end create cell test
+    ladder_task((void*) &ladder_ctx);
 
+    // check values
+
+    // end
     test_deinit();
 }
 
@@ -395,10 +503,14 @@ void test_fn_LT(void) {
         return;
     }
 
-// start test
+    // create cell test
 
-// end test
+    // end create cell test
+    ladder_task((void*) &ladder_ctx);
 
+    // check values
+
+    // end
     test_deinit();
 }
 
@@ -410,10 +522,14 @@ void test_fn_MOD(void) {
         return;
     }
 
-// start test
+    // create cell test
 
-// end test
+    // end create cell test
+    ladder_task((void*) &ladder_ctx);
 
+    // check values
+
+    // end
     test_deinit();
 }
 
@@ -425,10 +541,14 @@ void test_fn_MOVE(void) {
         return;
     }
 
-// start test
+    // create cell test
 
-// end test
+    // end create cell test
+    ladder_task((void*) &ladder_ctx);
 
+    // check values
+
+    // end
     test_deinit();
 }
 
@@ -440,10 +560,14 @@ void test_fn_MUL(void) {
         return;
     }
 
-// start test
+    // create cell test
 
-// end test
+    // end create cell test
+    ladder_task((void*) &ladder_ctx);
 
+    // check values
+
+    // end
     test_deinit();
 }
 
@@ -455,10 +579,14 @@ void test_fn_NC(void) {
         return;
     }
 
-// start test
+    // create cell test
 
-// end test
+    // end create cell test
+    ladder_task((void*) &ladder_ctx);
 
+    // check values
+
+    // end
     test_deinit();
 }
 
@@ -470,10 +598,14 @@ void test_fn_NE(void) {
         return;
     }
 
-// start test
+    // create cell test
 
-// end test
+    // end create cell test
+    ladder_task((void*) &ladder_ctx);
 
+    // check values
+
+    // end
     test_deinit();
 }
 
@@ -485,10 +617,14 @@ void test_fn_NEG(void) {
         return;
     }
 
-// start test
+    // create cell test
 
-// end test
+    // end create cell test
+    ladder_task((void*) &ladder_ctx);
 
+    // check values
+
+    // end
     test_deinit();
 }
 
@@ -500,10 +636,14 @@ void test_fn_NO(void) {
         return;
     }
 
-// start test
+    // create cell test
 
-// end test
+    // end create cell test
+    ladder_task((void*) &ladder_ctx);
 
+    // check values
+
+    // end
     test_deinit();
 }
 
@@ -515,10 +655,14 @@ void test_fn_NOP(void) {
         return;
     }
 
-// start test
+    // create cell test
 
-// end test
+    // end create cell test
+    ladder_task((void*) &ladder_ctx);
 
+    // check values
+
+    // end
     test_deinit();
 }
 
@@ -530,10 +674,14 @@ void test_fn_NOT(void) {
         return;
     }
 
-// start test
+    // create cell test
 
-// end test
+    // end create cell test
+    ladder_task((void*) &ladder_ctx);
 
+    // check values
+
+    // end
     test_deinit();
 }
 
@@ -545,10 +693,14 @@ void test_fn_OR(void) {
         return;
     }
 
-// start test
+    // create cell test
 
-// end test
+    // end create cell test
+    ladder_task((void*) &ladder_ctx);
 
+    // check values
+
+    // end
     test_deinit();
 }
 
@@ -560,10 +712,14 @@ void test_fn_RE(void) {
         return;
     }
 
-// start test
+    // create cell test
 
-// end test
+    // end create cell test
+    ladder_task((void*) &ladder_ctx);
 
+    // check values
+
+    // end
     test_deinit();
 }
 
@@ -575,10 +731,14 @@ void test_fn_ROL(void) {
         return;
     }
 
-// start test
+    // create cell test
 
-// end test
+    // end create cell test
+    ladder_task((void*) &ladder_ctx);
 
+    // check values
+
+    // end
     test_deinit();
 }
 
@@ -590,10 +750,14 @@ void test_fn_ROR(void) {
         return;
     }
 
-// start test
+    // create cell test
 
-// end test
+    // end create cell test
+    ladder_task((void*) &ladder_ctx);
 
+    // check values
+
+    // end
     test_deinit();
 }
 
@@ -605,10 +769,14 @@ void test_fn_SHL(void) {
         return;
     }
 
-// start test
+    // create cell test
 
-// end test
+    // end create cell test
+    ladder_task((void*) &ladder_ctx);
 
+    // check values
+
+    // end
     test_deinit();
 }
 
@@ -620,10 +788,14 @@ void test_fn_SHR(void) {
         return;
     }
 
-// start test
+    // create cell test
 
-// end test
+    // end create cell test
+    ladder_task((void*) &ladder_ctx);
 
+    // check values
+
+    // end
     test_deinit();
 }
 
@@ -635,10 +807,14 @@ void test_fn_SUB(void) {
         return;
     }
 
-// start test
+    // create cell test
 
-// end test
+    // end create cell test
+    ladder_task((void*) &ladder_ctx);
 
+    // check values
+
+    // end
     test_deinit();
 }
 
@@ -650,10 +826,14 @@ void test_fn_TMOVE(void) {
         return;
     }
 
-// start test
+    // create cell test
 
-// end test
+    // end create cell test
+    ladder_task((void*) &ladder_ctx);
 
+    // check values
+
+    // end
     test_deinit();
 }
 
@@ -665,10 +845,14 @@ void test_fn_TOF(void) {
         return;
     }
 
-// start test
+    // create cell test
 
-// end test
+    // end create cell test
+    ladder_task((void*) &ladder_ctx);
 
+    // check values
+
+    // end
     test_deinit();
 }
 
@@ -680,10 +864,14 @@ void test_fn_TON(void) {
         return;
     }
 
-// start test
+    // create cell test
 
-// end test
+    // end create cell test
+    ladder_task((void*) &ladder_ctx);
 
+    // check values
+
+    // end
     test_deinit();
 }
 
@@ -695,10 +883,14 @@ void test_fn_TP(void) {
         return;
     }
 
-// start test
+    // create cell test
 
-// end test
+    // end create cell test
+    ladder_task((void*) &ladder_ctx);
 
+    // check values
+
+    // end
     test_deinit();
 }
 
@@ -710,10 +902,14 @@ void test_fn_XOR(void) {
         return;
     }
 
-// start test
+    // create cell test
 
-// end test
+    // end create cell test
+    ladder_task((void*) &ladder_ctx);
 
+    // check values
+
+    // end
     test_deinit();
 }
 
