@@ -49,13 +49,13 @@
  * @def LADDERLIB_VERSION_MINOR
  * @brief Indicate some change on API or opcode or very important correction in functionality
  */
-#define LADDERLIB_VERSION_MINOR 4
+#define LADDERLIB_VERSION_MINOR 5
 
 /**
  * @def LADDERLIB_VERSION_PATCH
  * @brief Indicate some minor change or correction
  */
-#define LADDERLIB_VERSION_PATCH 1
+#define LADDERLIB_VERSION_PATCH 0
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
