@@ -146,15 +146,15 @@ int main(void) {
     uint8_t err = 0;
     ladder_prg_check_t err_prg_check;
 
+    // clear screen
+    printf("\e[1;1H\e[2J");
+
     if (!test_ladder_instructions()) {
         exit(1);
     }
 
     // main context
     ladder_ctx_t ladder_ctx;
-
-    // clear screen
-    printf("\e[1;1H\e[2J");
 
     // initialize context
     if (!ladder_ctx_init(&ladder_ctx, 6, 7, 3, QTY_M, QTY_C, QTY_T, QTY_D, QTY_R, 10, 0, true, true, 1000000UL, 100)) {

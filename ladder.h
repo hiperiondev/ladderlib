@@ -147,6 +147,7 @@ typedef enum LADDER_INS_ERROR {
     LADDER_INS_ERR_DIVBYZERO,    /**< Division by zero */
     LADDER_INS_ERR_TYPEMISMATCH, /**< Type mismatch */
     LADDER_INS_ERR_OVERFLOW,     /**< Overflow */
+    LADDER_INS_ERR_NULL,         /**< NULL value */
     //...//
     LADDER_INS_ERR_FAIL,         /**< Generic fail */
 } ladder_ins_err_t;

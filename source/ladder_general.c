@@ -558,7 +558,7 @@ bool ladder_ctx_deinit(ladder_ctx_t *ladder_ctx) {
     ladder_ctx->output = NULL;
 
 #ifdef OPTIONAL_CRON
-    if (((ladderlib_cron_t*) ladder_ctx->cron)->ctx != NULL)
+    if (((ladderlib_cron_t*) ladder_ctx->cron) != NULL && ((ladderlib_cron_t*) ladder_ctx->cron)->ctx != NULL)
         ladderlib_cron_deinit(ladder_ctx);
     free(ladder_ctx->cron);
     ladder_ctx->cron = NULL;
@@ -743,6 +743,7 @@ bool ladder_add_foreign(ladder_ctx_t *ladder_ctx, _foreign_fn_init fn_init, void
 
 bool ladder_fn_cell(ladder_ctx_t *ladder_ctx, uint32_t network, uint32_t row, uint32_t column, ladder_instruction_t function, uint32_t foreign_id) {
     if (ladder_ctx == NULL) {
+        ladder_ctx->ladder.last.err = LADDER_INS_ERR_NULL;
         return false;
     }
 
@@ -781,7 +782,7 @@ bool ladder_fn_cell(ladder_ctx_t *ladder_ctx, uint32_t network, uint32_t row, ui
 
     // Full span check for all cells (including starting) to be INV before any modifications
     for (uint8_t r = 0; r < actual_ioc.cells; r++) {
-        if (ladder_ctx->network[network].cells[row + r][column].code != LADDER_INS_INV) {
+        if (ladder_ctx->network[network].cells[row + r][column].code != LADDER_INS_NOP) {
             ladder_ctx->ladder.last.err = LADDER_INS_ERR_FAIL;  // Occupied cell in span
             return false;
         }
